@@ -285,3 +285,20 @@ def test_model_edits_protect_against_template_regeneration(tmp_path):
     assert source.read_text() == GOOD
     again=generate_revision(project,"change again",generator=lambda p,max_new_tokens: GOOD.replace("Hello from generated code","A second version"))
     assert again["status"] == "PREVIEW"
+
+
+def test_checkpoint_without_tokenizer_provenance_is_refused(tmp_path):
+    import torch
+    from sagallm.config import ModelConfig
+    from sagallm.model import SagaTransformer
+    from sagallm.tokenization import ByteBPETokenizer
+    from sagallm.training import checkpoint_save
+    tok = tmp_path / "tok.json"
+    ByteBPETokenizer().save(tok)
+    cfg = ModelConfig(vocab_size=320,hidden_size=32,num_layers=1,num_heads=4,
+                      num_kv_heads=2,intermediate_size=64,max_position_embeddings=64)
+    model = SagaTransformer(cfg)
+    ck = tmp_path / "old.pt"
+    checkpoint_save(ck, model, torch.optim.AdamW(model.parameters()), 0, cfg, {})
+    with pytest.raises(ValueError, match="lacks tokenizer SHA-256 provenance"):
+        LocalCheckpointGenerator(ck, tok)

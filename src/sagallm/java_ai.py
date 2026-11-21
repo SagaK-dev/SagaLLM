@@ -134,6 +134,8 @@ class LocalCheckpointGenerator:
         # weights_only=True avoids general-purpose pickle loading, but inputs
         # must still come from a trusted source.
         state = torch.load(self.checkpoint, map_location="cpu", weights_only=True)
+        if not state.get("train_state", {}).get("tokenizer_sha256"):
+            raise ValueError("Checkpoint lacks tokenizer SHA-256 provenance; cannot confirm vocabulary identity")
         config = ModelConfig(**state["config"])
         if config.parameter_count() > MAX_UNCONFIRMED_PARAMETERS:
             raise ValueError("Loading >200M-parameter models is blocked in Java assistant mode")
