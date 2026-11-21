@@ -23,6 +23,11 @@ jobs:
       - uses: actions/setup-python@v6
         with:
           python-version: '3.11'
+      - name: Install JDK for Java starter compile and run smoke tests
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '21'
       - name: Install CPU-only PyTorch and project extras
         run: |
           python -m pip install --upgrade pip

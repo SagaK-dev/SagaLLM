@@ -43,3 +43,11 @@ See [MMLU_REFERENCE.md](MMLU_REFERENCE.md) for limits.
 - MPS, CUDA, BF16 real GPU tests: **NOT_RUN**, because no compatible GPU exists in this development container.
 - Real physical machine operator attestation and multi-GPU training: **NOT_ATTESTED / NOT_RUN**.
 - GitHub-hosted CPU CI for v0.8: **PENDING** until workflow runs.
+
+## v0.9 Java natural-language starters
+
+- `sagallm java new/chat/revise/templates/check/run`: IMPLEMENTED, local deterministic templates only.
+- Nine Java tasks (hello, calculator, FizzBuzz, guessing game, TODO, prime, factorial, file reader, Swing): CPU/JDK COMPILE TESTED where JDK is installed.
+- JDK compile and intentional Java run: LOCAL_TESTED; **not a sandbox**.
+- Arbitrary prompt-to-Java by trained SagaLLM: NOT_IMPLEMENTED / NOT_TRAINED. Do not claim general vibe coding.
+- IDE integration, autonomous file edits, automatic dependency management, automatic fixing of compile errors: NOT_IMPLEMENTED.

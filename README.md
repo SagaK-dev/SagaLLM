@@ -1,6 +1,6 @@
 # SagaLLM
 
-**Prototype v0.8.0** — offline 5-shot MMLU-style evaluation, SHA-pinned dataset review, local hardware diagnostics, and CPU/Gloo readiness tests. The model itself remains experimental and untrained at 1B/3B scale.
+**Prototype v0.9.0** — offline 5-shot MMLU-style evaluation, SHA-pinned dataset review, local hardware diagnostics, and CPU/Gloo readiness tests. The model itself remains experimental and untrained at 1B/3B scale.
 
 A local-first **from-scratch** decoder-only language model research project. The model uses native PyTorch implementations of RMSNorm, rotary embeddings, grouped-query attention, SwiGLU and a tied token embedding / language-modeling head. The repository includes a small educational byte-level BPE tokenizer, disk-backed JSONL / uint32 token shards, deterministic document splits, resumable single-device training, supervised fine-tuning, held-out token-level validation, an optional local inference API, and greedy/sampling generation.
 
@@ -33,6 +33,30 @@ python -m pytest -q
 ```
 
 The `examples/toy_corpus.txt` is an artificial, repository-authored smoke-test corpus; it is **not** a licensed large-scale language training dataset. The `--license CC0-1.0` shown for this repository-authored demo does not certify permissions for third-party materials. `data/`, `checkpoints/` and binary model weights are gitignored. The default Python tokenizer is intentionally simple. The optional Rust-backed tokenizer can be selected with `--backend hf` (see `docs/TOKENIZERS.md`).
+
+## Java natural-language starter workflow (v0.9)
+
+For **simple Java** tasks, SagaLLM now provides local, interactive starter generation,
+reviewed revisions and optional JDK compile/run checks. This is **not** a trained
+Java code-generating LLM: it recognizes nine explicit tasks, rejects unsupported
+requests and runs without network access or pretrained model weights.
+
+```bash
+sagallm java templates
+sagallm java chat --project work/my-java
+# Or use noninteractive commands:
+sagallm java new --prompt 'FizzBuzzを30まで表示' --output work/fizzbuzz
+sagallm java check --project work/fizzbuzz
+sagallm java revise --project work/fizzbuzz --prompt '50までに変更'  # preview only
+sagallm java revise --project work/fizzbuzz --prompt '50までに変更' --apply
+# Only on trusted generated code; NOT SANDBOXED:
+sagallm java run --project work/fizzbuzz --trust-local-code
+```
+
+A local **JDK 17+** is needed to compile. Never run untrusted Java through the
+experimental runner: Java can access the host filesystem and network.
+See [docs/JAVA_VIBE.md](docs/JAVA_VIBE.md) (Japanese and English examples) for
+supported project types, iteration flow and limitations.
 
 ## Design constraints
 
@@ -141,6 +165,7 @@ GitHub Actions v0.5 CPU CI passed (53 tests, run 44905032184), including native 
 - `docs/DEPENDENCIES.md` — upstream references and license metadata.
 - `docs/HARDWARE.md` — local runtime limitations and resource estimation.
 - `docs/STATUS.md` — implemented/unimplemented feature matrix.
+- `docs/JAVA_VIBE.md` — offline Java starter creation, conversational revision, compile/run safety and limits.
 - `docs/TOKENIZERS.md` — optional native BPE, format identity and limitations.
 - `docs/BENCHMARKS.md` — offline multiple-choice scoring and contamination audit.
 - `docs/HF_EXPORT.md` — custom Transformers load and safetensors validation.
