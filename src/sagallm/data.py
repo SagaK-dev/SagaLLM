@@ -58,7 +58,8 @@ def read_documents(path: str | Path) -> Iterator[str]:
 
 
 def prepare_data(source: str | Path, output: str | Path, license_id: str,
-                 seed: int = 42, validation_fraction: float = 0.1) -> dict:
+                 seed: int = 42, validation_fraction: float = 0.1,
+                 dataset_card_path: str | Path | None = None) -> dict:
     """Legacy in-memory text splitting; use data shard for near-duplicate removal.
 
     Privacy screening is heuristic; no comprehensive detection is claimed.
@@ -68,6 +69,11 @@ def prepare_data(source: str | Path, output: str | Path, license_id: str,
     if not 0 < validation_fraction < 1:
         raise ValueError("validation_fraction must be strictly between 0 and 1")
     from .curation import sensitive_reason
+    card_review = None
+    if dataset_card_path is not None:
+        from .dataset_cards import verify_dataset_card
+        card_review = verify_dataset_card(source, dataset_card_path, purpose="train",
+                                          expected_license=license_id)
 
     seen = set()
     clean = []
@@ -99,6 +105,7 @@ def prepare_data(source: str | Path, output: str | Path, license_id: str,
               "validation_fraction": validation_fraction, "split_counts": {k: len(v) for k,v in splits.items()},
               "rejected": rejected, "unique_documents": len(clean),
               "source_sha256": hashlib.sha256(Path(source).read_bytes()).hexdigest(),
+              "dataset_card_review": card_review,
               "known_limitations": ["exact dedup only", "regex-based sensitive-data detection only", "in-memory dedup"]}
     (destination / "manifest.json").write_text(json.dumps(report, indent=2, ensure_ascii=False), encoding="utf-8")
     return report

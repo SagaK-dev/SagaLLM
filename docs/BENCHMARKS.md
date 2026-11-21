@@ -1,4 +1,4 @@
-# Reproducible offline benchmark harness (v0.4)
+# Reproducible offline benchmark harness (v0.6)
 
 SagaLLM provides **local multiple-choice likelihood scoring**. This is an evaluation harness, **not** a certified standard-benchmark result. It does not bundle, download, endorse or redistribute third-party datasets. Users must review benchmark licenses and data access rights themselves.
 
@@ -45,3 +45,15 @@ The CLI refuses to overwrite a report file. Output includes checkpoint/tokenizer
 - The algorithm does not detect paraphrases, partial question/answer leaks, semantic contamination, untracked prior training, or contamination of external models. `NO_EXACT_SUBSTRING_FOUND` is **not** a guarantee of data independence.
 
 The `--license` argument is a user assertion, not automatic proof of usage rights. The toy examples are repository-authored evaluation smoke tests; any computed score is not a useful measure of actual model skill.
+
+## v0.6 protocol and license-review additions
+
+- Each JSONL question may specify a `subject`; the report includes per-subject correct/count/accuracy and unweighted macro-subject accuracy. Unspecified subjects are grouped under `unspecified`.
+- The MMLU-style prompt builder remains **zero-shot** with a fixed SagaLLM template. It has **not** been checked against official MMLU prompting, few-shot selection, or evaluation scripts. `protocol_id` in the report prevents mistaking this for an official score.
+- A Wilson 95% binomial interval is included for descriptive uncertainty. Benchmark records are usually **not a random independent sample**; this interval must not be presented as a guarantee about unseen questions.
+- MMLU-style contamination screening tests the **raw question text**. Previous versions only searched for the rendered prompt (`Question: ... A. ... Answer:`) and could miss literal source-question leakage.
+- Optional `--dataset-card` verifies the benchmark file SHA-256, an explicit `evaluate` permission and the independently reviewed license string before any scoring, then records the reviewer attestation. **This is not legal verification**; without a card, the report marks the license as unverified.
+- Only normalized exact raw-question/prompt substring overlap is detected. Answer-option leakage, paraphrased questions, benchmark content in untracked upstream data, and partial training on the evaluation set can still be missed.
+- Evaluation is still local zero-shot continuation log-likelihood with independently tokenized suffixes. Tokenization of prompt plus suffix can differ across BPE boundaries; use a consistent tokenizer and scoring policy for all runs. These scores are **not** official MMLU results.
+
+Candidate source for optional user-provided data: https://huggingface.co/datasets/cais/mmlu (dataset card lists MIT; review exact version and terms before use). No download is performed by SagaLLM.

@@ -1,3 +1,12 @@
+## v0.6 offline evaluation and dataset-attestation work (2026-11-21)
+
+- `dataset_cards.py`: added a purpose-scoped (`train`, `evaluate`, `redistribute`), human-asserted dataset review record validated against the exact file bytes using SHA-256. It is not a legal-verification service. No automatic license approval or network fetch is performed.
+- `benchmarks.py`: MMLU-style contamination audit now checks the original question rather than only the rendered zero-shot prompt; subject-level and macro accuracy, descriptive Wilson 95% interval, and explicit non-official protocol IDs are included in evaluation output.
+- Optional `--dataset-card` for `data prepare`, `data shard`, `benchmark` and `sagallm data verify-license` CLI. Existing no-card workflows remain allowed but remain unverified.
+- `tests/test_dataset_cards.py` and `tests/test_benchmark_protocol.py`: validate tamper rejection, purpose restriction, raw-question leakage checks, CLI and real tiny-model per-subject scoring.
+- Development container Python 3.13 CPU: 56 PASS, 4 SKIP (optional dependencies unavailable). Hosted CI result must be checked separately.
+- NOT_DONE: downloaded or officially evaluated MMLU data, legal rights verification, approved third-party training data, GPU hardware tests, 1B/3B training.
+
 ## v0.5 native Transformers export (2026-11-21)
 
 - Added local-only, overwrite-refusing export of trusted SagaLLM checkpoints into safetensors and custom Transformers configuration/model loader files.

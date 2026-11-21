@@ -6,6 +6,8 @@ bundled or verified standard benchmark. It never fetches external datasets.
 from __future__ import annotations
 
 import hashlib
+from collections import defaultdict
+import math
 import json
 from pathlib import Path
 from typing import Iterator
@@ -48,12 +50,17 @@ def read_questions(path: str | Path, *, format: str = 'choices', max_examples: i
                 question = item.get('question')
                 options = item.get('choices')
                 answer = item.get('answer')
-                if not isinstance(question, str) or not question.strip() or not isinstance(options, list) or len(options) != 4:
+                if (not isinstance(question, str) or not question.strip() or
+                    not isinstance(options, list) or len(options) != 4 or
+                    not all(isinstance(value, str) and value.strip() and len(value) <= 2048
+                            for value in options)):
                     raise ValueError(f'Invalid MMLU-style record at line {line_no}')
                 if isinstance(answer, str):
                     answer = ord(answer.upper()) - ord('A') if len(answer) == 1 and answer.upper() in 'ABCD' else -1
                 item = {
                     'id': item.get('id', f'line-{line_no}'),
+                    'source_question': question,
+                    'subject': item.get('subject', 'unspecified'),
                     'prompt': 'Question: ' + question + '\n' + '\n'.join(
                         f'{"ABCD"[i]}. {value}' for i, value in enumerate(options)) + '\nAnswer:',
                     'choices': [' A', ' B', ' C', ' D'],
@@ -70,8 +77,13 @@ def read_questions(path: str | Path, *, format: str = 'choices', max_examples: i
                 raise ValueError(f'Invalid choices at line {line_no}')
             if type(answer) is not int or not 0 <= answer < len(choices):
                 raise ValueError(f'Invalid answer_index at line {line_no}')
+            subject = item.get('subject', 'unspecified')
+            if not isinstance(subject, str) or not subject.strip() or len(subject) > 128:
+                raise ValueError(f'Invalid subject at line {line_no}')
             seen.add(name)
-            result.append({'id': name, 'prompt': prompt, 'choices': choices, 'answer_index': answer})
+            result.append({'id': name, 'prompt': prompt, 'choices': choices,
+                           'answer_index': answer, 'subject': subject,
+                           'source_question': question if format == 'mmlu' else prompt})
             if len(result) > max_examples:
                 raise ValueError('Benchmark exceeds --max-examples')
     if not result:
@@ -104,7 +116,11 @@ def audit_contamination(questions: list[dict], training_docs: str | Path) -> dic
     Only prompts >= 24 normalized characters are screened. Short prompts
     are *unverifiable*, not automatically cleared.
     """
-    candidates = {q['id']: normalized_text(q['prompt']) for q in questions}
+    # For MMLU-style input use the *raw* question rather than the rendered
+    # 'Question: ... A. ... Answer:' evaluation template. Training documents
+    # may contain the original question but not the generated template.
+    candidates = {q['id']: normalized_text(q.get('source_question', q['prompt']))
+                  for q in questions}
     short = sorted(name for name, prompt in candidates.items() if len(prompt) < 24)
     checked = {name: prompt for name, prompt in candidates.items() if len(prompt) >= 24}
     matches: set[str] = set()
@@ -117,7 +133,7 @@ def audit_contamination(questions: list[dict], training_docs: str | Path) -> dic
         'status': 'FOUND' if matches else ('INCOMPLETE' if short else 'NO_EXACT_SUBSTRING_FOUND'),
         'matched_ids': sorted(matches), 'unchecked_short_ids': short,
         'train_documents_scanned': documents,
-        'method': 'NFKC+casefold+whitespace exact prompt substring; NO semantic or paraphrase screening',
+        'method': 'NFKC+casefold+whitespace exact raw-question/prompt substring; NO semantic or paraphrase screening',
     }
 
 
@@ -141,7 +157,8 @@ def evaluate_choices(checkpoint: str | Path, tokenizer_path: str | Path, data_pa
                      *, license_id: str, format: str = 'choices',
                      training_docs: str | Path | None = None,
                      allow_contaminated: bool = False, device_name: str = 'cpu',
-                     max_examples: int = 1000, scoring: str = 'mean') -> dict:
+                     max_examples: int = 1000, scoring: str = 'mean',
+                     dataset_card_path: str | Path | None = None) -> dict:
     """Score each choice's continuation tokens, report reproducible accuracy.
 
     If no train documents are available, contamination is explicitly NOT_CHECKED.
@@ -149,6 +166,11 @@ def evaluate_choices(checkpoint: str | Path, tokenizer_path: str | Path, data_pa
     """
     if scoring not in ('mean', 'sum') or not _valid_license(license_id):
         raise ValueError('Provide a reviewed benchmark license and a valid scoring mode')
+    card_review = None
+    if dataset_card_path is not None:
+        from .dataset_cards import verify_dataset_card
+        card_review = verify_dataset_card(data_path, dataset_card_path, purpose='evaluate',
+                                          expected_license=license_id)
     questions = read_questions(data_path, format=format, max_examples=max_examples)
     audit = ({'status':'NOT_CHECKED', 'matched_ids': [], 'unchecked_short_ids': [],
               'method':'No --train-docs provided; corpus overlap unknown'}
@@ -183,15 +205,35 @@ def evaluate_choices(checkpoint: str | Path, tokenizer_path: str | Path, data_pa
     checkpoint_load(checkpoint, model)
     model.to(device).eval()
     rows, passed = [], 0
+    by_subject = defaultdict(lambda: {'questions': 0, 'correct': 0})
     for q in questions:
         scores = [_choice_score(model, tokenizer, q['prompt'], option, device, scoring)
                   for option in q['choices']]
         predicted = max(range(len(scores)), key=lambda i: scores[i])
         passed += predicted == q['answer_index']
-        rows.append({'id': q['id'], 'prediction': predicted, 'answer_index': q['answer_index'],
+        group = by_subject[q['subject']]
+        group['questions'] += 1
+        group['correct'] += int(predicted == q['answer_index'])
+        rows.append({'id': q['id'], 'subject': q['subject'], 'prediction': predicted, 'answer_index': q['answer_index'],
                      'correct': predicted == q['answer_index'], 'choice_log_prob_scores': scores})
+    groups = {subject: {'questions': group['questions'], 'correct': group['correct'],
+                        'accuracy': group['correct'] / group['questions']}
+              for subject, group in sorted(by_subject.items())}
+    # Wilson 95% interval is descriptive, not a guarantee for a fixed dataset.
+    n, z = len(rows), 1.96
+    phat = passed / n
+    center = (phat + z*z/(2*n)) / (1 + z*z/n)
+    radius = z * math.sqrt(phat*(1-phat)/n + z*z/(4*n*n)) / (1 + z*z/n)
     return {
         'evaluation_type': 'local_multiple_choice_loglikelihood',
+        'protocol_id': 'sagallm-mmlu-style-zero-shot-v1' if format == 'mmlu'
+                       else 'sagallm-choices-zero-shot-v1',
+        'protocol_note': ('Not official MMLU: no prescribed subject/few-shot/split protocol; '
+                          'choices are independently tokenized as suffix continuations.'),
+        'num_shots': 0,
+        'subject_accuracy': groups,
+        'macro_subject_accuracy': sum(g['accuracy'] for g in groups.values()) / len(groups),
+        'wilson_95_interval': [max(0.0, center-radius), min(1.0, center+radius)],
         'standard_benchmark_certified': False,
         'format': format, 'scoring': scoring, 'questions': len(rows),
         'accuracy': passed/len(rows), 'correct': passed,
@@ -199,5 +241,6 @@ def evaluate_choices(checkpoint: str | Path, tokenizer_path: str | Path, data_pa
         'tokenizer_sha256': sha256_file(tokenizer_path),
         'benchmark_data_sha256': sha256_file(data_path),
         'benchmark_license_user_asserted': license_id,
+        'dataset_card_review': card_review,
         'device': str(device), 'contamination': audit, 'results': rows,
     }

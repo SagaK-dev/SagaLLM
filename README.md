@@ -1,6 +1,6 @@
 # SagaLLM
 
-**Prototype v0.5.0** — local Transformers custom-model export, optional fast tokenizer, offline evaluation and corpus overlap audit.
+**Prototype v0.6.0** — source-pinned dataset review cards, stronger MMLU-style contamination checks and subject-level evaluation, plus v0.5 Transformers export.
 
 A local-first **from-scratch** decoder-only language model research project. The model uses native PyTorch implementations of RMSNorm, rotary embeddings, grouped-query attention, SwiGLU and a tied token embedding / language-modeling head. The repository includes a small educational byte-level BPE tokenizer, disk-backed JSONL / uint32 token shards, deterministic document splits, resumable single-device training, supervised fine-tuning, held-out token-level validation, an optional local inference API, and greedy/sampling generation.
 
@@ -43,7 +43,7 @@ The `examples/toy_corpus.txt` is an artificial, repository-authored smoke-test c
 - Checkpoints should only be loaded from trusted locations. Resume verifies corpus, tokenizer SHA-256, schedule horizon and hyperparameters. When resuming, keep `--schedule-steps` unchanged or omit it to inherit the checkpoint value.
 - Inference restricts generated token IDs to the tokenizer's vocabulary and checks checkpoint/tokenizer identity when provenance is available.
 - The token-shard pipeline uses SQLite-backed exact and heuristic near-duplicate document deduplication, deterministic splits and disk-backed binary tokens. See `docs/DATA_PIPELINE.md`. It provides conservative near-duplicate removal and basic sensitive-pattern screening; neither can guarantee removal of paraphrases or all personal information.
-- Data preparation requires a manually reviewed license identifier; pattern-based privacy screening is not a complete PII solution.
+- Data preparation supports optional SHA-pinned human-review cards; a license identifier or card is not proof of rights. Pattern-based privacy screening is not a complete PII solution.
 - CPU smoke tests must not be represented as CUDA/MPS tests.
 
 ## Scope and limitations
@@ -67,6 +67,24 @@ sagallm benchmark --checkpoint checkpoints/tiny.pt --tokenizer data/tokenizer.js
 ```
 
 Without `--train-docs`, the report explicitly states that contamination has **not been checked**. For vetted document-shard training corpora, pass `--train-docs data/prepared` and refer to `docs/BENCHMARKS.md`. The adapter supports local MMLU-style four-choice JSONL but does not claim official leaderboard comparability. No external datasets are downloaded.
+
+## Dataset review cards and benchmark protocol v0.6
+
+Offline usage-review cards can bind dataset bytes to a human review, specified permitted use and SHA-256. This **does not prove license compliance**; it prevents a different or modified local file being used under a recorded review. Existing flags remain available but are unverified without a card.
+
+```bash
+# Start with examples/dataset-card.template.json (all placeholder values are unapproved).
+# After independently verifying rights, fill it and calculate the source file SHA-256.
+sagallm data verify-license --source /path/to/source.jsonl --card /path/to/card.json --purpose train
+sagallm data shard --source /path/to/source.jsonl --output data/new-prepared \
+  --license REVIEWED_LICENSE_ID --dataset-card /path/to/card.json
+# Use a separate review card explicitly allowing 'evaluate' for benchmark data.
+sagallm benchmark --checkpoint checkpoints/tiny.pt --tokenizer data/tokenizer.json \
+  --data /path/to/mmlu-style.jsonl --format mmlu --license REVIEWED_LICENSE_ID \
+  --dataset-card /path/to/benchmark-card.json --output reports/local-eval.json
+```
+
+The MMLU-style reader now checks normalized **raw questions** (not solely generated prompts) for train-corpus leakage, and reports subject-level and macro accuracy and a Wilson interval. It remains **zero-shot, local and not officially standardized**. These scores are not comparable to an official MMLU leaderboard; no benchmark dataset has been downloaded or scored. See `docs/DATASET_CARDS.md` and `docs/BENCHMARKS.md`.
 
 ## Local Transformers-compatible model export (v0.5)
 
@@ -110,7 +128,7 @@ python -m pip install -e ".[test,serve]"
 python scripts/check_cpu.py
 ```
 
-GitHub Actions v0.5 CPU CI passed (52 tests, run 44904787682) with custom Transformers model load/generation and the native tokenizer (prior to the final documentation update). A successful CPU CI run is not GPU validation.
+GitHub Actions v0.5 CPU CI passed (53 tests, run 44905032184), including native tokenizer and Transformers model loading/generation. A successful CPU CI run is not GPU validation.
 
 ## Licensing
 
@@ -126,6 +144,7 @@ GitHub Actions v0.5 CPU CI passed (52 tests, run 44904787682) with custom Transf
 - `docs/TOKENIZERS.md` — optional native BPE, format identity and limitations.
 - `docs/BENCHMARKS.md` — offline multiple-choice scoring and contamination audit.
 - `docs/HF_EXPORT.md` — custom Transformers load and safetensors validation.
+- `docs/DATASET_CARDS.md` — offline dataset rights-review attestations and SHA verification.
 
 ## API safety notes
 
