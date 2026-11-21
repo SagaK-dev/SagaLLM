@@ -115,6 +115,11 @@ def main(argv: list[str] | None = None) -> None:
     bench.add_argument("--scoring", choices=("mean", "sum"), default="mean")
     bench.add_argument("--device", default="cpu")
     bench.add_argument("--output", help="Write a JSON report (refuses overwrite)")
+    exp = sub.add_parser("export", help="Write a local Transformers-compatible safetensors bundle")
+    exp.add_argument("--checkpoint", required=True)
+    exp.add_argument("--tokenizer", required=True)
+    exp.add_argument("--output", required=True, help="New directory; never overwritten")
+    exp.add_argument("--allow-large", action="store_true")
     api = sub.add_parser("serve")
     api.add_argument("--checkpoint", required=True)
     api.add_argument("--tokenizer", required=True)
@@ -191,6 +196,10 @@ def main(argv: list[str] | None = None) -> None:
             output.parent.mkdir(parents=True, exist_ok=True)
             with output.open('x', encoding='utf-8') as report:
                 json.dump(result, report, ensure_ascii=False, indent=2)
+    elif args.command == "export":
+        from .export import export_transformers
+        result = export_transformers(args.checkpoint, args.tokenizer, args.output,
+                                     allow_large=args.allow_large)
     elif args.command == "serve":
         if args.host not in ("127.0.0.1", "localhost", "::1") and not args.api_key:
             parser.error("Non-loopback binding requires --api-key. Use a TLS terminator for external access.")

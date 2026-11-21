@@ -2,7 +2,6 @@
 from __future__ import annotations
 from dataclasses import asdict, dataclass
 from pathlib import Path
-import yaml
 
 
 @dataclass(frozen=True)
@@ -46,6 +45,7 @@ class ModelConfig:
 
     @classmethod
     def load(cls, path: str | Path) -> "ModelConfig":
+        import yaml
         data = yaml.safe_load(Path(path).read_text(encoding="utf-8"))
         if not isinstance(data, dict):
             raise ValueError("Model configuration must be a mapping")

@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.5.0 — Local Hugging Face-compatible model export
+
+- Export trusted SagaLLM checkpoints to CPU safetensors and standalone custom Transformers architecture/configuration files.
+- Preserve tied embeddings without duplicating shared storage, and include immutable SHA-256 provenance for source weights and tokenizer.
+- Map model layer/head parameters to standard Transformers config attributes; use no-cache greedy HF generation by default until interoperable Cache support is verified.
+- Emit HF native `tokenizer.json` and AutoTokenizer metadata for native FastBPE; label legacy Python BPE as incompatible with AutoTokenizer rather than silently changing its IDs.
+- Protect against accidental directory overwrite, tokenizer mismatch, and large-model allocation; export stays local and never uploads weights.
+- GitHub Actions run `44904787682` passed 52 tests; added a second custom-model loading regression for the legacy tokenizer backend and report verified-versus-unverified tokenizer provenance.
+- Add optional Hugging Face loading/forward/greedy tests in CI and documentation; no official benchmark or large-model training.
+
 ## 0.4.0 — Offline evaluation and optional fast tokenizer
 
 - Added optional Hugging Face Tokenizers-based Rust ByteLevel BPE training from a document iterator (`--backend hf`), with its own one-file tokenizer format and backward-compatible loader for the v0.3 Python BPE format.

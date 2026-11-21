@@ -16,3 +16,5 @@ dist/
 *.safetensors
 *.pt
 *.pth
+
+/exports/
