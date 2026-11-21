@@ -1,6 +1,6 @@
 # SagaLLM
 
-**Prototype v0.3.0** — local data curation, verified training resume, and automated CPU tests.
+**Prototype v0.4.0** — optional fast tokenizer, offline multiple-choice evaluation, and corpus overlap audit.
 
 A local-first **from-scratch** decoder-only language model research project. The model uses native PyTorch implementations of RMSNorm, rotary embeddings, grouped-query attention, SwiGLU and a tied token embedding / language-modeling head. The repository includes a small educational byte-level BPE tokenizer, disk-backed JSONL / uint32 token shards, deterministic document splits, resumable single-device training, supervised fine-tuning, held-out token-level validation, an optional local inference API, and greedy/sampling generation.
 
@@ -32,7 +32,7 @@ sagallm train sft --checkpoint checkpoints/tiny.pt --tokenizer data/tokenizer.js
 python -m pytest -q
 ```
 
-The `examples/toy_corpus.txt` is an artificial, repository-authored smoke-test corpus; it is **not** a licensed large-scale language training dataset. The `--license CC0-1.0` shown for this repository-authored demo does not certify permissions for third-party materials. `data/`, `checkpoints/` and binary model weights are gitignored. The tokenizer is simple and intended for learning/testing, not scalable production data pipelines.
+The `examples/toy_corpus.txt` is an artificial, repository-authored smoke-test corpus; it is **not** a licensed large-scale language training dataset. The `--license CC0-1.0` shown for this repository-authored demo does not certify permissions for third-party materials. `data/`, `checkpoints/` and binary model weights are gitignored. The default Python tokenizer is intentionally simple. The optional Rust-backed tokenizer can be selected with `--backend hf` (see `docs/TOKENIZERS.md`).
 
 ## Design constraints
 
@@ -50,7 +50,23 @@ The `examples/toy_corpus.txt` is an artificial, repository-authored smoke-test c
 
 Implemented: native dense causal Transformer, small-scale BPE tokenizer, config validation, CLI diagnostics, TXT/JSON/JSONL/CSV/optional Parquet input, SQLite-backed exact and heuristic near-duplicate filtering, document-level train/validation JSONL shards, disk-backed uint32 token shards, small-device pretraining with integrated validation and checkpoint resume, SFT smoke training, simple held-out token loss/perplexity, localhost-first inference API with basic rate/concurrency controls, KV-cached generation, CPU tests.
 
-Not yet implemented: preference training/DPO, production SFT batching and validation, FlashAttention-specific integration, distributed training, comprehensive privacy screening, guaranteed near-duplicate removal, out-of-core tokenizer training, Hugging Face export, streaming HTTP API, standardized benchmark suite, model distribution, or training of a 1B/3B model. These are planned phases, not completed features.
+Not yet implemented: official standardized benchmark protocol/results, preference training/DPO, production SFT batching and validation, FlashAttention-specific integration, distributed training, comprehensive privacy screening, guaranteed near-duplicate removal, guaranteed bounded-memory tokenizer training, Hugging Face export, streaming HTTP API, official standardized benchmark execution, model distribution, or training of a 1B/3B model. These are planned phases, not completed features.
+
+## Optional fast BPE and offline benchmark harness
+
+```bash
+# Optional CPU-native BPE implementation (downloads the free package if missing):
+python -m pip install -e '.[fast-tokenizer]'
+sagallm tokenizer train --backend hf --data examples/toy_corpus.txt --output data/fast.json --vocab-size 512
+# Existing python tokenizer format remains supported and is the default.
+
+# Simple, offline benchmark smoke test. This is *not* an official MMLU score:
+sagallm benchmark --checkpoint checkpoints/tiny.pt --tokenizer data/tokenizer.json \
+  --data examples/toy_benchmark.jsonl --license CC0-1.0 \
+  --output reports/benchmark-smoke.json
+```
+
+Without `--train-docs`, the report explicitly states that contamination has **not been checked**. For vetted document-shard training corpora, pass `--train-docs data/prepared` and refer to `docs/BENCHMARKS.md`. The adapter supports local MMLU-style four-choice JSONL but does not claim official leaderboard comparability. No external datasets are downloaded.
 
 ## Automatic lightweight CPU CI
 
@@ -61,7 +77,7 @@ python -m pip install -e ".[test,serve]"
 python scripts/check_cpu.py
 ```
 
-The CI workflow was tested syntactically and locally; GitHub Actions status must be checked after triggering a run. A successful CPU CI run is not GPU validation.
+GitHub Actions v0.4 CPU CI passed (48 tests, run 44903131319), including the optional native tokenizer. A successful CPU CI run is not GPU validation.
 
 ## Licensing
 
@@ -74,6 +90,8 @@ The CI workflow was tested syntactically and locally; GitHub Actions status must
 - `docs/DEPENDENCIES.md` — upstream references and license metadata.
 - `docs/HARDWARE.md` — local runtime limitations and resource estimation.
 - `docs/STATUS.md` — implemented/unimplemented feature matrix.
+- `docs/TOKENIZERS.md` — optional native BPE, format identity and limitations.
+- `docs/BENCHMARKS.md` — offline multiple-choice scoring and contamination audit.
 
 ## API safety notes
 

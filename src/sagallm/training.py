@@ -9,7 +9,7 @@ import torch
 from torch.nn import functional as F
 from .config import ModelConfig
 from .model import SagaTransformer
-from .tokenization import ByteBPETokenizer
+from .tokenization import ByteBPETokenizer, load_tokenizer
 from .shards import TokenShardDataset
 
 
@@ -140,7 +140,7 @@ def pretrain(model_config: ModelConfig, tokenizer_path: str | Path, dataset_path
         raise ValueError('Invalid schedule or checkpoint intervals')
     if not 1 <= block_size <= model_config.max_position_embeddings:
         raise ValueError('Invalid block_size')
-    tokenizer = ByteBPETokenizer.load(tokenizer_path)
+    tokenizer = load_tokenizer(tokenizer_path)
     if tokenizer.vocab_size > model_config.vocab_size:
         raise ValueError('Tokenizer vocabulary exceeds model vocabulary')
     dataset_path = Path(dataset_path)

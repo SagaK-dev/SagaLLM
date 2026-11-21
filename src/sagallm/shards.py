@@ -19,7 +19,7 @@ import torch
 
 from .data import read_documents
 from .curation import low_quality, normalized_text, sensitive_reason, simhash64, near_duplicate
-from .tokenization import ByteBPETokenizer
+from .tokenization import ByteBPETokenizer, load_tokenizer
 
 
 def safe_shard_path(root: Path, filename: str) -> Path:
@@ -195,7 +195,7 @@ def tokenize_shards(prepared_dir: str | Path, tokenizer_path: str | Path, output
     source = json.loads((prepared_dir / 'manifest.json').read_text(encoding='utf-8'))
     if source.get('format') != 'sagallm-doc-shards-v1':
         raise ValueError('Incompatible input data manifest')
-    tok = ByteBPETokenizer.load(tokenizer_path)
+    tok = load_tokenizer(tokenizer_path)
     if tok.vocab_size > 2**32:
         raise ValueError('Tokenizer exceeds uint32 vocabulary')
     output.parent.mkdir(parents=True, exist_ok=True)
