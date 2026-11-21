@@ -52,13 +52,19 @@ def main(argv: list[str] | None = None) -> None:
     prep.add_argument("--source", required=True)
     prep.add_argument("--output", required=True)
     prep.add_argument("--license", required=True)
+    prep.add_argument("--dataset-card", help="Reviewed, SHA-pinned dataset usage card")
     shards = ds.add_parser('shard')
     shards.add_argument('--source', required=True)
     shards.add_argument('--output', required=True)
     shards.add_argument('--license', required=True)
+    shards.add_argument('--dataset-card', help='Reviewed, SHA-pinned dataset usage card')
     shards.add_argument('--max-docs-per-shard', type=int, default=1000)
     shards.add_argument('--keep-near-duplicates', action='store_true',
                         help='Disable heuristic near-duplicate filtering')
+    license_check = ds.add_parser('verify-license', help='Offline review-card and SHA verification')
+    license_check.add_argument('--source', required=True)
+    license_check.add_argument('--card', required=True)
+    license_check.add_argument('--purpose', choices=('train', 'evaluate', 'redistribute'), required=True)
     tokenize = ds.add_parser('tokenize')
     tokenize.add_argument('--prepared', required=True)
     tokenize.add_argument('--tokenizer', required=True)
@@ -108,6 +114,7 @@ def main(argv: list[str] | None = None) -> None:
     bench.add_argument("--tokenizer", required=True)
     bench.add_argument("--data", required=True, help="JSONL questions (not downloaded automatically)")
     bench.add_argument("--license", required=True, help="User-reviewed benchmark dataset license")
+    bench.add_argument("--dataset-card", help="Reviewed, SHA-pinned benchmark dataset card")
     bench.add_argument("--format", choices=("choices", "mmlu"), default="choices")
     bench.add_argument("--train-docs", help="Prepared document-shard directory for contamination audit")
     bench.add_argument("--allow-contaminated", action="store_true")
@@ -152,11 +159,16 @@ def main(argv: list[str] | None = None) -> None:
             result = {"encoded": tokenizer.encode(args.text), "decoded": tokenizer.decode(tokenizer.encode(args.text))}
     elif args.command == "data":
         if args.action == 'prepare':
-            result = prepare_data(args.source, args.output, args.license)
+            result = prepare_data(args.source, args.output, args.license,
+                                  dataset_card_path=args.dataset_card)
         elif args.action == 'shard':
             result = prepare_shards(args.source, args.output, args.license,
                                     max_docs_per_shard=args.max_docs_per_shard,
-                                    remove_near_duplicates=not args.keep_near_duplicates)
+                                    remove_near_duplicates=not args.keep_near_duplicates,
+                                    dataset_card_path=args.dataset_card)
+        elif args.action == 'verify-license':
+            from .dataset_cards import verify_dataset_card
+            result = verify_dataset_card(args.source, args.card, purpose=args.purpose)
         else:
             result = tokenize_shards(args.prepared, args.tokenizer, args.output,
                                      max_tokens_per_shard=args.max_tokens_per_shard)
@@ -190,7 +202,7 @@ def main(argv: list[str] | None = None) -> None:
                                   training_docs=args.train_docs,
                                   allow_contaminated=args.allow_contaminated,
                                   device_name=args.device, max_examples=args.max_examples,
-                                  scoring=args.scoring)
+                                  scoring=args.scoring, dataset_card_path=args.dataset_card)
         if args.output:
             output = Path(args.output)
             output.parent.mkdir(parents=True, exist_ok=True)

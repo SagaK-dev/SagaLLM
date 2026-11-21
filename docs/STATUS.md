@@ -10,7 +10,7 @@
 | CLI generation / KV cache | IMPLEMENTED | No production decoding server |
 | Disk-backed dataset shards | PARTIAL | SQLite exact/normalized/heuristic near dedup, JSONL splits, uint32 shards; only basic privacy screening |
 | Basic next-token held-out validation | IMPLEMENTED | Model loss, perplexity, accuracy; rejects training split by default |
-| GitHub Actions CPU CI | IMPLEMENTED / HOSTED_VERIFIED_V0.5 | v0.5 Python 3.11 CPU workflow passed: 52 tests before final documentation update |
+| GitHub Actions CPU CI | IMPLEMENTED / HOSTED_VERIFIED_V0.5 | v0.5 Python 3.11 CPU workflow passed: 53 tests after the final test update; v0.6 hosted CI pending |
 | Standardized benchmarks | PARTIAL | Offline multiple-choice/MMLU-style adapter implemented; official datasets, splits and published scoring protocols NOT_RUN |
 | Single-turn SFT | IMPLEMENTED | Assistant-response masking; local JSONL |
 | DPO / scalable SFT | NOT_IMPLEMENTED | Phase 4 |
@@ -20,3 +20,9 @@
 | HF Transformers export | IMPLEMENTED / HOSTED_VERIFIED_V0.5 | Local custom-model safetensors export, fast tokenizer AutoTokenizer, roundtrip tests; does not upload |
 | Distributed learning / FlashAttention integration | NOT_IMPLEMENTED | Phase 6 |
 | Real 1B/3B training | NOT_RUN | No hardware or licensed corpus specified |
+
+## v0.6 follow-up (2026-11-21)
+
+- Added optional local SHA-256-pinned, purpose-restricted human dataset-review cards for data prepare/shard and benchmark scoring; auto-verification of actual legal rights remains impossible.
+- MMLU-style raw-question overlap audit fixed; subject and macro scores and an interval added. This is **not** an official MMLU score.
+- No official benchmark data imported, no real GPU or distributed training verified, no 1B/3B weights trained.

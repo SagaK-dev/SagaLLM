@@ -52,7 +52,8 @@ def _valid_license(license_id: str) -> bool:
 def prepare_shards(source: str | Path, output: str | Path, license_id: str,
                    *, validation_fraction: float = 0.1, max_docs_per_shard: int = 1000,
                    max_document_bytes: int = 1024 * 1024,
-                   remove_near_duplicates: bool = True) -> dict:
+                   remove_near_duplicates: bool = True,
+                   dataset_card_path: str | Path | None = None) -> dict:
     """Stream records into a temporary SQLite db and produce deterministic JSONL shards.
 
     Exact duplicates and, optionally, likely near duplicates are removed before
@@ -64,6 +65,11 @@ def prepare_shards(source: str | Path, output: str | Path, license_id: str,
     if not 0 < validation_fraction < 1 or max_docs_per_shard < 1 or max_document_bytes < 1:
         raise ValueError('Invalid split fraction or shard limits')
     source, output = Path(source), Path(output)
+    card_review = None
+    if dataset_card_path is not None:
+        from .dataset_cards import verify_dataset_card
+        card_review = verify_dataset_card(source, dataset_card_path, purpose="train",
+                                          expected_license=license_id)
     if output.exists():
         raise FileExistsError(f'Refusing to overwrite existing dataset: {output}')
     output.parent.mkdir(parents=True, exist_ok=True)
@@ -159,7 +165,8 @@ def prepare_shards(source: str | Path, output: str | Path, license_id: str,
             manifest = {
                 'format': 'sagallm-doc-shards-v1', 'source': str(source),
                 'source_sha256': sha256_file(source), 'license': license_id,
-                'license_review_required': True,
+                'license_review_required': card_review is None,
+                'dataset_card_review': card_review,
                 'validation_fraction': validation_fraction, 'unique_documents': total,
                 'rejected': counts, 'sensitive_categories': sensitive_counts, 'splits': results,
                 'near_dedup_enabled': remove_near_duplicates,

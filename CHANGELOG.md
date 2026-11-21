@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.6.0 (2026-11-21)
+
+- Add human-attested, purpose-restricted dataset review cards with SHA-256 verification and offline `data verify-license` CLI; cards are not proof of legal usage rights.
+- Integrate optional review-card verification into `data prepare`, `data shard` and `benchmark` without breaking legacy CLI usage.
+- Fix MMLU-style training contamination checks to scan the original question text, rather than only the generated zero-shot evaluation prompt.
+- Report subject-level and macro accuracy, Wilson interval and a stable, clearly non-official evaluation protocol ID.
+- Add regression, card validation and CLI tests, status documentation and template card.
+- No external datasets, paid services, GPU training, or large-model weights are used.
+
+
 ## 0.5.0 — Local Hugging Face-compatible model export
 
 - Export trusted SagaLLM checkpoints to CPU safetensors and standalone custom Transformers architecture/configuration files.

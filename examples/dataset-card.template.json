@@ -1,0 +1,13 @@
+{
+  "format": "sagallm-dataset-card-v1",
+  "name": "REPLACE with dataset name",
+  "source_uri": "REPLACE with original URL or local origin",
+  "source_version": "REPLACE with immutable revision",
+  "license_id": "unknown",
+  "license_evidence": "REPLACE with actual human-reviewed license source and conditions",
+  "review_status": "pending",
+  "reviewed_by": "REPLACE with reviewer",
+  "reviewed_at": "2026-11-21",
+  "allowed_uses": [],
+  "file_sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+}
