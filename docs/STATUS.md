@@ -9,9 +9,12 @@
 | Atomic checkpoint / resume | IMPLEMENTED | Data/tokenizer hash checks; schedule changes affect exact reproducibility |
 | CLI generation / KV cache | IMPLEMENTED | No production decoding server |
 | Basic data prep | PARTIAL | No near-dedup, streaming at training scale or comprehensive PII screening |
-| Validation / standardized benchmarks | NOT_IMPLEMENTED | Phase 3/5 |
-| SFT / DPO | NOT_IMPLEMENTED | Phase 4 |
-| API / streaming HTTP | NOT_IMPLEMENTED | Phase 5 |
+| Basic next-token held-out validation | IMPLEMENTED | Model loss, perplexity, accuracy |
+| Standardized benchmarks | NOT_IMPLEMENTED | Phase 5 |
+| Single-turn SFT | IMPLEMENTED | Assistant-response masking; local JSONL |
+| DPO / scalable SFT | NOT_IMPLEMENTED | Phase 4 |
+| Local inference HTTP API | PARTIAL | Three endpoints, optional bearer key |
+| HTTP streaming / rate limiting / hard timeouts | NOT_IMPLEMENTED | Proxy recommended for external serving |
 | HF Transformers export | NOT_IMPLEMENTED | Phase 5 |
 | Distributed learning / FlashAttention integration | NOT_IMPLEMENTED | Phase 6 |
 | Real 1B/3B training | NOT_RUN | No hardware or licensed corpus specified |

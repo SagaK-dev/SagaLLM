@@ -7,9 +7,9 @@ The source implementation is a decoder-only dense autoregressive Transformer: em
 0. **Environment / design** — inspect CPU/CUDA/MPS, model configurations and relevant upstream references. Complete for the execution sandbox; **the user's local hardware remains unknown**.
 1. **Minimal model** — tokenizer, Transformer, single-device train, checkpoint, CLI generate. Prototype implemented; test status must come from actual test runs.
 2. **Data** — exact dedup, document-level split, source integrity and basic screening implemented. Near-duplicate detection, PII-quality guarantees and streaming remain pending.
-3. **Advanced pretraining** — validation loop, mixed precision, scalable sharding and optimized streaming pending.
-4. **Post-training** — SFT, response masking, preference optimization pending.
-5. **Serving and evaluation** — CLI available; HTTP serving, Inspect AI integration, standardized evaluations pending.
+3. **Advanced pretraining** — basic held-out loss/perplexity evaluation implemented; integrated validation loop, mixed precision, scalable sharding and optimized streaming pending.
+4. **Post-training** — minimal single-turn SFT and response masking implemented; preference optimization, realistic datasets and large-scale batching pending.
+5. **Serving and evaluation** — CLI and experimental local HTTP serving available; Inspect AI integration and standardized evaluations pending.
 6. **Scale out** — DDP/FSDP/TorchTitan/Megatron-LM integration pending.
 
 ## Safety and reliability
