@@ -6,10 +6,10 @@ The source implementation is a decoder-only dense autoregressive Transformer: em
 
 0. **Environment / design** — inspect CPU/CUDA/MPS, model configurations and relevant upstream references. Complete for the execution sandbox; **the user's local hardware remains unknown**.
 1. **Minimal model** — tokenizer, Transformer, single-device train, checkpoint, CLI generate. Prototype implemented; test status must come from actual test runs.
-2. **Data** — exact dedup, document-level split, source integrity and basic screening implemented. Near-duplicate detection, PII-quality guarantees and streaming remain pending.
-3. **Advanced pretraining** — basic held-out loss/perplexity evaluation implemented; integrated validation loop, mixed precision, scalable sharding and optimized streaming pending.
+2. **Data** — exact dedup, document-level split, source integrity and basic screening implemented. Disk-backed SQLite exact deduplication, document shards and uint32 token shards are available; near-duplicate removal and robust PII screening remain pending.
+3. **Advanced pretraining** — basic held-out loss/perplexity evaluation implemented; integrated validation on disk-backed token shards and fixed-schedule resume implemented; mixed precision and distributed sampling pending.
 4. **Post-training** — minimal single-turn SFT and response masking implemented; preference optimization, realistic datasets and large-scale batching pending.
-5. **Serving and evaluation** — CLI and experimental local HTTP serving available; Inspect AI integration and standardized evaluations pending.
+5. **Serving and evaluation** — CLI and experimental local HTTP serving with basic in-process request/concurrency limits available; Inspect AI integration and standardized evaluations pending.
 6. **Scale out** — DDP/FSDP/TorchTitan/Megatron-LM integration pending.
 
 ## Safety and reliability
@@ -23,3 +23,11 @@ For h=hidden_size, f=intermediate_size, L=layers, v=vocab size, k=head-count rat
 `N = L * (2*h*h + 2*h*h*k + 3*h*f + 2*h) + v*h + h`
 
 This is accurate for the currently implemented bias-free architecture. The training-memory estimate shown by CLI is a heuristic based on 16 bytes/parameter for FP32 AdamW model weights, gradients and optimizer states, excluding activations, temporary buffers, and framework overhead.
+
+## Data and safety improvements (v0.2)
+
+- `shards.py`: staged on-disk SQLite exact dedup and stable document splits; token files are checked with SHA-256 before training. Data is not downloaded automatically. See `docs/DATA_PIPELINE.md`.
+- `training.py`: per-step optional atomic checkpoints, validated immutable resume hyperparameters, fixed learning-rate schedule, CPU/CUDA/MPS RNG state snapshots where available, held-out validation.
+- `evaluation.py`: reject training data when its identity matches the checkpoint, and default to validation split for token shards.
+- `api.py`: global in-process request-window limit, a bounded inference semaphore, bounded message lengths and a cooperative generation deadline. These are not suitable substitutes for an internet-facing reverse proxy, TLS and operating-system-level limits.
+- Generation: mask logits outside the trained tokenizer vocabulary; compare tokenizer SHA-256 to checkpoint metadata when present.
