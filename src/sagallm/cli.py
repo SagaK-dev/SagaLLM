@@ -8,9 +8,10 @@ from pathlib import Path
 import torch
 from .config import ModelConfig
 from .data import prepare_data, read_documents
+from .shards import prepare_shards, tokenize_shards
 from .model import SagaTransformer
 from .tokenization import ByteBPETokenizer
-from .training import checkpoint_load, pretrain, resolve_device
+from .training import checkpoint_load, pretrain, resolve_device, verify_checkpoint_tokenizer
 
 
 def doctor() -> dict:
@@ -49,6 +50,16 @@ def main(argv: list[str] | None = None) -> None:
     prep.add_argument("--source", required=True)
     prep.add_argument("--output", required=True)
     prep.add_argument("--license", required=True)
+    shards = ds.add_parser('shard')
+    shards.add_argument('--source', required=True)
+    shards.add_argument('--output', required=True)
+    shards.add_argument('--license', required=True)
+    shards.add_argument('--max-docs-per-shard', type=int, default=1000)
+    tokenize = ds.add_parser('tokenize')
+    tokenize.add_argument('--prepared', required=True)
+    tokenize.add_argument('--tokenizer', required=True)
+    tokenize.add_argument('--output', required=True)
+    tokenize.add_argument('--max-tokens-per-shard', type=int, default=100000)
     inspect = sub.add_parser("model")
     mi = inspect.add_subparsers(dest="action", required=True)
     mi_model = mi.add_parser("inspect")
@@ -69,6 +80,9 @@ def main(argv: list[str] | None = None) -> None:
         p.add_argument("--device", default="auto")
         p.add_argument("--allow-large", action="store_true")
         p.add_argument("--log-path", default=None)
+        p.add_argument('--schedule-steps', type=int, default=None)
+        p.add_argument('--checkpoint-every', type=int, default=0)
+        p.add_argument('--validate-every', type=int, default=0)
     sft = tx.add_parser("sft")
     sft.add_argument("--checkpoint", required=True)
     sft.add_argument("--tokenizer", required=True)
@@ -83,12 +97,17 @@ def main(argv: list[str] | None = None) -> None:
     evaluation.add_argument("--data", required=True)
     evaluation.add_argument("--block-size", type=int, default=32)
     evaluation.add_argument("--batches", type=int, default=4)
+    evaluation.add_argument('--split', choices=['train', 'validation'], default='validation')
+    evaluation.add_argument('--allow-training-data', action='store_true')
     api = sub.add_parser("serve")
     api.add_argument("--checkpoint", required=True)
     api.add_argument("--tokenizer", required=True)
     api.add_argument("--host", default="127.0.0.1")
     api.add_argument("--port", type=int, default=8000)
     api.add_argument("--api-key", default=None)
+    api.add_argument('--requests-per-minute', type=int, default=60)
+    api.add_argument('--max-concurrent', type=int, default=1)
+    api.add_argument('--generation-seconds', type=float, default=30.0)
     gen = sub.add_parser("generate")
     gen.add_argument("--checkpoint", required=True)
     gen.add_argument("--tokenizer", required=True)
@@ -108,7 +127,14 @@ def main(argv: list[str] | None = None) -> None:
             tokenizer = ByteBPETokenizer.load(args.tokenizer)
             result = {"encoded": tokenizer.encode(args.text), "decoded": tokenizer.decode(tokenizer.encode(args.text))}
     elif args.command == "data":
-        result = prepare_data(args.source, args.output, args.license)
+        if args.action == 'prepare':
+            result = prepare_data(args.source, args.output, args.license)
+        elif args.action == 'shard':
+            result = prepare_shards(args.source, args.output, args.license,
+                                    max_docs_per_shard=args.max_docs_per_shard)
+        else:
+            result = tokenize_shards(args.prepared, args.tokenizer, args.output,
+                                     max_tokens_per_shard=args.max_tokens_per_shard)
     elif args.command == "model":
         config = ModelConfig.load(args.config)
         count = config.parameter_count()
@@ -124,11 +150,14 @@ def main(argv: list[str] | None = None) -> None:
             result = pretrain(ModelConfig.load(args.config), args.tokenizer, args.data, args.checkpoint,
                               steps=args.steps, batch_size=args.batch_size, block_size=args.block_size,
                               grad_accum=args.grad_accum, lr=args.lr, device_name=args.device,
-                              resume=args.action == "resume", allow_large=args.allow_large, log_path=args.log_path)
+                              resume=args.action == "resume", allow_large=args.allow_large, log_path=args.log_path,
+                              schedule_steps=args.schedule_steps, checkpoint_every=args.checkpoint_every,
+                              validate_every=args.validate_every)
     elif args.command == "evaluate":
         from .evaluation import evaluate_language_model
         result = evaluate_language_model(args.checkpoint, args.tokenizer, args.data,
-                                         block_size=args.block_size, batches=args.batches)
+                                         block_size=args.block_size, batches=args.batches,
+                                         split=args.split, allow_training_data=args.allow_training_data)
     elif args.command == "serve":
         if args.host not in ("127.0.0.1", "localhost", "::1") and not args.api_key:
             parser.error("Non-loopback binding requires --api-key. Use a TLS terminator for external access.")
@@ -137,7 +166,10 @@ def main(argv: list[str] | None = None) -> None:
             import uvicorn
         except ImportError as exc:
             raise RuntimeError("Install the sagallm[serve] optional dependency") from exc
-        app = create_app(args.checkpoint, args.tokenizer, api_key=args.api_key)
+        app = create_app(args.checkpoint, args.tokenizer, api_key=args.api_key,
+                         requests_per_minute=args.requests_per_minute,
+                         max_concurrent=args.max_concurrent,
+                         max_generation_seconds=args.generation_seconds)
         uvicorn.run(app, host=args.host, port=args.port, access_log=False)
         return
     else:
@@ -145,6 +177,7 @@ def main(argv: list[str] | None = None) -> None:
         device = resolve_device(args.device)
         state = torch.load(args.checkpoint, map_location="cpu", weights_only=True)
         config = ModelConfig(**state["config"])
+        verify_checkpoint_tokenizer(state, args.tokenizer)
         if tokenizer.vocab_size > config.vocab_size:
             raise ValueError("Tokenizer vocabulary exceeds checkpoint model vocabulary")
         model = SagaTransformer(config)
@@ -152,7 +185,8 @@ def main(argv: list[str] | None = None) -> None:
         model.to(device).eval()
         ids = torch.tensor([tokenizer.encode(args.prompt, add_bos=True)], dtype=torch.long, device=device)
         new_ids = model.generate(ids, max_new_tokens=args.max_new_tokens, temperature=args.temperature,
-                                 eos_token_id=ByteBPETokenizer.SPECIAL["<eos>"])
+                                 eos_token_id=ByteBPETokenizer.SPECIAL["<eos>"],
+                                 vocab_limit=tokenizer.vocab_size)
         result = {"text": tokenizer.decode(new_ids[0].tolist()), "generated_tokens": int(new_ids.size(1)-ids.size(1))}
     print(json.dumps(result, ensure_ascii=False, indent=2, default=str))
 

@@ -13,8 +13,8 @@ def test_pretrain_resume_checkpoint(tmp_path):
     corpus.write_text('hello hello world ' * 80, encoding='utf8')
     checkpoint = tmp_path / 'model.pt'
     cfg = ModelConfig.load('configs/model/tiny.yaml')
-    first = pretrain(cfg, tpath, corpus, checkpoint, steps=2, batch_size=1, block_size=8)
-    second = pretrain(cfg, tpath, corpus, checkpoint, steps=3, batch_size=1, block_size=8, resume=True)
+    first = pretrain(cfg, tpath, corpus, checkpoint, steps=2, batch_size=1, block_size=8, schedule_steps=3)
+    second = pretrain(cfg, tpath, corpus, checkpoint, steps=3, batch_size=1, block_size=8, schedule_steps=3, resume=True)
     assert first['steps'] == 2 and second['steps'] == 3
     model = SagaTransformer(cfg)
     state = checkpoint_load(checkpoint, model)

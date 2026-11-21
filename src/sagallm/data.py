@@ -17,9 +17,16 @@ def read_documents(path: str | Path) -> Iterator[str]:
     suffix = path.suffix.lower()
     if suffix == ".txt":
         with path.open(encoding="utf-8") as f:
-            for paragraph in f.read().split("\n\n"):
-                if paragraph.strip():
-                    yield paragraph.strip()
+            paragraph: list[str] = []
+            for line in f:
+                if not line.strip():
+                    if paragraph:
+                        yield ''.join(paragraph).strip()
+                        paragraph.clear()
+                else:
+                    paragraph.append(line)
+            if paragraph:
+                yield ''.join(paragraph).strip()
     elif suffix in (".jsonl", ".json"):
         with path.open(encoding="utf-8") as f:
             if suffix == ".json":

@@ -7,7 +7,7 @@ import torch
 from .config import ModelConfig
 from .model import SagaTransformer
 from .tokenization import ByteBPETokenizer
-from .training import checkpoint_load, checkpoint_save, resolve_device
+from .training import checkpoint_load, checkpoint_save, resolve_device, verify_checkpoint_tokenizer
 
 
 def format_sft_example(messages: list[dict], tokenizer: ByteBPETokenizer, max_length: int) -> tuple[torch.Tensor, torch.Tensor]:
@@ -35,6 +35,7 @@ def sft_train(base_checkpoint: str | Path, tokenizer_file: str | Path, dataset_f
         raise ValueError("steps and lr must be positive")
     state = torch.load(base_checkpoint, map_location="cpu", weights_only=True)
     config = ModelConfig(**state["config"])
+    verify_checkpoint_tokenizer(state, tokenizer_file)
     if config.parameter_count() > 200_000_000 and not allow_large:
         raise ValueError("Large model SFT requires --allow-large")
     tokenizer = ByteBPETokenizer.load(tokenizer_file)

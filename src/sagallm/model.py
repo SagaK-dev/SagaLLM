@@ -2,6 +2,7 @@
 from __future__ import annotations
 from dataclasses import dataclass
 import math
+import time
 import torch
 from torch import nn
 from torch.nn import functional as F
@@ -150,9 +151,13 @@ class SagaTransformer(nn.Module):
 
     @torch.inference_mode()
     def generate(self, input_ids: torch.Tensor, max_new_tokens: int = 32, temperature: float = 1.0,
-                 top_k: int = 0, top_p: float = 1.0, eos_token_id: int | None = None) -> torch.Tensor:
+                 top_k: int = 0, top_p: float = 1.0, eos_token_id: int | None = None,
+                 deadline_monotonic: float | None = None,
+                 vocab_limit: int | None = None) -> torch.Tensor:
         if temperature < 0 or top_k < 0 or not (0 < top_p <= 1):
             raise ValueError("Invalid sampling parameters")
+        if vocab_limit is not None and not (1 <= vocab_limit <= self.config.vocab_size):
+            raise ValueError('vocab_limit must be within model vocabulary')
         if input_ids.ndim != 2 or input_ids.size(1) == 0:
             raise ValueError("Provide a non-empty prompt with shape (batch, sequence)")
         if max_new_tokens < 0:
@@ -163,11 +168,15 @@ class SagaTransformer(nn.Module):
         next_input = result[:, -self.config.max_position_embeddings:]
         finished = torch.zeros(result.size(0), device=result.device, dtype=torch.bool)
         for _ in range(max_new_tokens):
+            if deadline_monotonic is not None and time.monotonic() > deadline_monotonic:
+                raise TimeoutError('Generation exceeded the cooperative time budget')
             if cache is not None and cache[0][0].size(-2) + next_input.size(1) > self.config.max_position_embeddings:
                 cache = None
                 next_input = result[:, -self.config.max_position_embeddings:]
             out = self.forward(next_input, past_key_values=cache, use_cache=True)
             scores = out.logits[:, -1, :].float()
+            if vocab_limit is not None:
+                scores[:, vocab_limit:] = float('-inf')
             if temperature == 0:
                 token = scores.argmax(dim=-1, keepdim=True)
             else:
