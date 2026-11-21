@@ -1,3 +1,10 @@
+# v0.7.0 — Offline MMLU reference-style CSV adapter
+
+- Added `sagallm mmlu inventory`, `mmlu verify` and `mmlu evaluate` commands. Local dev/test CSVs are verified using a pending-by-default human-reviewed SHA-256 inventory.
+- Added a reference-style plain-text, 0–5-shot MMLU prompt builder based on Hendrycks et al. The default mode checks stable single-token answer-label scoring; an explicitly noncomparable suffix-likelihood mode is available.
+- Added context-aware shot reduction, round-robin subject sampling, per-subject accuracy, exact test and few-shot dev contamination screening, checkpoint/data provenance checks, and report metadata. Official and certified benchmark claims are explicitly false.
+- Added original synthetic fixtures and CPU regression tests; no official MMLU data downloaded.
+
 # Changelog
 
 ## 0.6.0 (2026-11-21)

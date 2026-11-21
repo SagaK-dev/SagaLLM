@@ -53,3 +53,9 @@ Run `OMP_NUM_THREADS=2 PYTHONPATH=src python -m pytest -q` from repository root 
 ## v0.3.0 local CPU quality pass (2026-11-21)
 
 Implemented deterministic post-ingestion corpus curation (normalized and probable near duplicates), conservative sensitive-pattern screening, and an offline CPU CI verifier. Added a GitHub Actions workflow for public push / PR CPU testing with read-only repository permissions. Hosted Actions pass/fail must be verified separately from local pytest. This remains a research prototype, with no 1B/3B training or GPU verification.
+
+## SagaLLM v0.7 reference-style benchmark milestone
+
+- Added `src/sagallm/mmlu_reference.py` with six-column CSV parsing, SHA-256 reviewed inventory, prompt layout, 0–5-shot context fallback and explicit next-token/continuation scoring modes.
+- Added CLI subcommands and synthetic CPU tests (`tests/test_mmlu_reference.py`), including round-robin subject sampling, review refusal, tamper detection and few-shot data leakage.
+- Not implemented: official MMLU dataset ingestion and verified league/leaderboard comparability. No official benchmark data is bundled or fetched.

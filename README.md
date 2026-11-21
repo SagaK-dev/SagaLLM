@@ -151,3 +151,7 @@ GitHub Actions v0.5 CPU CI passed (53 tests, run 44905032184), including native 
 The optional API exposes `/health`, `/v1/completions`, and `/v1/chat/completions`; it is an **experimental subset**, not a full OpenAI API implementation. The CLI defaults to `127.0.0.1`. Binding to a non-loopback address requires `--api-key`; additionally use TLS termination, reverse-proxy rate limiting, request timeouts and monitoring for any internet-facing deployment. Prompt length, rate (60 requests/minute per process by default), concurrent generations (1 by default), and token counts are bounded. Generation has a **cooperative**, not hard, time budget; a stalled native kernel cannot be forcibly interrupted. API streaming is not yet provided.
 
 Data preparation requires a supplied license identifier, which is **not proof** that the input material is legally licensed. Operators must independently review permissions. The demonstration SFT data is toy material, not representative of useful instruction-following performance.
+
+## MMLU reference-style offline CSV evaluation (v0.7)
+
+Use `sagallm mmlu inventory`, `sagallm mmlu verify`, and `sagallm mmlu evaluate` with **user-supplied, manually approved local MMLU CSVs**. The strict single-token label scorer approximates the original Hendrycks 5-shot protocol but refuses incompatible tokenization. Outputs never claim to be certified MMLU scores. No third-party benchmark data is downloaded or checked in. See [docs/MMLU_REFERENCE.md](docs/MMLU_REFERENCE.md).
