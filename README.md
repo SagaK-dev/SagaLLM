@@ -110,7 +110,7 @@ python -m pip install -e ".[test,serve]"
 python scripts/check_cpu.py
 ```
 
-GitHub Actions v0.4 CPU CI passed (48 tests, run 44903131319), including the optional native tokenizer. A successful CPU CI run is not GPU validation.
+GitHub Actions v0.5 CPU CI passed (52 tests, run 44904787682) with custom Transformers model load/generation and the native tokenizer (prior to the final documentation update). A successful CPU CI run is not GPU validation.
 
 ## Licensing
 

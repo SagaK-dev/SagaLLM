@@ -10,13 +10,13 @@
 | CLI generation / KV cache | IMPLEMENTED | No production decoding server |
 | Disk-backed dataset shards | PARTIAL | SQLite exact/normalized/heuristic near dedup, JSONL splits, uint32 shards; only basic privacy screening |
 | Basic next-token held-out validation | IMPLEMENTED | Model loss, perplexity, accuracy; rejects training split by default |
-| GitHub Actions CPU CI | IMPLEMENTED / HOSTED_VERIFIED_V0.4 | v0.4 Python 3.11 CPU workflow passed: 48 tests |
+| GitHub Actions CPU CI | IMPLEMENTED / HOSTED_VERIFIED_V0.5 | v0.5 Python 3.11 CPU workflow passed: 52 tests before final documentation update |
 | Standardized benchmarks | PARTIAL | Offline multiple-choice/MMLU-style adapter implemented; official datasets, splits and published scoring protocols NOT_RUN |
 | Single-turn SFT | IMPLEMENTED | Assistant-response masking; local JSONL |
 | DPO / scalable SFT | NOT_IMPLEMENTED | Phase 4 |
 | Local inference HTTP API | PARTIAL | Three endpoints, optional bearer key |
 | API rate/concurrency limits | IMPLEMENTED | In-process limiter and cooperative deadline; hard kill, TLS, production rate limiting not implemented |
 | HTTP streaming / hard kernel timeouts | NOT_IMPLEMENTED | Proxy recommended for external serving |
-| HF Transformers export | IMPLEMENTED / CI_PENDING | Local custom-model safetensors export, fast tokenizer AutoTokenizer, roundtrip tests; does not upload |
+| HF Transformers export | IMPLEMENTED / HOSTED_VERIFIED_V0.5 | Local custom-model safetensors export, fast tokenizer AutoTokenizer, roundtrip tests; does not upload |
 | Distributed learning / FlashAttention integration | NOT_IMPLEMENTED | Phase 6 |
 | Real 1B/3B training | NOT_RUN | No hardware or licensed corpus specified |

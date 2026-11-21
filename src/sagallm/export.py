@@ -116,6 +116,7 @@ def export_transformers(
                 'pad_token': '<pad>', 'unk_token': '<unk>',
             }, indent=2) + '\n', encoding='utf-8')
         report = {
+            'tokenizer_identity_verified': bool(state.get('train_state', {}).get('tokenizer_sha256')),
             'format': 'sagallm_transformers_custom_v1',
             'checkpoint_sha256': _sha256(checkpoint),
             'tokenizer_sha256': _sha256(tokenizer_path),

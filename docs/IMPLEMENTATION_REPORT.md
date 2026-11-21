@@ -3,7 +3,7 @@
 - Added local-only, overwrite-refusing export of trusted SagaLLM checkpoints into safetensors and custom Transformers configuration/model loader files.
 - Source model weights are checked against their native configuration; tokenizer SHA-256 must match when present. Checkpoint optimizer and RNG states are excluded from exported weights.
 - FastBPE supports `AutoTokenizer`; legacy Python BPE is preserved as a native artifact without claiming HF AutoTokenizer compatibility.
-- Added CPU roundtrip/CLI and optional Transformers 4.x integration tests. GH-hosted status must be verified separately after upload.
+- Added CPU roundtrip/CLI and optional Transformers 4.x integration tests. GitHub CPU run 44904787682 passed 52 tests; legacy Python BPE AutoModel regression was added after that run.
 - Neither model weights nor training datasets are published; 1B/3B training and GPU tests remain NOT_RUN.
 
 ## v0.4 CPU validation (2026-11-21)

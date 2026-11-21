@@ -17,7 +17,8 @@ The custom `AutoModelForCausalLM` loader wraps the original SagaLLM PyTorch arch
 
 ## Verified / not verified
 
-- CPU native export and exact forward-logit roundtrip are tested with a small model.
+- CPU native export and exact forward-logit roundtrip are tested with a small model. The manifest marks whether checkpoint/tokenizer SHA identity was actually verified.
+- GitHub CPU CI run `44904787682` passed 52 tests (including native fast-tokenizer AutoTokenizer load, custom AutoModel load, logits/labels parity, and no-cache greedy generation). Additional legacy Python BPE AutoModel parity coverage is being added.
 - On CI, integration tests attempt `AutoConfig` / `AutoModelForCausalLM` / `AutoTokenizer` and greedy generation with Transformers 4.x and native FastBPE.
 - The legacy educational ByteBPETokenizer **cannot** be loaded by HF `AutoTokenizer`. Its exact original file is still preserved for SagaLLM CLI.
 - Standard `generate` uses a **limited no-padding / no-cache** pathway (`generation_config.json` sets `use_cache=false`); native SagaLLM generation retains its own KV cache. Attention masks with padding, `inputs_embeds`, custom position offsets, efficient HF batch generation, beam search across versions, quantization, Hub deployment, multi-GPU and third-party inference-server adapters are **not validated**.

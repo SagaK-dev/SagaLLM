@@ -56,6 +56,7 @@ def test_local_export_roundtrip_legacy_tokenizer(tmp_path):
     for filename, digest in manifest['files_sha256'].items():
         assert hashlib.sha256((dest / filename).read_bytes()).hexdigest() == digest
     assert manifest['checkpoint_step'] == 3
+    assert manifest['tokenizer_identity_verified']
     assert not manifest['uploaded']
 
 
@@ -117,3 +118,19 @@ def test_hf_auto_model_and_tokenizer_roundtrip(tmp_path):
     expected = model.generate(x, temperature=0, max_new_tokens=2,
                               vocab_limit=tok.vocab_size)
     assert torch.equal(generated, expected)
+
+
+def test_hf_custom_model_loads_legacy_python_tokenizer_weights(tmp_path):
+    pytest.importorskip('transformers')
+    pytest.importorskip('safetensors')
+    from transformers import AutoModelForCausalLM
+    model, cp, tp, _ = _toy_checkpoint(tmp_path, fast=False)
+    dest = tmp_path / 'legacy-export'
+    info = export_transformers(cp, tp, dest)
+    assert not info['hf_tokenizer_auto_load']
+    loaded = AutoModelForCausalLM.from_pretrained(
+        str(dest), trust_remote_code=True, local_files_only=True
+    ).eval()
+    x = torch.tensor([[1, 5, 22, 9]], dtype=torch.long)
+    with torch.inference_mode():
+        torch.testing.assert_close(loaded(input_ids=x).logits, model(x).logits, rtol=0, atol=0)
