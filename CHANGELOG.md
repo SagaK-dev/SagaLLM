@@ -1,3 +1,13 @@
+## v0.10.0 — 2026-11-21
+
+- Add opt-in, **local SagaLLM checkpoint** Java revision backend (`java ai-revise`, `java ai-chat`); generation always comes from a randomly initialized/locally trained SagaTransformer checkpoint, never a hosted or pretrained model fallback.
+- Limit weight loading, token context and generation budgets; require tokenizer provenance, use CPU by default and reject malformed model output.
+- Compile generated candidates in a temporary directory using `javac -proc:none`; feed bounded compiler diagnostics back to the same model for up to three proposals; never execute untrusted Java automatically.
+- Preview unified diffs; interactive mode applies the **exact compiled candidate** only on explicit `APPLY`, with source SHA-256 integrity guards. Model-edited files are protected from later template regeneration.
+- Add `java toy-sft` to export five original synthetic Java instruction-response pairs using the existing SFT wire format. This is a pipeline smoke dataset, not a useful standalone Java training corpus.
+- Add test coverage for proposals, refusals, retry, JDK absence, source tampering, human approval, toy SFT and an actual tiny checkpoint load/SFT step.
+- Real-world Java generation quality, 1B/3B training, real GPU and licensed Java corpus remain NOT_RUN/UNVERIFIED.
+
 ## v0.9.0 — 2026-11-21
 
 - Add local interactive Java starter workflow (`sagallm java`) for nine explicit Japanese/English task templates, with no LLM API and no pretrained code model.

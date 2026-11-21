@@ -1,6 +1,6 @@
 # SagaLLM
 
-**Prototype v0.9.0** — offline 5-shot MMLU-style evaluation, SHA-pinned dataset review, local hardware diagnostics, and CPU/Gloo readiness tests. The model itself remains experimental and untrained at 1B/3B scale.
+**Prototype v0.10.0** — offline 5-shot MMLU-style evaluation, SHA-pinned dataset review, local hardware diagnostics, and CPU/Gloo readiness tests. The model itself remains experimental and untrained at 1B/3B scale.
 
 A local-first **from-scratch** decoder-only language model research project. The model uses native PyTorch implementations of RMSNorm, rotary embeddings, grouped-query attention, SwiGLU and a tied token embedding / language-modeling head. The repository includes a small educational byte-level BPE tokenizer, disk-backed JSONL / uint32 token shards, deterministic document splits, resumable single-device training, supervised fine-tuning, held-out token-level validation, an optional local inference API, and greedy/sampling generation.
 
@@ -33,6 +33,46 @@ python -m pytest -q
 ```
 
 The `examples/toy_corpus.txt` is an artificial, repository-authored smoke-test corpus; it is **not** a licensed large-scale language training dataset. The `--license CC0-1.0` shown for this repository-authored demo does not certify permissions for third-party materials. `data/`, `checkpoints/` and binary model weights are gitignored. The default Python tokenizer is intentionally simple. The optional Rust-backed tokenizer can be selected with `--backend hf` (see `docs/TOKENIZERS.md`).
+
+## Model-backed Java revisions (v0.10, experimental)
+
+SagaLLM can now **optionally use its own local, matching model checkpoint** to
+propose edits to an existing Java starter project. Unlike the deterministic
+starter workflow below, `java ai-revise` actually calls `SagaTransformer.generate`.
+This does **not** make the tiny research checkpoints competent Java coders:
+expect incomplete or invalid output and `REJECTED` responses.
+No cloud LLM, pretrained model or paid API is used or silently substituted.
+
+```bash
+# Safe default: generate, compile with javac -proc:none, and show a diff.
+sagallm java ai-revise --project work/my-java \
+  --checkpoint checkpoints/your-trained-sft.pt --tokenizer data/tokenizer.json \
+  --prompt 'Change the greeting to Hello Saga' --max-new-tokens 512
+
+# Interactive: review the diff and type APPLY to install that exact candidate.
+sagallm java ai-chat --project work/my-java \
+  --checkpoint checkpoints/your-trained-sft.pt --tokenizer data/tokenizer.json
+
+# Generate five original synthetic SFT examples (a test corpus, NOT enough for
+# reliable code generation). Refuses to overwrite the output JSONL file.
+sagallm java toy-sft --output data/java-toy-sft.jsonl
+
+# Training requires a compatible pre-trained base checkpoint, tokenizer and a
+# context window large enough for the full prompt and response. No training
+# runs automatically and no 1B/3B model is loaded by this command.
+sagallm train sft --checkpoint checkpoints/base.pt \
+  --tokenizer data/tokenizer.json --data data/java-toy-sft.jsonl \
+  --output checkpoints/java-toy-sft.pt --steps 1 --device cpu
+```
+
+A local **JDK 17+** must be on `PATH` for successful compilation. The model
+must be trained separately and its checkpoint must contain tokenizer SHA-256
+provenance. Candidate Java is **never run automatically**; `javac` confirms
+syntax, not correctness or safety. The initial model path edits an *existing*
+SagaLLM Java starter, keeping its class name and one source file; multiple-file
+project generation remains NOT_IMPLEMENTED. The original template editing
+command refuses to regenerate a model-edited file to avoid overwriting custom
+work. See [docs/JAVA_VIBE.md](docs/JAVA_VIBE.md) for limitations.
 
 ## Java natural-language starter workflow (v0.9)
 

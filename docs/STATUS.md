@@ -51,3 +51,15 @@ See [MMLU_REFERENCE.md](MMLU_REFERENCE.md) for limits.
 - JDK compile and intentional Java run: LOCAL_TESTED; **not a sandbox**.
 - Arbitrary prompt-to-Java by trained SagaLLM: NOT_IMPLEMENTED / NOT_TRAINED. Do not claim general vibe coding.
 - IDE integration, autonomous file edits, automatic dependency management, automatic fixing of compile errors: NOT_IMPLEMENTED.
+
+## v0.10 local model-backed Java experiment
+
+- `java ai-revise` and `java ai-chat`: **IMPLEMENTED / LOCAL CPU TESTED** for
+  using a trusted local SagaTransformer checkpoint to generate a candidate,
+  compile with JDK, preview a diff and apply only after explicit approval.
+- `java toy-sft`: **IMPLEMENTED / LOCAL CPU TESTED**, five original synthetic
+  instruction/Java examples in existing SFT schema; one tiny SFT update tested.
+- Learned Java coding quality, realistic coding benchmarks, reliable model
+  self-repair, GPU testing, multi-file project agent, 1B/3B training: **NOT_RUN**.
+- Java compilation does not provide a security sandbox; automated Java execution
+  remains forbidden in the new model-generated workflow.

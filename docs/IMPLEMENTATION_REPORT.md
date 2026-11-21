@@ -76,3 +76,19 @@ Implemented deterministic post-ingestion corpus curation (normalized and probabl
 - Current SagaLLM weights are **not** capable of reliable free-form Java vibe coding. Unsupported requests fail explicitly; no external pretrained models or paid API were used.
 - Java compilation uses javac with annotation processors disabled and a short timeout. Explicit Java execution is a host process and **not isolated**; only trusted files should be run.
 - The source LICENSE is still undecided. No third-party Java code dataset imported or trained.
+
+## SagaLLM v0.10 experimental Java model adapter (2026-11-21)
+
+- Added `src/sagallm/java_ai.py`: local checkpoint-backed SagaTransformer
+  inference, verified matching tokenizer, safe output parsing, bounded compiler
+  diagnostics and repair iterations, preview/approve with source hashes.
+- Added `java ai-revise`, `java ai-chat`, `java toy-sft` CLI commands and
+  regression tests; model-generated Java is never automatically executed.
+- One tiny checkpoint loading and one genuine 1-step CPU SFT optimization were
+  tested with original synthetic Java pairs. This verifies plumbing only, NOT
+  the ability to generate correct Java from natural language.
+- Large checkpoints, long model outputs, unsupported context lengths, missing
+  compilers and source mismatches are fail-closed. No 1B/3B model was allocated.
+- Local Python 3.13 / PyTorch CPU testing must be distinguished from GitHub CI
+  and from real GPU validation; official Java code generation benchmarks and
+  production-grade self-repair remain NOT_RUN.

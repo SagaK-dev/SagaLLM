@@ -69,6 +69,19 @@ def main(argv: list[str] | None = None) -> None:
     jchat = js.add_parser("chat", help="Interactive create/revise/check loop")
     jchat.add_argument("--project", required=True)
     jchat.add_argument("--class-name", default="Main")
+    jai = js.add_parser("ai-revise", help="Local SagaLLM-checkpoint Java code proposal, compile, and reviewed apply")
+    jaic = js.add_parser("ai-chat", help="Interactive revision using a local SagaLLM checkpoint")
+    for assistant in (jai, jaic):
+        assistant.add_argument("--project", required=True, help="Existing SagaLLM Java starter project")
+        assistant.add_argument("--checkpoint", required=True, help="Trusted local SagaLLM checkpoint")
+        assistant.add_argument("--tokenizer", required=True, help="Matching local tokenizer file")
+        assistant.add_argument("--device", choices=("cpu", "cuda", "mps"), default="cpu")
+        assistant.add_argument("--max-new-tokens", type=int, default=256)
+        assistant.add_argument("--attempts", type=int, default=2, help="1..3 attempts; never runs generated code")
+    jai.add_argument("--prompt", required=True)
+    jai.add_argument("--apply", action="store_true", help="Explicitly write a successful, compiled proposal")
+    jsft = js.add_parser("toy-sft", help="Write five original toy Java instruction-response examples")
+    jsft.add_argument("--output", required=True, help="New JSONL file; never overwrite")
     token = sub.add_parser("tokenizer")
     ts = token.add_subparsers(dest="action", required=True)
     train_tok = ts.add_parser("train")
@@ -222,6 +235,25 @@ def main(argv: list[str] | None = None) -> None:
         elif args.action == "run":
             result = run_project(args.project, trust_local_code=args.trust_local_code,
                                  stdin=args.stdin, timeout=args.timeout, java_args=args.java_arg)
+        elif args.action == "toy-sft":
+            from .java_ai import build_toy_java_sft
+            result = build_toy_java_sft(args.output)
+        elif args.action in ("ai-revise", "ai-chat"):
+            from .java_ai import LocalCheckpointGenerator, generate_revision, ai_chat
+            backend = LocalCheckpointGenerator(args.checkpoint, args.tokenizer, device=args.device)
+            if args.action == "ai-revise":
+                result = generate_revision(
+                    args.project, args.prompt, generator=backend,
+                    max_new_tokens=args.max_new_tokens, attempts=args.attempts,
+                    apply=args.apply,
+                    checkpoint_sha256=backend.checkpoint_sha256,
+                    tokenizer_sha256=backend.tokenizer_sha256,
+                )
+            else:
+                ai_chat(args.project, backend, max_new_tokens=args.max_new_tokens,
+                        attempts=args.attempts, checkpoint_sha256=backend.checkpoint_sha256,
+                        tokenizer_sha256=backend.tokenizer_sha256)
+                return
         else:
             chat(args.project, class_name=args.class_name)
             return
@@ -341,7 +373,7 @@ def main(argv: list[str] | None = None) -> None:
                                  vocab_limit=tokenizer.vocab_size)
         result = {"text": tokenizer.decode(new_ids[0].tolist()), "generated_tokens": int(new_ids.size(1)-ids.size(1))}
     print(json.dumps(result, ensure_ascii=False, indent=2, default=str))
-    if args.command == "java" and result.get("status") == "FAIL":
+    if args.command == "java" and result.get("status") in ("FAIL", "REJECTED"):
         raise SystemExit(1)
     if args.command == "hardware" and result.get("runtime_test", {}).get("status") == "FAIL":
         raise SystemExit(1)
