@@ -97,6 +97,7 @@ def export_transformers(
         (output / 'generation_config.json').write_text(
             json.dumps({'bos_token_id': 1, 'eos_token_id': 2, 'pad_token_id': 0,
                         'max_new_tokens': 32,
+                        'use_cache': False,
                         'suppress_tokens': list(range(tokenizer.vocab_size, config.vocab_size))}, indent=2) + '\n', encoding='utf-8')
         # The original byte-level BPE cannot be converted to a standard HF
         # tokenizer without changing segmentation rules. Avoid a false claim.

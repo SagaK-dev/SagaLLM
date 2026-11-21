@@ -8,6 +8,12 @@ from transformers import PretrainedConfig
 
 class SagaLLMConfig(PretrainedConfig):
     model_type = "sagallm"
+    # Transformers tooling expects standard Transformer layer/head names.
+    attribute_map = {
+        "num_hidden_layers": "num_layers",
+        "num_attention_heads": "num_heads",
+        "num_key_value_heads": "num_kv_heads",
+    }
     keys_to_ignore_at_inference = ["past_key_values"]
 
     def __init__(
