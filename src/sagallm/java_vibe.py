@@ -338,6 +338,8 @@ def propose_revision(project_path: str | Path, prompt: str, *, apply: bool = Fal
     prompt = _text(prompt)
     project = Path(project_path).expanduser().resolve()
     meta, source, original = _metadata(project)
+    if meta.get("generated_by") == "local_sagallm_checkpoint":
+        raise ValueError("Model-edited Java project: use java ai-revise/ai-chat; template regeneration would overwrite custom edits")
     opts = dict(meta.get("options", {}))
     name = meta["class_name"]
     cls = (re.search(r"(?:クラス名を|クラス名は|rename\s+(?:the\s+)?class(?:\s+to)?|class\s+name\s+to)\s*([A-Za-z_$][A-Za-z0-9_$]*)", prompt, re.IGNORECASE))

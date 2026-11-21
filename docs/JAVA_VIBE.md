@@ -102,3 +102,66 @@ python scripts/check_cpu.py
 
 The GitHub CPU workflow installs JDK 21 and compiles all nine templates.
 It does not upload generated Java or run any unknown external project.
+
+## v0.10 — Local checkpoint-driven Java revisions
+
+The optional `java ai-revise` and `java ai-chat` commands load a *trusted local*
+SagaLLM `.pt` checkpoint and matching tokenizer. They do not wrap external API
+calls. The usual `java new/chat/revise` starter templates still work **until**
+a file has been modified by the model. Thereafter, use the model-backed
+editor; template regeneration is blocked so custom edits are not discarded.
+
+```bash
+sagallm java new --prompt 'Hello world' --output work/my-java
+
+# Generate an uncommitted candidate, compile it and show a diff.
+sagallm java ai-revise --project work/my-java --prompt 'Say Hello world' \
+  --checkpoint checkpoints/java-sft.pt --tokenizer data/tokenizer.json \
+  --max-new-tokens 512 --attempts 2
+
+# Interactive review / approve: type APPLY to accept precisely the displayed
+# candidate; the model is not invoked again on acceptance.
+sagallm java ai-chat --project work/my-java \
+  --checkpoint checkpoints/java-sft.pt --tokenizer data/tokenizer.json
+```
+
+`java ai-revise --apply` is an **explicit noninteractive opt-in** to install a
+compiling proposal without the interactive diff approval step. Omit it when you
+want to review the change manually first. Once applied, the exact model checkpoint
+and tokenizer hashes are recorded in project metadata. Raw natural-language
+prompts are not saved as a separate chat history.
+
+### Simple local SFT smoke data
+
+```bash
+sagallm java toy-sft --output data/java-toy-sft.jsonl
+sagallm train sft --checkpoint checkpoints/base.pt --tokenizer data/tokenizer.json \
+  --data data/java-toy-sft.jsonl --output checkpoints/java-toy-sft.pt \
+  --steps 1 --device cpu
+```
+
+The five examples use project-owned deterministic Java templates. Their prompts
+are encoded with the same `User: ...\nAssistant: ` framing as `format_sft_example()`.
+This alone **cannot** teach a small language model to write arbitrary Java.
+A checkpoint with a sufficiently long context window is required; unsupported
+models reject requests with `INSUFFICIENT_CONTEXT`. Training/permission review
+is always separate and explicit.
+
+### Invariants and limitations
+
+- Entire Java file replacement only; **one** expected public class and no
+  `package` statement, dependencies, multiple files or arbitrary IDE access.
+- No model output is applied if extraction or compilation fails, or if the JDK
+  is absent. Compiler diagnostics are fed back only on an explicit bounded retry.
+- `javac -proc:none` reduces plugin execution but is **not** an OS sandbox. The
+  Java program is not run by `ai-revise` or `ai-chat`. A manually requested
+  `java run --trust-local-code` is a separate unsafe opt-in.
+- Checkpoint files must be from trusted sources. The local adapter refuses
+  checkpoints over 512 MiB and model configs over 200 million parameters.
+  No 1B/3B inference or GPU validation has been done.
+- The adapter requires an appropriate tokenization/context window and does not
+  assure logical correctness, unit-test passing, useful Java capability or
+  consistent self-repair. Syntax compilation is not semantic validation.
+- The SFT dataset is an **original synthetic smoke fixture**, not an approved
+  external Java corpus or proof of learned programming ability. Before importing
+  external material, use the project's dataset-license review workflow.
