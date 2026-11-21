@@ -1,3 +1,11 @@
+## v0.9.0 — 2026-11-21
+
+- Add local interactive Java starter workflow (`sagallm java`) for nine explicit Japanese/English task templates, with no LLM API and no pretrained code model.
+- Support conversation-style reviewed modifications (class name, comments, greeting text and FizzBuzz upper bound) with diffs and deliberate `--apply`.
+- Add optional JDK compilation with annotation processors disabled; explicit untrusted-code warnings and `--trust-local-code` opt-in for executing the generated Java.
+- Prevent overwrite of project directories and detect out-of-band source edits through SHA-256.
+- Add Java source/runtime regression tests and CI JDK 21 setup. Arbitrary vibe coding remains unsupported until a capable local model and substantial code training are available.
+
 ## v0.8.0 — 2026-11-21
 
 - Added opt-in `sagallm hardware inspect`, `smoke`, and `distributed-smoke` commands, with safe, small synthetic tests and exclusive-create JSON evidence.

@@ -46,6 +46,29 @@ def main(argv: list[str] | None = None) -> None:
     hw_dist = ht.add_parser("distributed-smoke", help="Two local CPU Gloo collective ranks, no training")
     hw_dist.add_argument("--timeout", type=int, default=40)
     hw_dist.add_argument("--output", help="New JSON evidence file; refuses overwrite")
+    java = sub.add_parser("java", help="Local natural-language Java starter projects (supported templates only)")
+    js = java.add_subparsers(dest="action", required=True)
+    js.add_parser("templates", help="List supported basic Java tasks")
+    jnew = js.add_parser("new", help="Create Java project from a supported Japanese/English request")
+    jnew.add_argument("--prompt", required=True)
+    jnew.add_argument("--output", required=True, help="New project directory; never overwrite")
+    jnew.add_argument("--class-name", default="Main")
+    jnew.add_argument("--template", choices=("hello", "calculator", "fizzbuzz", "guess", "todo", "prime", "factorial", "file", "swing"))
+    jrev = js.add_parser("revise", help="Preview or apply a supported conversational revision")
+    jrev.add_argument("--project", required=True)
+    jrev.add_argument("--prompt", required=True)
+    jrev.add_argument("--apply", action="store_true", help="Write reviewed diff; default preview only")
+    jcheck = js.add_parser("check", help="Compile with javac -proc:none (does not run Java)")
+    jcheck.add_argument("--project", required=True)
+    jrun = js.add_parser("run", help="Explicitly compile and run trusted local Java; NOT sandboxed")
+    jrun.add_argument("--project", required=True)
+    jrun.add_argument("--trust-local-code", action="store_true", help="I understand Java can access local files/network")
+    jrun.add_argument("--stdin", default="", help="Text to pass to the console program")
+    jrun.add_argument("--timeout", type=float, default=6.0)
+    jrun.add_argument("--java-arg", action="append", default=[], help="Java main method argument")
+    jchat = js.add_parser("chat", help="Interactive create/revise/check loop")
+    jchat.add_argument("--project", required=True)
+    jchat.add_argument("--class-name", default="Main")
     token = sub.add_parser("tokenizer")
     ts = token.add_subparsers(dest="action", required=True)
     train_tok = ts.add_parser("train")
@@ -186,6 +209,22 @@ def main(argv: list[str] | None = None) -> None:
             precision=getattr(args, "precision", "fp32"),
             timeout=getattr(args, "timeout", 40), output=args.output,
         )
+    elif args.command == "java":
+        from .java_vibe import TEMPLATES, create_project, propose_revision, check_project, run_project, chat
+        if args.action == "templates":
+            result = {"supported": TEMPLATES, "mode": "deterministic", "llm_based": False}
+        elif args.action == "new":
+            result = create_project(args.output, args.prompt, template=args.template, class_name=args.class_name)
+        elif args.action == "revise":
+            result = propose_revision(args.project, args.prompt, apply=args.apply)
+        elif args.action == "check":
+            result = check_project(args.project)
+        elif args.action == "run":
+            result = run_project(args.project, trust_local_code=args.trust_local_code,
+                                 stdin=args.stdin, timeout=args.timeout, java_args=args.java_arg)
+        else:
+            chat(args.project, class_name=args.class_name)
+            return
     elif args.command == "tokenizer":
         if args.action == "train":
             if args.backend == "hf":
@@ -302,6 +341,8 @@ def main(argv: list[str] | None = None) -> None:
                                  vocab_limit=tokenizer.vocab_size)
         result = {"text": tokenizer.decode(new_ids[0].tolist()), "generated_tokens": int(new_ids.size(1)-ids.size(1))}
     print(json.dumps(result, ensure_ascii=False, indent=2, default=str))
+    if args.command == "java" and result.get("status") == "FAIL":
+        raise SystemExit(1)
     if args.command == "hardware" and result.get("runtime_test", {}).get("status") == "FAIL":
         raise SystemExit(1)
 

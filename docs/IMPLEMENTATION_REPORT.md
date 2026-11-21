@@ -68,3 +68,11 @@ Implemented deterministic post-ingestion corpus curation (normalized and probabl
 - Python 3.13 CPU tests: **78 passed, 4 skipped** (optional Transformers and tokenizer integrations not installed in the container). `scripts/check_cpu.py` passed.
 - All GPU, MPS, BF16 GPU, multi-GPU and 1B/3B training: **NOT_RUN**. Automatic physical hardware attestation: **NOT_ATTESTED**.
 - Exact reproducible commands and conditions are documented in `docs/PHYSICAL_VALIDATION.md`. Hosted GitHub Actions verification remains separate.
+
+## SagaLLM v0.9 local Java starter coding (2026-11-21)
+
+- Created `src/sagallm/java_vibe.py`, added `sagallm java` CLI, manual, and a regression suite.
+- Nine deterministic Java standard-library templates, Japanese/English intent matching, preview-before-apply edits, source SHA-256 guards, optional javac 17-compatible compilation and opt-in Java execution.
+- Current SagaLLM weights are **not** capable of reliable free-form Java vibe coding. Unsupported requests fail explicitly; no external pretrained models or paid API were used.
+- Java compilation uses javac with annotation processors disabled and a short timeout. Explicit Java execution is a host process and **not isolated**; only trusted files should be run.
+- The source LICENSE is still undecided. No third-party Java code dataset imported or trained.
