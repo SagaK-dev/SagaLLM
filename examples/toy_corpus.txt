@@ -1,0 +1,23 @@
+こんにちは。これは小さな言語モデルの学習テストです。日本語の文章を読みます。
+
+Hello world. This is a toy corpus for testing a small language model. We read English text.
+
+Python example: def square(x): return x * x. This is only test code, not a training benchmark.
+
+日本語とEnglishの両方をテストします。print('hello') is valid Python syntax.
+
+The model predicts the next token. The tiny experiment does not produce useful intelligence.
+
+朝の空は青く、夜には星が見えます。学習テスト用の人工的な文章です。
+
+Functions return values. Loops repeat statements. Variable names can include underscores.
+
+小さな実験を繰り返して、保存と再開が動作することを確かめます。
+
+JavaScript example: const add = (a, b) => a + b; console.log(add(1, 2));
+
+The quick brown fox jumps over the lazy dog. The rain in Spain falls mainly on the plain.
+
+日本語のテスト：猫、犬、鳥、海、山、川、森、町、学校、研究、言語、計算。
+
+C example: int add(int a, int b) { return a + b; }
