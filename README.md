@@ -77,7 +77,7 @@ python -m pip install -e ".[test,serve]"
 python scripts/check_cpu.py
 ```
 
-The CI workflow was tested syntactically and locally; GitHub Actions status must be checked after triggering a run. A successful CPU CI run is not GPU validation.
+GitHub Actions v0.4 CPU CI passed (48 tests, run 44903131319), including the optional native tokenizer. A successful CPU CI run is not GPU validation.
 
 ## Licensing
 

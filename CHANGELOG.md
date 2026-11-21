@@ -5,7 +5,7 @@
 - Added optional Hugging Face Tokenizers-based Rust ByteLevel BPE training from a document iterator (`--backend hf`), with its own one-file tokenizer format and backward-compatible loader for the v0.3 Python BPE format.
 - Added a local multiple-choice continuation log-likelihood benchmark harness and MMLU-style four-choice JSONL adapter. Reports include SHA-256 provenance and explicitly **do not** claim official benchmark comparability.
 - Added optional contamination screening against immutable prepared training document shards, including their SHA-256 validation and checkpoint corpus matching. Missing corpus proofs are marked `NOT_CHECKED` / `CHECKPOINT_CORPUS_NOT_RECORDED`.
-- Added tests, toy benchmark input, and dedicated documentation. CI installs the optional fast-tokenizer backend for hosted tests.
+- Added tests, toy benchmark input, and dedicated documentation. GitHub-hosted CPU CI passed 48/48 tests, including the native tokenizer backend (run 44903131319).
 
 ## v0.3.0 — 2026-11-21
 
