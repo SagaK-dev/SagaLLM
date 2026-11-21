@@ -59,3 +59,12 @@ Implemented deterministic post-ingestion corpus curation (normalized and probabl
 - Added `src/sagallm/mmlu_reference.py` with six-column CSV parsing, SHA-256 reviewed inventory, prompt layout, 0–5-shot context fallback and explicit next-token/continuation scoring modes.
 - Added CLI subcommands and synthetic CPU tests (`tests/test_mmlu_reference.py`), including round-robin subject sampling, review refusal, tamper detection and few-shot data leakage.
 - Not implemented: official MMLU dataset ingestion and verified league/leaderboard comparability. No official benchmark data is bundled or fetched.
+
+## SagaLLM v0.8 local hardware checks (2026-11-21)
+
+- Added inspect-only `hardware inspect` (no weights allocated). The container reports Linux / CPU-only PyTorch, no CUDA or MPS. This is not the user's computer.
+- `hardware smoke --device cpu`: **PASS_RUNTIME**, one tiny Forward/Backward/AdamW step, checkpoint save/reload, two-token generation. It does not measure language ability.
+- `hardware distributed-smoke`: **PASS_RUNTIME**, two local CPU processes with Gloo all-reduce sum=3; it does not implement DDP or verify NCCL.
+- Python 3.13 CPU tests: **78 passed, 4 skipped** (optional Transformers and tokenizer integrations not installed in the container). `scripts/check_cpu.py` passed.
+- All GPU, MPS, BF16 GPU, multi-GPU and 1B/3B training: **NOT_RUN**. Automatic physical hardware attestation: **NOT_ATTESTED**.
+- Exact reproducible commands and conditions are documented in `docs/PHYSICAL_VALIDATION.md`. Hosted GitHub Actions verification remains separate.

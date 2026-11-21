@@ -35,6 +35,17 @@ def main(argv: list[str] | None = None) -> None:
     parser = argparse.ArgumentParser(description="SagaLLM: native local language model development")
     sub = parser.add_subparsers(dest="command", required=True)
     sub.add_parser("doctor")
+    hardware = sub.add_parser("hardware", help="Local-only hardware inventory and bounded smoke tests")
+    ht = hardware.add_subparsers(dest="action", required=True)
+    hw_inspect = ht.add_parser("inspect", help="Metadata only; never allocate model weights")
+    hw_inspect.add_argument("--output", help="New JSON evidence file; refuses overwrite")
+    hw_smoke = ht.add_parser("smoke", help="One tiny train/checkpoint/generation step")
+    hw_smoke.add_argument("--device", choices=("cpu", "cuda", "mps", "auto"), default="cpu")
+    hw_smoke.add_argument("--precision", choices=("fp32", "bf16"), default="fp32")
+    hw_smoke.add_argument("--output", help="New JSON evidence file; refuses overwrite")
+    hw_dist = ht.add_parser("distributed-smoke", help="Two local CPU Gloo collective ranks, no training")
+    hw_dist.add_argument("--timeout", type=int, default=40)
+    hw_dist.add_argument("--output", help="New JSON evidence file; refuses overwrite")
     token = sub.add_parser("tokenizer")
     ts = token.add_subparsers(dest="action", required=True)
     train_tok = ts.add_parser("train")
@@ -168,6 +179,13 @@ def main(argv: list[str] | None = None) -> None:
     args = parser.parse_args(argv)
     if args.command == "doctor":
         result = doctor()
+    elif args.command == "hardware":
+        from .hardware import run_hardware_command
+        result = run_hardware_command(
+            args.action, device=getattr(args, "device", "cpu"),
+            precision=getattr(args, "precision", "fp32"),
+            timeout=getattr(args, "timeout", 40), output=args.output,
+        )
     elif args.command == "tokenizer":
         if args.action == "train":
             if args.backend == "hf":
@@ -284,6 +302,8 @@ def main(argv: list[str] | None = None) -> None:
                                  vocab_limit=tokenizer.vocab_size)
         result = {"text": tokenizer.decode(new_ids[0].tolist()), "generated_tokens": int(new_ids.size(1)-ids.size(1))}
     print(json.dumps(result, ensure_ascii=False, indent=2, default=str))
+    if args.command == "hardware" and result.get("runtime_test", {}).get("status") == "FAIL":
+        raise SystemExit(1)
 
 
 if __name__ == "__main__":

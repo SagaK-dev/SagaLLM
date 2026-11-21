@@ -1,6 +1,6 @@
 # SagaLLM
 
-**Prototype v0.6.0** — source-pinned dataset review cards, stronger MMLU-style contamination checks and subject-level evaluation, plus v0.5 Transformers export.
+**Prototype v0.8.0** — offline 5-shot MMLU-style evaluation, SHA-pinned dataset review, local hardware diagnostics, and CPU/Gloo readiness tests. The model itself remains experimental and untrained at 1B/3B scale.
 
 A local-first **from-scratch** decoder-only language model research project. The model uses native PyTorch implementations of RMSNorm, rotary embeddings, grouped-query attention, SwiGLU and a tied token embedding / language-modeling head. The repository includes a small educational byte-level BPE tokenizer, disk-backed JSONL / uint32 token shards, deterministic document splits, resumable single-device training, supervised fine-tuning, held-out token-level validation, an optional local inference API, and greedy/sampling generation.
 
@@ -155,3 +155,15 @@ Data preparation requires a supplied license identifier, which is **not proof** 
 ## MMLU reference-style offline CSV evaluation (v0.7)
 
 Use `sagallm mmlu inventory`, `sagallm mmlu verify`, and `sagallm mmlu evaluate` with **user-supplied, manually approved local MMLU CSVs**. The strict single-token label scorer approximates the original Hendrycks 5-shot protocol but refuses incompatible tokenization. Outputs never claim to be certified MMLU scores. No third-party benchmark data is downloaded or checked in. See [docs/MMLU_REFERENCE.md](docs/MMLU_REFERENCE.md).
+
+## Hardware validation and distributed readiness (v0.8)
+
+No GPU is required for the built-in hardware evidence tools:
+
+```bash
+sagallm hardware inspect --output reports/hardware-inventory.json
+sagallm hardware smoke --device cpu --output reports/cpu-smoke.json
+sagallm hardware distributed-smoke --output reports/gloo-smoke.json
+```
+
+On the actual GPU-equipped computer, **explicitly** run `sagallm hardware smoke --device cuda --precision fp32` (or `--device mps` on supported Apple Silicon). BF16 is an opt-in CUDA-only check. All reports distinguish `PASS_RUNTIME` from `NOT_RUN` and are always `NOT_ATTESTED` for physical ownership. No paid cloud service, GPU provisioning, pretrained checkpoint or 1B/3B training is performed. See [docs/PHYSICAL_VALIDATION.md](docs/PHYSICAL_VALIDATION.md).
