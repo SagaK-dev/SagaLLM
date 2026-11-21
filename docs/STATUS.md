@@ -26,3 +26,12 @@
 - Added optional local SHA-256-pinned, purpose-restricted human dataset-review cards for data prepare/shard and benchmark scoring; auto-verification of actual legal rights remains impossible.
 - MMLU-style raw-question overlap audit fixed; subject and macro scores and an interval added. This is **not** an official MMLU score.
 - No official benchmark data imported, no real GPU or distributed training verified, no 1B/3B weights trained.
+
+## v0.7 update
+
+- Offline Hendrycks-style CSV evaluation (5-shot layout, conditional answer-label scoring): IMPLEMENTED/CPU TESTED.
+- Human-reviewed, SHA-pinned local MMLU dev/test data inventory: IMPLEMENTED/CPU TESTED.
+- Published/official MMLU test data evaluation and reproducible official benchmark score: **NOT_RUN**.
+- Hardware GPU measurements, 1B/3B full model training: **NOT_RUN**.
+
+See [MMLU_REFERENCE.md](MMLU_REFERENCE.md) for limits.

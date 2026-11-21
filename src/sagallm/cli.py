@@ -122,6 +122,28 @@ def main(argv: list[str] | None = None) -> None:
     bench.add_argument("--scoring", choices=("mean", "sum"), default="mean")
     bench.add_argument("--device", default="cpu")
     bench.add_argument("--output", help="Write a JSON report (refuses overwrite)")
+    mmlu = sub.add_parser("mmlu", help="Offline Hendrycks-style MMLU CSV evaluator")
+    mm = mmlu.add_subparsers(dest="action", required=True)
+    inv = mm.add_parser("inventory", help="Create pending-review SHA-256 inventory for local CSVs")
+    inv.add_argument("--data-dir", required=True)
+    inv.add_argument("--output", required=True)
+    verify = mm.add_parser("verify", help="Verify SHA-pinned reviewed MMLU CSV inventory")
+    verify.add_argument("--data-dir", required=True)
+    verify.add_argument("--inventory", required=True)
+    runm = mm.add_parser("evaluate", help="Evaluate reviewed local MMLU dev/test CSVs")
+    runm.add_argument("--checkpoint", required=True)
+    runm.add_argument("--tokenizer", required=True)
+    runm.add_argument("--data-dir", required=True)
+    runm.add_argument("--inventory", required=True)
+    runm.add_argument("--subjects", help="Comma-separated local MMLU subjects; default all")
+    runm.add_argument("--shots", type=int, default=5)
+    runm.add_argument("--max-examples", type=int, default=100)
+    runm.add_argument("--scoring", choices=("reference_next_token", "continuation"),
+                      default="reference_next_token")
+    runm.add_argument("--train-docs", help="Exact prepared train-document shards, if available")
+    runm.add_argument("--allow-contaminated", action="store_true")
+    runm.add_argument("--device", default="cpu")
+    runm.add_argument("--output", help="New JSON report; refuses overwrite")
     exp = sub.add_parser("export", help="Write a local Transformers-compatible safetensors bundle")
     exp.add_argument("--checkpoint", required=True)
     exp.add_argument("--tokenizer", required=True)
@@ -208,6 +230,25 @@ def main(argv: list[str] | None = None) -> None:
             output.parent.mkdir(parents=True, exist_ok=True)
             with output.open('x', encoding='utf-8') as report:
                 json.dump(result, report, ensure_ascii=False, indent=2)
+    elif args.command == "mmlu":
+        from .mmlu_reference import create_inventory_template, evaluate_mmlu
+        if args.action == "inventory":
+            result = create_inventory_template(args.data_dir, args.output)
+        elif args.action == "verify":
+            from .mmlu_reference import verify_inventory
+            result = verify_inventory(args.data_dir, args.inventory)
+        else:
+            subjects = None if args.subjects is None else args.subjects.split(',')
+            result = evaluate_mmlu(
+                args.checkpoint, args.tokenizer, args.data_dir, args.inventory,
+                subjects=subjects, requested_shots=args.shots, max_examples=args.max_examples,
+                scoring=args.scoring, device_name=args.device, training_docs=args.train_docs,
+                allow_contaminated=args.allow_contaminated)
+            if args.output:
+                output = Path(args.output)
+                output.parent.mkdir(parents=True, exist_ok=True)
+                with output.open('x', encoding='utf-8') as handle:
+                    json.dump(result, handle, ensure_ascii=False, indent=2)
     elif args.command == "export":
         from .export import export_transformers
         result = export_transformers(args.checkpoint, args.tokenizer, args.output,
