@@ -10,7 +10,7 @@
 | CLI generation / KV cache | IMPLEMENTED | No production decoding server |
 | Disk-backed dataset shards | PARTIAL | SQLite exact/normalized/heuristic near dedup, JSONL splits, uint32 shards; only basic privacy screening |
 | Basic next-token held-out validation | IMPLEMENTED | Model loss, perplexity, accuracy; rejects training split by default |
-| GitHub Actions CPU CI | IMPLEMENTED / HOSTED_VERIFIED_V0.5 | v0.5 Python 3.11 CPU workflow passed: 53 tests after the final test update; v0.6 hosted CI pending |
+| GitHub Actions CPU CI | IMPLEMENTED / HOSTED_VERIFIED_V0.5 | v0.5 Python 3.11 CPU workflow passed: 53 tests after the final test update; v0.6: hosted CI passed 60 tests; v0.7: hosted CI passed 72 tests |
 | Standardized benchmarks | PARTIAL | Offline multiple-choice/MMLU-style adapter implemented; official datasets, splits and published scoring protocols NOT_RUN |
 | Single-turn SFT | IMPLEMENTED | Assistant-response masking; local JSONL |
 | DPO / scalable SFT | NOT_IMPLEMENTED | Phase 4 |
@@ -35,3 +35,11 @@
 - Hardware GPU measurements, 1B/3B full model training: **NOT_RUN**.
 
 See [MMLU_REFERENCE.md](MMLU_REFERENCE.md) for limits.
+
+## v0.8 local hardware validation update
+
+- Hardware inventory and local tiny CPU Forward/Backward, optimizer, checkpoint and generation: **IMPLEMENTED / LOCAL_CPU_PASS**.
+- Two-rank local CPU/Gloo `all_reduce`: **IMPLEMENTED / LOCAL_CPU_PASS**; not DDP training.
+- MPS, CUDA, BF16 real GPU tests: **NOT_RUN**, because no compatible GPU exists in this development container.
+- Real physical machine operator attestation and multi-GPU training: **NOT_ATTESTED / NOT_RUN**.
+- GitHub-hosted CPU CI for v0.8: **PENDING** until workflow runs.

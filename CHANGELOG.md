@@ -1,3 +1,10 @@
+## v0.8.0 — 2026-11-21
+
+- Added opt-in `sagallm hardware inspect`, `smoke`, and `distributed-smoke` commands, with safe, small synthetic tests and exclusive-create JSON evidence.
+- Added CUDA/MPS inventory (driver/VRAM where available), BF16-capability gates, CPU checkpoint roundtrip, and two-process local CPU/Gloo collective readiness.
+- Added hardware regression tests and a physical validation guide; never assert `PASS_PHYSICAL` or trained 1B/3B.
+- All GPU and NCCL/multi-GPU tests are marked `NOT_RUN` in CPU-only development.
+
 # v0.7.0 — Offline MMLU reference-style CSV adapter
 
 - Added `sagallm mmlu inventory`, `mmlu verify` and `mmlu evaluate` commands. Local dev/test CSVs are verified using a pending-by-default human-reviewed SHA-256 inventory.
