@@ -1,0 +1,25 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "sagallm"
+version = "0.1.0"
+description = "Local-first from-scratch decoder-only language model research framework"
+requires-python = ">=3.10"
+dependencies = ["torch>=2.3", "PyYAML>=6.0"]
+
+[project.optional-dependencies]
+test = ["pytest>=8.0"]
+parquet = ["pyarrow>=14"]
+monitor = ["psutil>=5"]
+
+[project.scripts]
+sagallm = "sagallm.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
