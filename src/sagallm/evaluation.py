@@ -5,7 +5,7 @@ from pathlib import Path
 import torch
 from .config import ModelConfig
 from .model import SagaTransformer
-from .tokenization import ByteBPETokenizer
+from .tokenization import ByteBPETokenizer, load_tokenizer
 from .training import checkpoint_load, load_tokens, resolve_device, verify_checkpoint_tokenizer
 from .shards import TokenShardDataset
 
@@ -17,7 +17,7 @@ def evaluate_language_model(checkpoint: str | Path, tokenizer_file: str | Path, 
                             split: str = "validation", allow_training_data: bool = False) -> dict:
     if batches < 1 or batch_size < 1:
         raise ValueError("batches and batch_size must be positive")
-    tokenizer = ByteBPETokenizer.load(tokenizer_file)
+    tokenizer = load_tokenizer(tokenizer_file)
     state = torch.load(checkpoint, map_location="cpu", weights_only=True)
     config = ModelConfig(**state["config"])
     verify_checkpoint_tokenizer(state, tokenizer_file)

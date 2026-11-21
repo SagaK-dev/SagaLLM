@@ -1,3 +1,10 @@
+## v0.4 local changes (validation required)
+
+- Optional streaming-iterator HF Tokenizers integration and dispatch for both serialized tokenizer formats.
+- Offline multiple-choice/MMLU-style question adapter, scoring, and leakage checks against verified train-document shards.
+- No official benchmark dataset, internet API, pretrained weights, GPU training or pretrained 1B/3B model is included.
+- Local `tokenizers` package was unavailable in the sandbox; the optional backend must be exercised by GitHub Actions. CPU fixture tests exercise the non-optional paths locally.
+
 # Implementation and verification report — follow-up v0.2
 
 This report describes work in the execution container, **not** the repository owner's PC. No paid training or external dataset download was performed. No 1B/3B weights were initialized or trained.

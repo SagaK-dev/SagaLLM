@@ -11,7 +11,7 @@ import time
 import torch
 from .config import ModelConfig
 from .model import SagaTransformer
-from .tokenization import ByteBPETokenizer
+from .tokenization import ByteBPETokenizer, load_tokenizer
 from .training import checkpoint_load, resolve_device, verify_checkpoint_tokenizer
 
 
@@ -25,7 +25,7 @@ def create_app(checkpoint: str | Path, tokenizer_file: str | Path, *, api_key: s
         from pydantic import BaseModel, Field
     except ImportError as exc:
         raise RuntimeError("Install optional 'sagallm[serve]' dependencies for HTTP serving") from exc
-    tokenizer = ByteBPETokenizer.load(tokenizer_file)
+    tokenizer = load_tokenizer(tokenizer_file)
     state = torch.load(checkpoint, map_location='cpu', weights_only=True)
     config = ModelConfig(**state['config'])
     verify_checkpoint_tokenizer(state, tokenizer_file)

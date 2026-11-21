@@ -83,3 +83,88 @@ class ByteBPETokenizer:
         if data.get("type") != "byte_bpe_v1":
             raise ValueError("Unsupported tokenizer format")
         return cls(data["merges"])
+
+
+class FastBPETokenizer:
+    """Optional Rust-backed ByteLevel BPE; stores its engine in one checksumable file.
+
+    Token IDs differ from :class:`ByteBPETokenizer`. Never substitute one
+    for the other in an existing checkpoint or uint32 shard dataset.
+    """
+
+    SPECIAL = ByteBPETokenizer.SPECIAL
+    FORMAT = 'hf_byte_bpe_v1'
+
+    def __init__(self, engine):
+        self.engine = engine
+        if any(engine.token_to_id(k) != v for k, v in self.SPECIAL.items()):
+            raise ValueError('Fast tokenizer special token IDs must be 0..3')
+
+    @staticmethod
+    def _package():
+        try:
+            from tokenizers import Tokenizer, models, trainers, pre_tokenizers, decoders
+        except ImportError as exc:
+            raise RuntimeError('Fast BPE requires the optional dependency: pip install -e ".[fast-tokenizer]"') from exc
+        return Tokenizer, models, trainers, pre_tokenizers, decoders
+
+    @classmethod
+    def train(cls, texts, vocab_size: int = 32768, min_frequency: int = 2):
+        if not (260 <= vocab_size <= 262144) or min_frequency < 1:
+            raise ValueError('Fast BPE vocabulary must be 260..262144 and min_frequency >= 1')
+        Tokenizer, models, trainers, pre_tokenizers, decoders = cls._package()
+        engine = Tokenizer(models.BPE(unk_token='<unk>'))
+        engine.pre_tokenizer = pre_tokenizers.ByteLevel(add_prefix_space=False)
+        engine.decoder = decoders.ByteLevel()
+        trainer = trainers.BpeTrainer(
+            vocab_size=vocab_size, min_frequency=min_frequency,
+            special_tokens=list(cls.SPECIAL),
+            initial_alphabet=pre_tokenizers.ByteLevel.alphabet(),
+            show_progress=False,
+        )
+        # An iterator streams documents into the native library; no Python list is needed.
+        engine.train_from_iterator(texts, trainer=trainer)
+        return cls(engine)
+
+    @property
+    def vocab_size(self) -> int:
+        return self.engine.get_vocab_size(with_added_tokens=True)
+
+    def encode(self, text: str, add_bos: bool = False, add_eos: bool = False) -> list[int]:
+        ids = self.engine.encode(text, add_special_tokens=False).ids
+        return ([self.SPECIAL['<bos>']] if add_bos else []) + ids + (
+            [self.SPECIAL['<eos>']] if add_eos else [])
+
+    def decode(self, ids: list[int], skip_special: bool = True) -> str:
+        if any(not isinstance(i, int) or i < 0 or i >= self.vocab_size for i in ids):
+            raise ValueError('Unknown token ID')
+        return self.engine.decode(ids, skip_special_tokens=skip_special)
+
+    def save(self, path: str | Path) -> None:
+        path = Path(path)
+        path.parent.mkdir(parents=True, exist_ok=True)
+        payload = {'type': self.FORMAT, 'engine': json.loads(self.engine.to_str())}
+        path.write_text(json.dumps(payload, ensure_ascii=False), encoding='utf-8')
+
+    @classmethod
+    def from_payload(cls, payload: dict):
+        if payload.get('type') != cls.FORMAT or not isinstance(payload.get('engine'), dict):
+            raise ValueError('Unsupported fast tokenizer format')
+        Tokenizer, *_ = cls._package()
+        return cls(Tokenizer.from_str(json.dumps(payload['engine'])))
+
+    @classmethod
+    def load(cls, path: str | Path):
+        return cls.from_payload(json.loads(Path(path).read_text(encoding='utf-8')))
+
+
+def load_tokenizer(path: str | Path) -> ByteBPETokenizer | FastBPETokenizer:
+    """Dispatch from the exact on-disk format; no implicit conversions."""
+    payload = json.loads(Path(path).read_text(encoding='utf-8'))
+    if not isinstance(payload, dict):
+        raise ValueError('Invalid tokenizer file')
+    if payload.get('type') == 'byte_bpe_v1':
+        return ByteBPETokenizer.load(path)
+    if payload.get('type') == FastBPETokenizer.FORMAT:
+        return FastBPETokenizer.from_payload(payload)
+    raise ValueError('Unsupported tokenizer format')

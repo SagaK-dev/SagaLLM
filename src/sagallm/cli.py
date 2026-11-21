@@ -10,7 +10,7 @@ from .config import ModelConfig
 from .data import prepare_data, read_documents
 from .shards import prepare_shards, tokenize_shards
 from .model import SagaTransformer
-from .tokenization import ByteBPETokenizer
+from .tokenization import ByteBPETokenizer, FastBPETokenizer, load_tokenizer
 from .training import checkpoint_load, pretrain, resolve_device, verify_checkpoint_tokenizer
 
 
@@ -41,6 +41,8 @@ def main(argv: list[str] | None = None) -> None:
     train_tok.add_argument("--data", required=True)
     train_tok.add_argument("--output", required=True)
     train_tok.add_argument("--vocab-size", type=int, default=512)
+    train_tok.add_argument("--backend", choices=("python", "hf"), default="python",
+                           help="hf uses optional Rust-backed Hugging Face Tokenizers")
     token_test = ts.add_parser("check")
     token_test.add_argument("--tokenizer", required=True)
     token_test.add_argument("--text", required=True)
@@ -101,6 +103,18 @@ def main(argv: list[str] | None = None) -> None:
     evaluation.add_argument("--batches", type=int, default=4)
     evaluation.add_argument('--split', choices=['train', 'validation'], default='validation')
     evaluation.add_argument('--allow-training-data', action='store_true')
+    bench = sub.add_parser("benchmark", help="Offline multiple-choice benchmark harness")
+    bench.add_argument("--checkpoint", required=True)
+    bench.add_argument("--tokenizer", required=True)
+    bench.add_argument("--data", required=True, help="JSONL questions (not downloaded automatically)")
+    bench.add_argument("--license", required=True, help="User-reviewed benchmark dataset license")
+    bench.add_argument("--format", choices=("choices", "mmlu"), default="choices")
+    bench.add_argument("--train-docs", help="Prepared document-shard directory for contamination audit")
+    bench.add_argument("--allow-contaminated", action="store_true")
+    bench.add_argument("--max-examples", type=int, default=1000)
+    bench.add_argument("--scoring", choices=("mean", "sum"), default="mean")
+    bench.add_argument("--device", default="cpu")
+    bench.add_argument("--output", help="Write a JSON report (refuses overwrite)")
     api = sub.add_parser("serve")
     api.add_argument("--checkpoint", required=True)
     api.add_argument("--tokenizer", required=True)
@@ -122,11 +136,14 @@ def main(argv: list[str] | None = None) -> None:
         result = doctor()
     elif args.command == "tokenizer":
         if args.action == "train":
-            tokenizer = ByteBPETokenizer.train(list(read_documents(args.data)), args.vocab_size)
+            if args.backend == "hf":
+                tokenizer = FastBPETokenizer.train(read_documents(args.data), args.vocab_size)
+            else:
+                tokenizer = ByteBPETokenizer.train(list(read_documents(args.data)), args.vocab_size)
             tokenizer.save(args.output)
-            result = {"output": args.output, "vocab_size": tokenizer.vocab_size}
+            result = {"output": args.output, "vocab_size": tokenizer.vocab_size, "backend": args.backend}
         else:
-            tokenizer = ByteBPETokenizer.load(args.tokenizer)
+            tokenizer = load_tokenizer(args.tokenizer)
             result = {"encoded": tokenizer.encode(args.text), "decoded": tokenizer.decode(tokenizer.encode(args.text))}
     elif args.command == "data":
         if args.action == 'prepare':
@@ -161,6 +178,19 @@ def main(argv: list[str] | None = None) -> None:
         result = evaluate_language_model(args.checkpoint, args.tokenizer, args.data,
                                          block_size=args.block_size, batches=args.batches,
                                          split=args.split, allow_training_data=args.allow_training_data)
+    elif args.command == "benchmark":
+        from .benchmarks import evaluate_choices
+        result = evaluate_choices(args.checkpoint, args.tokenizer, args.data,
+                                  license_id=args.license, format=args.format,
+                                  training_docs=args.train_docs,
+                                  allow_contaminated=args.allow_contaminated,
+                                  device_name=args.device, max_examples=args.max_examples,
+                                  scoring=args.scoring)
+        if args.output:
+            output = Path(args.output)
+            output.parent.mkdir(parents=True, exist_ok=True)
+            with output.open('x', encoding='utf-8') as report:
+                json.dump(result, report, ensure_ascii=False, indent=2)
     elif args.command == "serve":
         if args.host not in ("127.0.0.1", "localhost", "::1") and not args.api_key:
             parser.error("Non-loopback binding requires --api-key. Use a TLS terminator for external access.")
@@ -176,7 +206,7 @@ def main(argv: list[str] | None = None) -> None:
         uvicorn.run(app, host=args.host, port=args.port, access_log=False)
         return
     else:
-        tokenizer = ByteBPETokenizer.load(args.tokenizer)
+        tokenizer = load_tokenizer(args.tokenizer)
         device = resolve_device(args.device)
         state = torch.load(args.checkpoint, map_location="cpu", weights_only=True)
         config = ModelConfig(**state["config"])

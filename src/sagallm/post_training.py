@@ -6,7 +6,7 @@ from pathlib import Path
 import torch
 from .config import ModelConfig
 from .model import SagaTransformer
-from .tokenization import ByteBPETokenizer
+from .tokenization import ByteBPETokenizer, load_tokenizer
 from .training import checkpoint_load, checkpoint_save, resolve_device, verify_checkpoint_tokenizer
 
 
@@ -38,7 +38,7 @@ def sft_train(base_checkpoint: str | Path, tokenizer_file: str | Path, dataset_f
     verify_checkpoint_tokenizer(state, tokenizer_file)
     if config.parameter_count() > 200_000_000 and not allow_large:
         raise ValueError("Large model SFT requires --allow-large")
-    tokenizer = ByteBPETokenizer.load(tokenizer_file)
+    tokenizer = load_tokenizer(tokenizer_file)
     if tokenizer.vocab_size > config.vocab_size:
         raise ValueError("Tokenizer vocabulary exceeds model vocabulary")
     examples = []
