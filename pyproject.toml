@@ -13,6 +13,7 @@ dependencies = ["torch>=2.3", "PyYAML>=6.0"]
 test = ["pytest>=8.0"]
 parquet = ["pyarrow>=14"]
 monitor = ["psutil>=5"]
+serve = ["fastapi>=0.110", "uvicorn>=0.30"]
 
 [project.scripts]
 sagallm = "sagallm.cli:main"

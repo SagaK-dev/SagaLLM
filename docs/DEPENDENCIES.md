@@ -19,3 +19,5 @@ Research references consulted via GitHub on 2026-11-21. Repository license metad
 | [UKGovernmentBEIS/inspect_ai](https://github.com/UKGovernmentBEIS/inspect_ai) | Future evaluation | MIT | no |
 
 Current runtime dependencies are PyTorch and PyYAML; optional pytest, pyarrow and psutil are declared in `pyproject.toml`. Versions in published environments should be locked after testing on the target host. Current upstream commit SHAs have not been pinned, because upstream code is **not vendored or imported**.
+
+Optional HTTP serving uses FastAPI and Uvicorn (`sagallm[serve]`); see each package's published license when deploying. SFT/evaluation code in this repository is written as a small independent implementation and is not a copy of Open Instruct or Inspect AI.

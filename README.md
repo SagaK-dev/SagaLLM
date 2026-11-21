@@ -1,6 +1,6 @@
 # SagaLLM
 
-A local-first **from-scratch** decoder-only language model research project. The model uses native PyTorch implementations of RMSNorm, rotary embeddings, grouped-query attention, SwiGLU and a tied token embedding / language-modeling head. The repository includes a small educational byte-level BPE tokenizer, basic data preparation, resumable single-device training and greedy/sampling generation.
+A local-first **from-scratch** decoder-only language model research project. The model uses native PyTorch implementations of RMSNorm, rotary embeddings, grouped-query attention, SwiGLU and a tied token embedding / language-modeling head. The repository includes a small educational byte-level BPE tokenizer, basic data preparation, resumable single-device training, supervised fine-tuning, held-out token-level validation, an optional local inference API, and greedy/sampling generation.
 
 > **Status: experimental foundation, not a trained 1B/3B LLM.** This project can initialize and train a small model with random weights. The 1B/3B configs are for inspection and future scaling; no large model is pretrained. Never interpret a falling toy loss as language proficiency.
 
@@ -16,6 +16,12 @@ sagallm model inspect --config configs/model/3b.yaml
 sagallm tokenizer train --data examples/toy_corpus.txt --output data/tokenizer.json --vocab-size 384
 sagallm train pretrain --config configs/model/tiny.yaml --tokenizer data/tokenizer.json --data examples/toy_corpus.txt --checkpoint checkpoints/tiny.pt --steps 8 --batch-size 2 --block-size 32
 sagallm generate --checkpoint checkpoints/tiny.pt --tokenizer data/tokenizer.json --prompt 'こんにちは' --max-new-tokens 16
+# Optional: evaluate a held-out local corpus (sample corpus used only for demonstration)
+sagallm evaluate --checkpoint checkpoints/tiny.pt --tokenizer data/tokenizer.json --data examples/toy_corpus.txt
+# Optional supervised fine-tuning (toy instructions only)
+sagallm train sft --checkpoint checkpoints/tiny.pt --tokenizer data/tokenizer.json --data examples/toy_sft.jsonl --output checkpoints/tiny-sft.pt --steps 2
+# Optional local HTTP API: python -m pip install -e '.[serve]'
+# sagallm serve --checkpoint checkpoints/tiny.pt --tokenizer data/tokenizer.json
 python -m pytest -q
 ```
 
@@ -33,9 +39,9 @@ The `examples/toy_corpus.txt` is an artificial, repository-authored smoke-test c
 
 ## Scope and limitations
 
-Implemented: native dense causal Transformer, BPE tokenizer, config validation, CLI environment diagnostics, basic TXT/JSON/JSONL/CSV/optional Parquet input, exact deduplication, document-level split, small-device pretraining and checkpoint resume, generation with KV caching, CPU tests.
+Implemented: native dense causal Transformer, BPE tokenizer, config validation, CLI environment diagnostics, basic TXT/JSON/JSONL/CSV/optional Parquet input, exact deduplication, document-level split, small-device pretraining and checkpoint resume, SFT smoke training, simple held-out token loss/perplexity, localhost-first inference API, generation with KV caching, CPU tests.
 
-Not yet implemented: instruction tuning/SFT, preference training, FlashAttention-specific integration, distributed training, streaming training data shards, near-duplicate detection, comprehensive privacy screening, Hugging Face export, OpenAI-compatible API, formal evaluation benchmark suite, model distribution, or training of a 1B/3B model. These are planned phases, not completed features.
+Not yet implemented: preference training/DPO, production SFT batching and validation, FlashAttention-specific integration, distributed training, streaming training data shards, near-duplicate detection, comprehensive privacy screening, Hugging Face export, streaming HTTP API, standardized evaluation benchmark suite, model distribution, or training of a 1B/3B model. These are planned phases, not completed features.
 
 ## Licensing
 
@@ -47,3 +53,9 @@ Not yet implemented: instruction tuning/SFT, preference training, FlashAttention
 - `docs/DEPENDENCIES.md` — upstream references and license metadata.
 - `docs/HARDWARE.md` — local runtime limitations and resource estimation.
 - `docs/STATUS.md` — implemented/unimplemented feature matrix.
+
+## API safety notes
+
+The optional API exposes `/health`, `/v1/completions`, and `/v1/chat/completions`; it is an **experimental subset**, not a full OpenAI API implementation. The CLI defaults to `127.0.0.1`. Binding to a non-loopback address requires `--api-key`; additionally use TLS termination, reverse-proxy rate limiting, request timeouts and monitoring for any internet-facing deployment. Prompt length and token counts are bounded but there is currently no built-in rate limiter or hard inference execution deadline. API streaming is not yet provided.
+
+Data preparation requires a supplied license identifier, which is **not proof** that the input material is legally licensed. Operators must independently review permissions. The demonstration SFT data is toy material, not representative of useful instruction-following performance.
