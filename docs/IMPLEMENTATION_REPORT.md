@@ -20,8 +20,12 @@ Run `OMP_NUM_THREADS=2 PYTHONPATH=src python -m pytest -q` from repository root 
 ## Limitations / next stages
 
 - The custom Python BPE trainer and text file input are not yet scalable to multi-terabyte corpora. A production-grade streaming tokenizer trainer is still required.
-- Near-duplicate removal, comprehensive PII screening, trained language ID, true multi-node training, DPO, standardized benchmark batteries, hard HTTP timeouts and streaming API remain unimplemented.
+- High-recall near-duplicate removal, comprehensive PII screening, trained language ID, true multi-node training, DPO, standardized benchmark batteries, hard HTTP timeouts and streaming API remain unimplemented.
 - Checkpoint files are trusted input only; `weights_only=True` reduces pickle exposure but does not make arbitrary files safe.
 - Dataset identifiers and license strings must be independently reviewed; they do not certify usage rights or prevent data contamination.
 - Inference API controls apply to one process, not a production distributed deployment.
 - 1B/3B configs remain inspect-only; no meaningful language quality is claimed.
+
+## v0.3.0 local CPU quality pass (2026-11-21)
+
+Implemented deterministic post-ingestion corpus curation (normalized and probable near duplicates), conservative sensitive-pattern screening, and an offline CPU CI verifier. Added a GitHub Actions workflow for public push / PR CPU testing with read-only repository permissions. Hosted Actions pass/fail must be verified separately from local pytest. This remains a research prototype, with no 1B/3B training or GPU verification.

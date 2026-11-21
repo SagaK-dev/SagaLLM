@@ -1,6 +1,6 @@
 # SagaLLM
 
-**Prototype v0.2.0** — offline dataset sharding, checked resume, and guarded local inference.
+**Prototype v0.3.0** — local data curation, verified training resume, and automated CPU tests.
 
 A local-first **from-scratch** decoder-only language model research project. The model uses native PyTorch implementations of RMSNorm, rotary embeddings, grouped-query attention, SwiGLU and a tied token embedding / language-modeling head. The repository includes a small educational byte-level BPE tokenizer, disk-backed JSONL / uint32 token shards, deterministic document splits, resumable single-device training, supervised fine-tuning, held-out token-level validation, an optional local inference API, and greedy/sampling generation.
 
@@ -42,15 +42,26 @@ The `examples/toy_corpus.txt` is an artificial, repository-authored smoke-test c
 - The tokenizer is byte-level and handles Japanese/English/code/Unicode without pre-trained vocabularies.
 - Checkpoints should only be loaded from trusted locations. Resume verifies corpus, tokenizer SHA-256, schedule horizon and hyperparameters. When resuming, keep `--schedule-steps` unchanged or omit it to inherit the checkpoint value.
 - Inference restricts generated token IDs to the tokenizer's vocabulary and checks checkpoint/tokenizer identity when provenance is available.
-- The token-shard pipeline uses SQLite-backed exact document deduplication, deterministic splits and disk-backed binary tokens. See `docs/DATA_PIPELINE.md`. This does not provide near-duplicate or comprehensive PII screening.
-- Data preparation requires an explicit verified license identifier; basic regex screening is not a complete PII solution.
+- The token-shard pipeline uses SQLite-backed exact and heuristic near-duplicate document deduplication, deterministic splits and disk-backed binary tokens. See `docs/DATA_PIPELINE.md`. It provides conservative near-duplicate removal and basic sensitive-pattern screening; neither can guarantee removal of paraphrases or all personal information.
+- Data preparation requires a manually reviewed license identifier; pattern-based privacy screening is not a complete PII solution.
 - CPU smoke tests must not be represented as CUDA/MPS tests.
 
 ## Scope and limitations
 
-Implemented: native dense causal Transformer, small-scale BPE tokenizer, config validation, CLI diagnostics, TXT/JSON/JSONL/CSV/optional Parquet input, SQLite-backed exact deduplication, document-level train/validation JSONL shards, disk-backed uint32 token shards, small-device pretraining with integrated validation and checkpoint resume, SFT smoke training, simple held-out token loss/perplexity, localhost-first inference API with basic rate/concurrency controls, KV-cached generation, CPU tests.
+Implemented: native dense causal Transformer, small-scale BPE tokenizer, config validation, CLI diagnostics, TXT/JSON/JSONL/CSV/optional Parquet input, SQLite-backed exact and heuristic near-duplicate filtering, document-level train/validation JSONL shards, disk-backed uint32 token shards, small-device pretraining with integrated validation and checkpoint resume, SFT smoke training, simple held-out token loss/perplexity, localhost-first inference API with basic rate/concurrency controls, KV-cached generation, CPU tests.
 
-Not yet implemented: preference training/DPO, production SFT batching and validation, FlashAttention-specific integration, distributed training, near-duplicate detection, comprehensive privacy screening, out-of-core tokenizer training, Hugging Face export, streaming HTTP API, standardized benchmark suite, model distribution, or training of a 1B/3B model. These are planned phases, not completed features.
+Not yet implemented: preference training/DPO, production SFT batching and validation, FlashAttention-specific integration, distributed training, comprehensive privacy screening, guaranteed near-duplicate removal, out-of-core tokenizer training, Hugging Face export, streaming HTTP API, standardized benchmark suite, model distribution, or training of a 1B/3B model. These are planned phases, not completed features.
+
+## Automatic lightweight CPU CI
+
+`.github/workflows/cpu-ci.yml` runs fast offline tests on GitHub-hosted **CPU** for pushes to `main` and pull requests. It does **not** start large-scale model training or contact hosted LLM APIs. GitHub-hosted CI is not a local execution environment; to keep every test on your own machine instead, disable the workflow in GitHub and run:
+
+```bash
+python -m pip install -e ".[test,serve]"
+python scripts/check_cpu.py
+```
+
+The CI workflow was tested syntactically and locally; GitHub Actions status must be checked after triggering a run. A successful CPU CI run is not GPU validation.
 
 ## Licensing
 

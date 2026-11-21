@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "sagallm"
-version = "0.2.0"
+version = "0.3.0"
 description = "Local-first from-scratch decoder-only language model research framework"
 requires-python = ">=3.10"
 dependencies = ["torch>=2.3", "PyYAML>=6.0"]

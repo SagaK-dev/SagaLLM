@@ -1,3 +1,11 @@
+## v0.3.0 — 2026-11-21
+
+- Added deterministic second-pass dataset curation with whitespace/Unicode-normalized duplicate removal and SimHash/LSH + 5-gram Jaccard **heuristic** near-duplicate filtering before train/validation split.
+- Added conservative sensitive-data checks for email, credentials/private keys, Japanese mobile phone patterns, and Luhn-valid card numbers; manifest records only rejection categories/counts.
+- Added offline CPU verification script and least-privilege GitHub Actions CPU workflow (no external LLM API or expensive training).
+- Added regression tests for cross-split duplicate leakage, source order determinism, privacy screening and CI safeguards.
+- Explicitly documented limitations: no comprehensive PII screening, no guaranteed semantic dedup, no training rights verification, CI run status unverified until hosted execution.
+
 # Changelog
 
 ## 0.2.0 — 2026-11-21

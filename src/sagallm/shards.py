@@ -17,7 +17,8 @@ from typing import Iterator
 
 import torch
 
-from .data import EMAIL, SECRET, read_documents
+from .data import read_documents
+from .curation import low_quality, normalized_text, sensitive_reason, simhash64, near_duplicate
 from .tokenization import ByteBPETokenizer
 
 
@@ -50,12 +51,13 @@ def _valid_license(license_id: str) -> bool:
 
 def prepare_shards(source: str | Path, output: str | Path, license_id: str,
                    *, validation_fraction: float = 0.1, max_docs_per_shard: int = 1000,
-                   max_document_bytes: int = 1024 * 1024) -> dict:
+                   max_document_bytes: int = 1024 * 1024,
+                   remove_near_duplicates: bool = True) -> dict:
     """Stream records into a temporary SQLite db and produce deterministic JSONL shards.
 
-    Every input document is deduplicated by its raw UTF-8 text after trimming;
-    split membership is by a deterministic SHA-256 rank, independent of order.
-    PII screening is heuristic and not a guarantee of privacy.
+    Exact duplicates and, optionally, likely near duplicates are removed before
+    document-level splitting. Acceptance order is deterministic by SHA-256,
+    independent of source order. PII screening is only heuristic.
     """
     if not _valid_license(license_id):
         raise ValueError('A reviewed dataset license identifier is required')
@@ -65,7 +67,9 @@ def prepare_shards(source: str | Path, output: str | Path, license_id: str,
     if output.exists():
         raise FileExistsError(f'Refusing to overwrite existing dataset: {output}')
     output.parent.mkdir(parents=True, exist_ok=True)
-    counts = {'empty': 0, 'sensitive': 0, 'duplicate': 0, 'oversize': 0}
+    counts = {'empty': 0, 'sensitive': 0, 'duplicate': 0, 'normalized_duplicate': 0,
+              'near_duplicate': 0, 'low_quality': 0, 'oversize': 0}
+    sensitive_counts = {'email': 0, 'credential': 0, 'phone': 0, 'payment_card': 0}
     with tempfile.TemporaryDirectory(prefix='.sagallm-prepare-', dir=output.parent) as temporary:
         stage = Path(temporary)
         db = sqlite3.connect(stage / 'dedup.sqlite')
@@ -79,15 +83,57 @@ def prepare_shards(source: str | Path, output: str | Path, license_id: str,
                 if len(text.encode('utf-8')) > max_document_bytes:
                     counts['oversize'] += 1
                     continue
-                if EMAIL.search(text) or SECRET.search(text):
+                reason = sensitive_reason(text)
+                if reason:
                     counts['sensitive'] += 1
+                    sensitive_counts[reason] += 1
+                    continue
+                if low_quality(text):
+                    counts['low_quality'] += 1
                     continue
                 digest = hashlib.sha256(text.encode('utf-8')).hexdigest()
                 cursor = db.execute('INSERT OR IGNORE INTO documents VALUES (?, ?)', (digest, text))
                 if not cursor.rowcount:
                     counts['duplicate'] += 1
             db.commit()
-            total = db.execute('SELECT COUNT(*) FROM documents').fetchone()[0]
+            # Deterministic curation pass: exact SHA-256 order is independent of
+            # input order. LSH buckets produce candidate pairs via matching 16-bit bands;
+            # sampled shingle Jaccard confirms near duplicates conservatively.
+            db.execute('CREATE TABLE accepted (hash TEXT PRIMARY KEY)')
+            db.execute('CREATE TABLE normalized (digest TEXT PRIMARY KEY)')
+            db.execute('CREATE TABLE buckets (band INTEGER, signature INTEGER, hash TEXT)')
+            db.execute('CREATE INDEX buckets_lookup ON buckets (band, signature)')
+            for digest, text in db.execute('SELECT hash, text FROM documents ORDER BY hash'):
+                clean = normalized_text(text)
+                normalized_digest = hashlib.sha256(clean.encode('utf-8')).hexdigest()
+                if db.execute('SELECT 1 FROM normalized WHERE digest=?', (normalized_digest,)).fetchone():
+                    counts['normalized_duplicate'] += 1
+                    continue
+                signature = None
+                close = False
+                if remove_near_duplicates and len(clean) >= 80:
+                    signature = simhash64(clean)
+                    candidates: set[str] = set()
+                    for band in range(4):
+                        piece = (signature >> (band * 16)) & 0xffff
+                        for (other,) in db.execute('SELECT hash FROM buckets WHERE band=? AND signature=?', (band, piece)):
+                            candidates.add(other)
+                    for candidate in sorted(candidates):
+                        row = db.execute('SELECT text FROM documents WHERE hash=?', (candidate,)).fetchone()
+                        if row and near_duplicate(text, row[0]):
+                            close = True
+                            break
+                if close:
+                    counts['near_duplicate'] += 1
+                    continue
+                db.execute('INSERT INTO normalized VALUES (?)', (normalized_digest,))
+                db.execute('INSERT INTO accepted VALUES (?)', (digest,))
+                if signature is not None:
+                    for band in range(4):
+                        db.execute('INSERT INTO buckets VALUES (?, ?, ?)',
+                                   (band, (signature >> (band * 16)) & 0xffff, digest))
+            db.commit()
+            total = db.execute('SELECT COUNT(*) FROM accepted').fetchone()[0]
             if total < 2:
                 raise ValueError('At least two eligible unique documents are required')
             val_count = min(total - 1, max(1, round(total * validation_fraction)))
@@ -96,7 +142,7 @@ def prepare_shards(source: str | Path, output: str | Path, license_id: str,
                 files = []
                 count = 0
                 handle = None
-                for _digest, text in db.execute('SELECT hash, text FROM documents ORDER BY hash LIMIT ? OFFSET ?', (limit, skip)):
+                for _digest, text in db.execute('SELECT documents.hash, documents.text FROM documents JOIN accepted USING(hash) ORDER BY documents.hash LIMIT ? OFFSET ?', (limit, skip)):
                     if count % max_docs_per_shard == 0:
                         if handle is not None:
                             handle.close()
@@ -115,8 +161,10 @@ def prepare_shards(source: str | Path, output: str | Path, license_id: str,
                 'source_sha256': sha256_file(source), 'license': license_id,
                 'license_review_required': True,
                 'validation_fraction': validation_fraction, 'unique_documents': total,
-                'rejected': counts, 'splits': results,
-                'limitations': ['exact dedup only', 'regex-based sensitive data screening only',
+                'rejected': counts, 'sensitive_categories': sensitive_counts, 'splits': results,
+                'near_dedup_enabled': remove_near_duplicates,
+                'limitations': ['SimHash candidate search is approximate (can miss paraphrases)',
+                                'regex/Luhn-based sensitive data screening only',
                                 'no automatic license verification', 'no semantic quality scoring']
             }
         finally:
