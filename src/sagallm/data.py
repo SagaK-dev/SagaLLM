@@ -59,15 +59,16 @@ def read_documents(path: str | Path) -> Iterator[str]:
 
 def prepare_data(source: str | Path, output: str | Path, license_id: str,
                  seed: int = 42, validation_fraction: float = 0.1) -> dict:
-    """Reject unverified licenses; deduplicate and split at document granularity.
+    """Legacy in-memory text splitting; use data shard for near-duplicate removal.
 
-    No near-duplicate detection, model-based PII removal, or large-scale streaming is
-    claimed by this implementation. They remain Phase 2 follow-ups.
+    Privacy screening is heuristic; no comprehensive detection is claimed.
     """
     if license_id.lower() in ("", "unknown", "unverified", "none"):
         raise ValueError("Provide a verified dataset license before preparation")
     if not 0 < validation_fraction < 1:
         raise ValueError("validation_fraction must be strictly between 0 and 1")
+    from .curation import sensitive_reason
+
     seen = set()
     clean = []
     rejected = {"empty": 0, "duplicate": 0, "sensitive": 0}
@@ -76,7 +77,7 @@ def prepare_data(source: str | Path, output: str | Path, license_id: str,
         if not text:
             rejected["empty"] += 1
             continue
-        if EMAIL.search(text) or SECRET.search(text):
+        if sensitive_reason(text):
             rejected["sensitive"] += 1
             continue
         digest = hashlib.sha256(text.encode("utf-8")).hexdigest()

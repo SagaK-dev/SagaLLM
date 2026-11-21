@@ -8,8 +8,9 @@
 | Single-device pretraining | IMPLEMENTED | CPU / optional CUDA/MPS unverified |
 | Atomic checkpoint / resume | IMPLEMENTED | Fixed schedule and hyperparameter checks; bitwise CPU interrupted/uninterrupted test passes |
 | CLI generation / KV cache | IMPLEMENTED | No production decoding server |
-| Disk-backed dataset shards | PARTIAL | SQLite exact dedup, JSONL splits, uint32 token shards, integrity checks; no near-dedup or comprehensive PII screening |
+| Disk-backed dataset shards | PARTIAL | SQLite exact/normalized/heuristic near dedup, JSONL splits, uint32 shards; only basic privacy screening |
 | Basic next-token held-out validation | IMPLEMENTED | Model loss, perplexity, accuracy; rejects training split by default |
+| GitHub Actions CPU CI | IMPLEMENTED / REMOTE_NOT_VERIFIED | Workflow and portable verifier added; hosted run must be checked |
 | Standardized benchmarks | NOT_IMPLEMENTED | Phase 5 |
 | Single-turn SFT | IMPLEMENTED | Assistant-response masking; local JSONL |
 | DPO / scalable SFT | NOT_IMPLEMENTED | Phase 4 |

@@ -55,6 +55,8 @@ def main(argv: list[str] | None = None) -> None:
     shards.add_argument('--output', required=True)
     shards.add_argument('--license', required=True)
     shards.add_argument('--max-docs-per-shard', type=int, default=1000)
+    shards.add_argument('--keep-near-duplicates', action='store_true',
+                        help='Disable heuristic near-duplicate filtering')
     tokenize = ds.add_parser('tokenize')
     tokenize.add_argument('--prepared', required=True)
     tokenize.add_argument('--tokenizer', required=True)
@@ -131,7 +133,8 @@ def main(argv: list[str] | None = None) -> None:
             result = prepare_data(args.source, args.output, args.license)
         elif args.action == 'shard':
             result = prepare_shards(args.source, args.output, args.license,
-                                    max_docs_per_shard=args.max_docs_per_shard)
+                                    max_docs_per_shard=args.max_docs_per_shard,
+                                    remove_near_duplicates=not args.keep_near_duplicates)
         else:
             result = tokenize_shards(args.prepared, args.tokenizer, args.output,
                                      max_tokens_per_shard=args.max_tokens_per_shard)

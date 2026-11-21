@@ -16,3 +16,15 @@ def test_dedup_and_split(tmp_path):
     assert info['rejected']['sensitive'] == 1
     assert info['split_counts']['validation'] >= 1
     assert (out / 'train.txt').exists()
+
+
+def test_legacy_prepare_uses_shared_privacy_screen(tmp_path):
+    inp = tmp_path / "privacy.jsonl"
+    inp.write_text("\n".join(json.dumps({"text": t}) for t in [
+        "Allowed independent paragraph one", "Allowed independent paragraph two",
+        "Call the test number 090-1234-5678",
+    ]), encoding="utf-8")
+    output = tmp_path / "out"
+    result = prepare_data(inp, output, "CC0-1.0")
+    assert result["rejected"]["sensitive"] == 1
+    assert "090-1234-5678" not in (output / "train.txt").read_text(encoding="utf-8")
