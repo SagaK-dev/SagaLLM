@@ -17,6 +17,6 @@
 | Local inference HTTP API | PARTIAL | Three endpoints, optional bearer key |
 | API rate/concurrency limits | IMPLEMENTED | In-process limiter and cooperative deadline; hard kill, TLS, production rate limiting not implemented |
 | HTTP streaming / hard kernel timeouts | NOT_IMPLEMENTED | Proxy recommended for external serving |
-| HF Transformers export | NOT_IMPLEMENTED | Phase 5 |
+| HF Transformers export | IMPLEMENTED / CI_PENDING | Local custom-model safetensors export, fast tokenizer AutoTokenizer, roundtrip tests; does not upload |
 | Distributed learning / FlashAttention integration | NOT_IMPLEMENTED | Phase 6 |
 | Real 1B/3B training | NOT_RUN | No hardware or licensed corpus specified |

@@ -1,6 +1,6 @@
 # SagaLLM
 
-**Prototype v0.4.0** — optional fast tokenizer, offline multiple-choice evaluation, and corpus overlap audit.
+**Prototype v0.5.0** — local Transformers custom-model export, optional fast tokenizer, offline evaluation and corpus overlap audit.
 
 A local-first **from-scratch** decoder-only language model research project. The model uses native PyTorch implementations of RMSNorm, rotary embeddings, grouped-query attention, SwiGLU and a tied token embedding / language-modeling head. The repository includes a small educational byte-level BPE tokenizer, disk-backed JSONL / uint32 token shards, deterministic document splits, resumable single-device training, supervised fine-tuning, held-out token-level validation, an optional local inference API, and greedy/sampling generation.
 
@@ -50,7 +50,7 @@ The `examples/toy_corpus.txt` is an artificial, repository-authored smoke-test c
 
 Implemented: native dense causal Transformer, small-scale BPE tokenizer, config validation, CLI diagnostics, TXT/JSON/JSONL/CSV/optional Parquet input, SQLite-backed exact and heuristic near-duplicate filtering, document-level train/validation JSONL shards, disk-backed uint32 token shards, small-device pretraining with integrated validation and checkpoint resume, SFT smoke training, simple held-out token loss/perplexity, localhost-first inference API with basic rate/concurrency controls, KV-cached generation, CPU tests.
 
-Not yet implemented: official standardized benchmark protocol/results, preference training/DPO, production SFT batching and validation, FlashAttention-specific integration, distributed training, comprehensive privacy screening, guaranteed near-duplicate removal, guaranteed bounded-memory tokenizer training, Hugging Face export, streaming HTTP API, official standardized benchmark execution, model distribution, or training of a 1B/3B model. These are planned phases, not completed features.
+Not yet implemented: official standardized benchmark protocol/results, preference training/DPO, production SFT batching and validation, FlashAttention-specific integration, distributed training, comprehensive privacy screening, guaranteed near-duplicate removal, guaranteed bounded-memory tokenizer training, fully standardized HF pipelines, streaming HTTP API, official standardized benchmark execution, model distribution, or training of a 1B/3B model. These are planned phases, not completed features.
 
 ## Optional fast BPE and offline benchmark harness
 
@@ -67,6 +67,39 @@ sagallm benchmark --checkpoint checkpoints/tiny.pt --tokenizer data/tokenizer.js
 ```
 
 Without `--train-docs`, the report explicitly states that contamination has **not been checked**. For vetted document-shard training corpora, pass `--train-docs data/prepared` and refer to `docs/BENCHMARKS.md`. The adapter supports local MMLU-style four-choice JSONL but does not claim official leaderboard comparability. No external datasets are downloaded.
+
+## Local Transformers-compatible model export (v0.5)
+
+`export` writes a **new local directory** with safetensors weights, custom architecture code,
+configuration, generation settings, the original SagaLLM tokenizer and SHA-256 provenance.
+It does not upload to the Hub or publish model weights. Inspect all generated Python files
+before using `trust_remote_code=True` and do not load an untrusted training checkpoint.
+
+```bash
+python -m pip install -e '.[hf-export]'
+# For an AutoTokenizer-ready export, train with --backend hf first:
+sagallm tokenizer train --backend hf --data examples/toy_corpus.txt --output data/hf-fast.json --vocab-size 384
+sagallm train pretrain --config configs/model/tiny.yaml --tokenizer data/hf-fast.json \
+  --data examples/toy_corpus.txt --checkpoint checkpoints/hf-demo.pt --steps 2 --block-size 8
+sagallm export --checkpoint checkpoints/hf-demo.pt --tokenizer data/hf-fast.json --output exports/hf-demo
+```
+
+Load and use **only after reviewing the exported custom code**:
+
+```python
+from transformers import AutoModelForCausalLM, AutoTokenizer
+p = 'exports/hf-demo'
+tok = AutoTokenizer.from_pretrained(p, local_files_only=True)
+model = AutoModelForCausalLM.from_pretrained(p, trust_remote_code=True, local_files_only=True)
+ids = tok('こんにちは', return_tensors='pt', add_special_tokens=False).input_ids
+out = model.generate(ids, max_new_tokens=8, do_sample=False)
+print(tok.decode(out[0]))
+```
+
+The older Python BPE backend is saved as `sagallm_tokenizer.json` but **cannot** be
+loaded with `AutoTokenizer`; model safetensors and custom code can still be exported.
+Generation suppresses token IDs not in the exported tokenizer's vocabulary.
+See `docs/HF_EXPORT.md` for limitations and validation.
 
 ## Automatic lightweight CPU CI
 
@@ -92,6 +125,7 @@ GitHub Actions v0.4 CPU CI passed (48 tests, run 44903131319), including the opt
 - `docs/STATUS.md` — implemented/unimplemented feature matrix.
 - `docs/TOKENIZERS.md` — optional native BPE, format identity and limitations.
 - `docs/BENCHMARKS.md` — offline multiple-choice scoring and contamination audit.
+- `docs/HF_EXPORT.md` — custom Transformers load and safetensors validation.
 
 ## API safety notes
 
