@@ -57,7 +57,7 @@ def compile_candidates(folder: Path, *, timeout: int = 120) -> dict:
         # Only finite, allowlisted diagnostics are emitted; never store the
         # compiler's raw stderr or its temporary source paths.
         failed = sorted({int(index) for index in
-                         re.findall(r"Candidate([0-9]{4})\\.java:\\d+: error:",
+                         re.findall(r"Candidate([0-9]{4})\.java:\d+: error:",
                                     outcome.stderr) if int(index) < len(rows)})
         stderr_lower = outcome.stderr.lower()
         if passed:
