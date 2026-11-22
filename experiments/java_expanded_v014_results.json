@@ -1,0 +1,85 @@
+{
+  "schema": "sagallm-java-expanded-training-evidence-v1",
+  "as_of": "2026-11-22",
+  "tool_environment": "CPU-only Python 3.13, torch 2.10, JDK 21; not user-owned hardware",
+  "corpus": {
+    "total": 5436,
+    "train": 5220,
+    "validation": 108,
+    "test": 108,
+    "families": 70,
+    "train_families": 58,
+    "validation_families": 6,
+    "test_families": 6,
+    "duplicate_sources": 0,
+    "sha256": "845900e0404979c97dd7037e27deb1c10a25f26e66193fefb0e6254b0fd3a101",
+    "origin": "only project-authored parameterized templates; no third-party Java repositories"
+  },
+  "experiments": {
+    "from_random": {
+      "model_weights_origin": "RANDOM_INIT",
+      "initial_local_checkpoint_sha256": null,
+      "parameter_count": 1427136,
+      "optimizer_steps_requested": 5220,
+      "optimizer_steps_completed": 5220,
+      "distinct_training_examples_seen": 5220,
+      "best_checkpoint_distinct_training_examples_seen": 600,
+      "unseen_training_examples": 0,
+      "best_checkpoint_step": 600,
+      "training_seconds": 123.66,
+      "train_sample_loss_before": 6.274511784315109,
+      "train_sample_loss_after": 0.3683476820588112,
+      "validation_selection_loss_before": 6.273265282313029,
+      "validation_selection_loss_best": 2.6478349566459656,
+      "validation_full_loss_best_checkpoint": 2.6373147324279502,
+      "test_loss_selected_checkpoint": 3.75637345623087,
+      "checkpoint_sha256": "ce99cf9861bf5bc99238c94b26bbc086d0db9818912ad08c964fd00a4c2188c1",
+      "last_checkpoint_sha256": "fdcf57e14b1d07877886ac394e7886a962b4a9bf131809a0d27865e7b59dcb13",
+      "tokenizer_sha256": "623dc2cc0109cdac1e72e07dc3857ed216ebfb18fb0b0a87b3f529e4907849ff",
+      "heldout_compilation": {
+        "status": "PASS_RUNTIME",
+        "evaluated": 18,
+        "compiled": 2,
+        "exact_reference_matches": 0,
+        "behavioral_execution": "NOT_RUN",
+        "semantic_correctness": "NOT_ESTABLISHED"
+      }
+    },
+    "continued_from_v013": {
+      "model_weights_origin": "PRIOR_LOCAL_SAGALLM",
+      "initial_local_checkpoint_sha256": "f27aaeba4bdbd50188abb2ad3927ab34632533ae6f4317a70a51299bdecece9a",
+      "parameter_count": 774240,
+      "optimizer_steps_requested": 5220,
+      "optimizer_steps_completed": 5220,
+      "distinct_training_examples_seen": 5220,
+      "best_checkpoint_distinct_training_examples_seen": 600,
+      "unseen_training_examples": 0,
+      "best_checkpoint_step": 600,
+      "training_seconds": 80.1,
+      "train_sample_loss_before": 4.290445566177368,
+      "train_sample_loss_after": 0.33333669463172555,
+      "validation_selection_loss_before": 5.112466295560201,
+      "validation_selection_loss_best": 2.939399758974711,
+      "validation_full_loss_best_checkpoint": 2.9375723357553833,
+      "test_loss_selected_checkpoint": 3.9299529283135026,
+      "checkpoint_sha256": "55b6ac656c56df489b526f31c9093d38ca73e685c1682283d8c1fce2d08f586e",
+      "last_checkpoint_sha256": "669a43d15caf8e54377f355cb691d74e88d7ee1ec33b6a9bc630ad00edae9208",
+      "tokenizer_sha256": "4dddf2a80510b2d5f89c76f716e0073c2beb120d544842b7c76f8a6782aeb2a7",
+      "heldout_compilation": {
+        "status": "PASS_RUNTIME",
+        "evaluated": 18,
+        "compiled": 1,
+        "exact_reference_matches": 0,
+        "behavioral_execution": "NOT_RUN",
+        "semantic_correctness": "NOT_ESTABLISHED"
+      }
+    }
+  },
+  "notes": [
+    "Best checkpoint was selected with validation loss only; test loss was measured once after selection.",
+    "At the end of each experiment 5220 unique samples had contributed to gradient updates, but each validation-selected best checkpoint reflects only the first 600 samples.",
+    "Compilation is syntax-only; model-generated Java was NOT executed and task correctness is NOT_ESTABLISHED.",
+    "Each example is a parameterized template variant; 5436 examples are NOT 5436 separate algorithms.",
+    "No external pretrained weights, dataset or paid service was used."
+  ]
+}

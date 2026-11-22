@@ -52,14 +52,58 @@ class ByteBPETokenizer:
         return output
 
     def encode(self, text: str, add_bos: bool = False, add_eos: bool = False) -> list[int]:
-        seq = [byte+4 for byte in text.encode("utf-8")]
-        while len(seq) > 1:
-            candidates = [(self.ranks[(a,b)], (a,b)) for a,b in zip(seq, seq[1:]) if (a,b) in self.ranks]
-            if not candidates:
-                break
-            rank, pair = min(candidates)
-            seq = self._merge(seq, pair, rank)
-        return ([self.SPECIAL["<bos>"]] if add_bos else []) + seq + ([self.SPECIAL["<eos>"]] if add_eos else [])
+        """Byte BPE via a rank heap and linked neighbors (avoids full rescans).
+
+        For equal-rank matches, the leftmost pair merges first. This preserves
+        the original implementation's simultaneous left-to-right merge order.
+        """
+        import heapq
+
+        values = [byte + 4 for byte in text.encode("utf-8")]
+        count = len(values)
+        if count < 2 or not self.ranks:
+            result = values
+        else:
+            left = [i - 1 for i in range(count)]
+            right = [i + 1 for i in range(count)]
+            right[-1] = -1
+            queue = []
+
+            def enqueue(i: int) -> None:
+                if i < 0:
+                    return
+                j = right[i]
+                if j >= 0:
+                    pair = (values[i], values[j])
+                    rank = self.ranks.get(pair)
+                    if rank is not None:
+                        heapq.heappush(queue, (rank, i, j))
+
+            for i in range(count - 1):
+                enqueue(i)
+            while queue:
+                rank, i, j = heapq.heappop(queue)
+                if right[i] != j or self.ranks.get((values[i], values[j])) != rank:
+                    continue  # stale pair after a neighboring merge
+                values[i] = rank
+                k = right[j]
+                right[i] = k
+                if k >= 0:
+                    left[k] = i
+                # Invalidate *both* links of the removed node. Stale heap
+                # entries must not merge an index that has left the chain.
+                right[j] = -1
+                left[j] = -1
+                # A newly formed token can only participate in higher-rank
+                # merges, so the priority queue remains order-correct.
+                enqueue(left[i])
+                enqueue(i)
+            result = []
+            i = 0
+            while i >= 0:
+                result.append(values[i])
+                i = right[i]
+        return ([self.SPECIAL["<bos>"]] if add_bos else []) + result + ([self.SPECIAL["<eos>"]] if add_eos else [])
 
     def decode(self, ids: list[int], skip_special: bool = True) -> str:
         chunks = []

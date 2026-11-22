@@ -1,3 +1,11 @@
+## v0.14.0 — expanded original Java corpus and full-pass CPU SFT (2026-11-22)
+
+- Generate **5,436 original parameterized Java 17 code/instruction pairs** across 70 task families: 5,220 train / 108 validation / 108 held-out test, segregated by entire family. Japanese and English task requests. No third-party repository or pretrained model downloaded.
+- New deterministic corpus generator and strict audit: source and file hashes, exact regeneration, no duplicate Java source, family-disjoint split and fail-closed license statement (`NOT_LEGALLY_ATTESTED`).
+- Replace the prototype ByteBPE encoder's repeated full scans with a rank-ordered heap and correct linked-node invalidation, preserving the old tokenizer ID outputs; randomized old/new parity regression tests added.
+- Train a random-initialized ~1.4M-parameter native model on an offline CPU, reporting the **distinct training examples actually used**, optimizer steps, validation-selected checkpoint and held-out compile-only behavior. Keep all generated weights/corpora outside Git.
+- Data volume is not algorithmic variety: 5,436 variants belong to just 70 parameterized families. Java behavior, real-world code generation skill and license approval remain unverified.
+
 ## v0.13.0 — validation-selected Java SFT and guarded OCI behavior harness (2026-11-22)
 
 - Use validation-only early stopping and retain both selected best and last-step

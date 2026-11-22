@@ -1,3 +1,11 @@
+## v0.14 Java corpus scale-up and CPU training
+
+- Added source-authored `java_large_corpus.py` with 70 parameterized Java task families and 5,436 row-level distinct code examples. Whole family splits prevent direct train/test task-family overlap (but shared scaffolding and Java syntax remain).
+- New `train_java_expanded.py` uses train-only BPE fitting, one-example-per-gradient-step, no-repeat sampling until all 5,220 train rows are seen, and validation-selected best checkpoint; test is excluded from optimization and model selection. The integrity verifier reads all split files but their contents are never used as optimization labels outside training rows.
+- Optimized `ByteBPETokenizer.encode` via a linked-list merge heap after discovering and fixing a stale-node issue; regression checks require output equivalence with the old algorithm on random Unicode strings.
+- Java tests cover deterministic build, cross-split duplicate rejection, forged manifest refusal and a batch JDK compiler check for all 70 representative Java classes.
+- Two real 5,220-update CPU runs completed: random-init 1,427,136 parameter model and continued local v0.13 model 774,240 parameters; both best selected at step 600. Held-out compile-only scores were 2/18 and 1/18; exact match 0/18. The last checkpoints have all 5,220 examples seen, best checkpoints only 600. Generated corpus and model checkpoints are packaged separately rather than checked into the public source repository.
+
 ## v0.13: validation-only checkpoint selection and optional guarded Java run
 
 - Changed `scripts/train_java_original.py`: patience/min-delta-controlled
