@@ -200,6 +200,38 @@ def restore_verified_base_weights(model:SagaTransformer, checkpoint_state:dict,
     model.load_state_dict(checkpoint_state['model'],strict=True)
 
 
+def classify_javac_diagnostic(stderr: str) -> str:
+    """Classify compiler errors using a fixed allowlist; never retain raw stderr.
+
+    This is a coarse diagnostic hint, not a verified root-cause attribution.
+    """
+    if not isinstance(stderr, str) or not stderr:
+        return 'NONE'
+    # The first error is the primary compiler diagnostic. Ignore source snippets
+    # and filenames; no untrusted compiler text is copied to the report.
+    lines = stderr[:16384].splitlines()
+    first = next((line.split('error:', 1)[1].strip().lower()
+                  for line in lines if 'error:' in line), '')
+    if not first:
+        return 'OTHER'
+    if any(term in first for term in (
+            'cannot find symbol', 'package does not exist', 'cannot resolve symbol')):
+        return 'MISSING_SYMBOL'
+    if any(term in first for term in (
+            'incompatible types', 'cannot be converted', 'bad operand types',
+            'no suitable method found', 'method cannot be applied')):
+        return 'TYPE_ERROR'
+    if 'missing return statement' in first:
+        return 'MISSING_RETURN'
+    if any(term in first for term in (
+            "';' expected", "'}' expected", "')' expected", "'(' expected",
+            "illegal start of", "reached end of file while parsing",
+            "not a statement", "class, interface, enum, or record expected",
+            "unclosed string literal", "unclosed character literal")):
+        return 'SYNTAX_ERROR'
+    return 'OTHER'
+
+
 def heldout_compilation(model, tokenizer, rows:list[dict], *, max_cases:int=10) -> dict:
     """Compiles model output, never executes it. Called only after model selection."""
     cases=eval_sample(rows,max_cases,seed=67)
@@ -225,6 +257,7 @@ def heldout_compilation(model, tokenizer, rows:list[dict], *, max_cases:int=10) 
         reason='NOT_COMPILED'
         diagnostic_hash=None
         diagnostic_category='NONE'
+        javac_error_category='NONE'
         if len(output)>=4000:
             reason='OUTPUT_TOO_LONG'
         elif 'public class Main' not in output:
@@ -241,6 +274,8 @@ def heldout_compilation(model, tokenizer, rows:list[dict], *, max_cases:int=10) 
                 if stderr:
                     diagnostic_hash=hashlib.sha256(stderr.encode('utf8')).hexdigest()
                     diagnostic_category='JAVAC_DIAGNOSTIC'
+                    if status=='FAIL':
+                        javac_error_category=classify_javac_diagnostic(stderr)
                 elif status=='FAIL':
                     diagnostic_category='JAVAC_FAILURE_NO_STDERR'
         compiles+=int(status=='PASS')
@@ -256,6 +291,7 @@ def heldout_compilation(model, tokenizer, rows:list[dict], *, max_cases:int=10) 
                         'compile_reason':reason,
                         'javac_stderr_sha256':diagnostic_hash,
                         'javac_diagnostic_category':diagnostic_category,
+                        'javac_error_category':javac_error_category,
                         'source_persisted':False,
                         'java_behavior':'NOT_RUN'})
     return {'status':'SCORED_COMPILE_ONLY','evaluated':total,'compiled':compiles,
