@@ -1,6 +1,6 @@
 # SagaLLM
 
-**Prototype v0.12.0** — offline 5-shot MMLU-style evaluation, SHA-pinned dataset review, local hardware diagnostics, and CPU/Gloo readiness tests. The model itself remains experimental and untrained at 1B/3B scale.
+**Prototype v0.13.0** — offline 5-shot MMLU-style evaluation, SHA-pinned dataset review, local hardware diagnostics, and CPU/Gloo readiness tests. The model itself remains experimental and untrained at 1B/3B scale.
 
 A local-first **from-scratch** decoder-only language model research project. The model uses native PyTorch implementations of RMSNorm, rotary embeddings, grouped-query attention, SwiGLU and a tied token embedding / language-modeling head. The repository includes a small educational byte-level BPE tokenizer, disk-backed JSONL / uint32 token shards, deterministic document splits, resumable single-device training, supervised fine-tuning, held-out token-level validation, an optional local inference API, and greedy/sampling generation.
 
@@ -33,6 +33,23 @@ python -m pytest -q
 ```
 
 The `examples/toy_corpus.txt` is an artificial, repository-authored smoke-test corpus; it is **not** a licensed large-scale language training dataset. The `--license CC0-1.0` shown for this repository-authored demo does not certify permissions for third-party materials. `data/`, `checkpoints/` and binary model weights are gitignored. The default Python tokenizer is intentionally simple. The optional Rust-backed tokenizer can be selected with `--backend hf` (see `docs/TOKENIZERS.md`).
+
+## Validation-selected Java training and guarded runtime checks (v0.13)
+
+The original Java trainer now **stops early based on validation loss**, retains
+best and last-step checkpoints, and accesses test labels only once after model
+selection. On the same small, original 350-example dataset, an actual CPU run
+stopped at 300 steps and selected step 150: test loss improved from **6.010**
+to **3.761**, but compiler success decreased from **10/15 to 8/15**, and
+reference equality remained **0/15**. This is not usable free-form Java coding.
+
+A separate opt-in OCI behavioral evaluator is available under
+`python scripts/evaluate_java_behavior.py`. It requires a preinstalled
+Docker/Podman image, an explicit `--allow-execution`, and a dedicated
+disposable VM. No generated Java is run on the host by this feature. The
+current development environment has no OCI engine, so model-generated Java
+**behavioral execution remains NOT_RUN**. OCI restrictions are not a security
+guarantee. See `docs/JAVA_BEHAVIORAL_VALIDATION.md`.
 
 ## Original Java data and actual CPU training (v0.12)
 
