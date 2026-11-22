@@ -1,6 +1,6 @@
 # SagaLLM
 
-**Prototype v0.10.0** — offline 5-shot MMLU-style evaluation, SHA-pinned dataset review, local hardware diagnostics, and CPU/Gloo readiness tests. The model itself remains experimental and untrained at 1B/3B scale.
+**Prototype v0.11.0** — offline 5-shot MMLU-style evaluation, SHA-pinned dataset review, local hardware diagnostics, and CPU/Gloo readiness tests. The model itself remains experimental and untrained at 1B/3B scale.
 
 A local-first **from-scratch** decoder-only language model research project. The model uses native PyTorch implementations of RMSNorm, rotary embeddings, grouped-query attention, SwiGLU and a tied token embedding / language-modeling head. The repository includes a small educational byte-level BPE tokenizer, disk-backed JSONL / uint32 token shards, deterministic document splits, resumable single-device training, supervised fine-tuning, held-out token-level validation, an optional local inference API, and greedy/sampling generation.
 
@@ -33,6 +33,40 @@ python -m pytest -q
 ```
 
 The `examples/toy_corpus.txt` is an artificial, repository-authored smoke-test corpus; it is **not** a licensed large-scale language training dataset. The `--license CC0-1.0` shown for this repository-authored demo does not certify permissions for third-party materials. `data/`, `checkpoints/` and binary model weights are gitignored. The default Python tokenizer is intentionally simple. The optional Rust-backed tokenizer can be selected with `--backend hf` (see `docs/TOKENIZERS.md`).
+
+## Java synthetic study kit and honest held-out checks (v0.11)
+
+An **original, locally generated** Java SFT fixture now contains 10 training
+examples, one validation example and two held-out test examples. Train,
+validation and test split by **task family** (not by random instruction row),
+which prevents literal answers from the held-out `prime` / `calculator` /
+`factorial` families being used as supervised training examples. Every split
+is SHA-256-pinned and verified against the known local reference templates.
+This is only an engineering fixture: it is **not** enough data to teach useful
+Java coding or a substitute for rights-reviewed real instruction/code data.
+
+```bash
+# Offline, no third-party data; refuses to overwrite existing directories.
+sagallm java dataset-build --output data/java-study
+sagallm java dataset-verify --dataset data/java-study
+# Fine-tune an existing trusted checkpoint whose context fits these examples:
+sagallm train sft --checkpoint checkpoints/base.pt --tokenizer data/tokenizer.json \
+  --data data/java-study/train.jsonl --output checkpoints/java-study.pt \
+  --steps 2 --device cpu
+# Holdout evaluation: generated code is compiled, NEVER executed.
+sagallm java evaluate --dataset data/java-study --checkpoint checkpoints/java-study.pt \
+  --tokenizer data/tokenizer.json --split test --max-examples 2 \
+  --max-new-tokens 512 --output reports/java-study.json
+# Independent tiny random-base smoke (no production coding ability implied):
+PYTHONPATH=src python scripts/java_sft_smoke.py --output reports/java-tiny-smoke.json
+```
+
+The compile pass rate measures **syntax only**. Exact-reference match is a
+second, strict, diagnostic metric, not a behavioral test. Runtime correctness
+is `NOT_RUN` because generated Java is untrusted and must not run on the host
+without an isolated sandbox. The dataset reports license review `NOT_ATTESTED`;
+it contains only original SagaLLM source templates, no imported Java corpus.
+See [docs/JAVA_CODING_DATA.md](docs/JAVA_CODING_DATA.md).
 
 ## Model-backed Java revisions (v0.10, experimental)
 

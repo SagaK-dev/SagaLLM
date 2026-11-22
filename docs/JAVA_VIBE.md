@@ -165,3 +165,7 @@ is always separate and explicit.
 - The SFT dataset is an **original synthetic smoke fixture**, not an approved
   external Java corpus or proof of learned programming ability. Before importing
   external material, use the project's dataset-license review workflow.
+
+## v0.11 — Family-separated Java data and compile-only evaluation
+
+See [JAVA_CODING_DATA.md](JAVA_CODING_DATA.md) for deterministic fixture creation, data integrity checks, 2-step tiny CPU SFT smoke and non-executing held-out compiler evaluation. This is not a general-purpose Java model.

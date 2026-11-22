@@ -1,3 +1,10 @@
+## v0.11.0 — 2026-11-22
+
+- Added original, task-family-separated Java synthetic SFT fixture (`java dataset-build/verify`) with deterministic SHA-256 manifests and strict integrity checks. No external code corpus or license approval is implied.
+- Added held-out **compile-only** Java benchmark (`java evaluate`) against an explicitly supplied trusted local SagaLLM checkpoint. Never runs generated Java. Tracks compilability, exact reference equality, and `runtime_behavior=NOT_RUN` separately.
+- Added `scripts/java_sft_smoke.py`: real small CPU random-weight model, 2 SFT optimizer steps and held-out loss measurements; no strong Java generation ability is claimed.
+- Added regression tests, usage docs and version bump; no 1B/3B training, GPU work, hosted API or paid services.
+
 ## v0.10.0 — 2026-11-21
 
 - Add opt-in, **local SagaLLM checkpoint** Java revision backend (`java ai-revise`, `java ai-chat`); generation always comes from a randomly initialized/locally trained SagaTransformer checkpoint, never a hosted or pretrained model fallback.
