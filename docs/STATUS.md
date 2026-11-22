@@ -71,3 +71,15 @@ See [MMLU_REFERENCE.md](MMLU_REFERENCE.md) for limits.
 - `java evaluate`: real local checkpoint inference and held-out **javac syntax-only** rate; output never executed; semantic accuracy is `NOT_RUN`.
 - `scripts/java_sft_smoke.py`: two optimizer steps on random 98,624-parameter model with train-only tokenizer training: CPU RUN; held-out behavior competence `NOT_ESTABLISHED`.
 - Real-world Java generation benchmark, secure behavior test sandbox, 1B/3B training, GPU experiments: NOT_RUN.
+
+## v0.12 — Java data generation and actual SFT experiment
+
+- Original Japanese/English Java task data: **IMPLEMENTED**, 350 examples and
+  26 algorithm families; train/validation/test disjoint by family.
+- Synthetic dataset provenance/digest verification: **IMPLEMENTED**, no third-party corpus.
+- Actual from-scratch CPU model SFT: **TRAINED**, 774,240 parameters, 1500 steps.
+- Held-out compilation: **10/15 PASS_COMPILE**, exact reference match **0/15**.
+- Java behavioral correctness: **NOT_RUN**; no independent useful coding capability established.
+- Evidence: `docs/JAVA_ORIGINAL_TRAINING.md` and separately downloadable
+  model checkpoint/tokenizer/dataset/report. **Do not upload weights to Git.**
+- Real GPU, 1B/3B, broader programming datasets, safe sandbox execution: **NOT_RUN**.

@@ -1,6 +1,6 @@
 # SagaLLM
 
-**Prototype v0.11.0** — offline 5-shot MMLU-style evaluation, SHA-pinned dataset review, local hardware diagnostics, and CPU/Gloo readiness tests. The model itself remains experimental and untrained at 1B/3B scale.
+**Prototype v0.12.0** — offline 5-shot MMLU-style evaluation, SHA-pinned dataset review, local hardware diagnostics, and CPU/Gloo readiness tests. The model itself remains experimental and untrained at 1B/3B scale.
 
 A local-first **from-scratch** decoder-only language model research project. The model uses native PyTorch implementations of RMSNorm, rotary embeddings, grouped-query attention, SwiGLU and a tied token embedding / language-modeling head. The repository includes a small educational byte-level BPE tokenizer, disk-backed JSONL / uint32 token shards, deterministic document splits, resumable single-device training, supervised fine-tuning, held-out token-level validation, an optional local inference API, and greedy/sampling generation.
 
@@ -33,6 +33,33 @@ python -m pytest -q
 ```
 
 The `examples/toy_corpus.txt` is an artificial, repository-authored smoke-test corpus; it is **not** a licensed large-scale language training dataset. The `--license CC0-1.0` shown for this repository-authored demo does not certify permissions for third-party materials. `data/`, `checkpoints/` and binary model weights are gitignored. The default Python tokenizer is intentionally simple. The optional Rust-backed tokenizer can be selected with `--backend hf` (see `docs/TOKENIZERS.md`).
+
+## Original Java data and actual CPU training (v0.12)
+
+SagaLLM now generates **350 newly authored bilingual Java 17 training/evaluation
+examples** with strictly disjoint task families: 320 train, 15 validation and
+15 test. A deterministic manifest and byte-by-byte verifier detect tampering,
+including forged SHA-256 manifests. The code generator uses no external Java
+corpus, no pretrained model and no paid API.
+
+A **real** random-initialized 774,240-parameter SagaTransformer was trained
+on the train split for **1,500 CPU optimizer steps**. Training loss fell from
+6.2038 to 0.2634, but held-out test loss only fell 6.1769 to 6.0101.
+On 15 unseen Java requests, **10 generated programs compiled, 0 matched the
+reference code**, and **zero** generated Java programs were executed.
+Validation loss worsened late in training, showing overfitting. **This is not
+an independently useful Java coding LLM.** Model weights and the generated
+corpus are not stored in Git; downloadable artifacts are supplied separately.
+
+```bash
+PYTHONPATH=src python -c 'from sagallm.java_generated_data import build_java_dataset; print(build_java_dataset("data/java-original"))'
+OMP_NUM_THREADS=2 PYTHONPATH=src python scripts/train_java_original.py \
+  --dataset data/java-original --output checkpoints/java-original-exp \
+  --steps 1500 --max-seconds 155 --hidden-size 160 --layers 3
+```
+
+See [docs/JAVA_ORIGINAL_TRAINING.md](docs/JAVA_ORIGINAL_TRAINING.md) for
+source, audit, precise settings, results and limitations.
 
 ## Java synthetic study kit and honest held-out checks (v0.11)
 

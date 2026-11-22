@@ -1,3 +1,18 @@
+## v0.12.0 — original Java training dataset and CPU SFT (2026-11-22)
+
+- Add 350 **new original** Java instruction/code examples (320 train, 15 validation,
+  15 test), split by disjoint algorithm families, in Japanese and English.
+- Add deterministic SHA-256 dataset audit, content and provenance checks, and
+  Java compile tests; no third-party code or pretrained model weights used.
+- Add bounded local `scripts/train_java_original.py` for genuine random-base
+  CPU supervised fine-tuning, held-out loss, and compile-only Java scoring.
+- Actual CPU experiment: 774,240 parameters, 1,500 steps, train loss
+  6.2038→0.2634, held-out test loss 6.1769→6.0101, 10/15 generated Java
+  compiled but 0/15 exact matches. Model can emit *compilable but incorrect*
+  Java and exhibits overfitting; runtime program behavior NOT_RUN.
+- No Java source downloaded, no cloud GPU, no external API, no 1B/3B model
+  trained. Keep generated corpora, tokenizer, and model weights outside Git.
+
 ## v0.11.0 — 2026-11-22
 
 - Added original, task-family-separated Java synthetic SFT fixture (`java dataset-build/verify`) with deterministic SHA-256 manifests and strict integrity checks. No external code corpus or license approval is implied.
