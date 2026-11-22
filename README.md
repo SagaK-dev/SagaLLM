@@ -1,6 +1,6 @@
 # SagaLLM
 
-**Prototype v0.15.0** — offline 5-shot MMLU-style evaluation, SHA-pinned dataset review, local hardware diagnostics, and CPU/Gloo readiness tests. The model itself remains experimental and untrained at 1B/3B scale.
+**Prototype v0.16.0** — offline 5-shot MMLU-style evaluation, SHA-pinned dataset review, local hardware diagnostics, and CPU/Gloo readiness tests. The model itself remains experimental and untrained at 1B/3B scale.
 
 A local-first **from-scratch** decoder-only language model research project. The model uses native PyTorch implementations of RMSNorm, rotary embeddings, grouped-query attention, SwiGLU and a tied token embedding / language-modeling head. The repository includes a small educational byte-level BPE tokenizer, disk-backed JSONL / uint32 token shards, deterministic document splits, resumable single-device training, supervised fine-tuning, held-out token-level validation, an optional local inference API, and greedy/sampling generation.
 
@@ -33,6 +33,24 @@ python -m pytest -q
 ```
 
 The `examples/toy_corpus.txt` is an artificial, repository-authored smoke-test corpus; it is **not** a licensed large-scale language training dataset. The `--license CC0-1.0` shown for this repository-authored demo does not certify permissions for third-party materials. `data/`, `checkpoints/` and binary model weights are gitignored. The default Python tokenizer is intentionally simple. The optional Rust-backed tokenizer can be selected with `--backend hf` (see `docs/TOKENIZERS.md`).
+
+## Java production-source learning (v0.16) — pinned, attributed open source
+
+The new CPU pipeline can train the **native SagaLLM model from random weights**
+on real Java from 4 specific Git revisions: TheAlgorithms/Java (MIT),
+Google Gson and Guava (Apache-2.0), and Java Design Patterns (MIT).
+Git revision and license blob IDs are pinned, Git-tracked production `.java`
+files are deduplicated and screened, and source-package-disjoint splits are
+used. Preserve license notices and source provenance. This is an engineering
+license hash check, not a legal certification of all source contributions.
+
+See `docs/JAVA_REAL_SOURCE_TRAINING.md` and the separate
+`.github/workflows/java-public-cpu-train.yml` workflow. The training workflow
+will report actual file counts, files that contributed gradients and held-out
+code next-token loss. It uploads model artifacts only after a successful run.
+**This is code language modeling, not Java instruction fine-tuning**; falling
+loss does not demonstrate usable natural-language Java Vibe Coding. Generated
+Java behavior/compilation in this step is `NOT_RUN`.
 
 ## Java diverse training v0.15.0: 17,536 synthetic examples, 110 families (2026-11-22)
 

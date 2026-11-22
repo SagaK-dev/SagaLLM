@@ -1,3 +1,10 @@
+## v0.16 development — real open-source Java code learning
+
+- Source pipeline checks four exact Git commit SHA-1 hashes and independently pinned license blobs, discards untracked/modified/unsafe code, retains license files and per-file content SHA-256. Actual corpus sizes are determined when the four pinned repositories are checked out.
+- Small PyTorch causal code LM can train from random weights on train-only source chunks; report unique files/windows actually used and validation-only model selection. This is not the older 17,536 synthetic Java instruction-pair corpus.
+- A separate PR-triggered GitHub Actions CPU job performs live pinned-source checkout and code training, preserving checkpoint artifacts. Until its run completes, public-source learning status is `NOT_RUN`.
+- No 1B/3B, GPU, compiler/behavior scores, or demonstrated Java Vibe Coding competence from real-source pretraining. Upstream license evidence is SHA-pinned, not individualized legal clearance.
+
 ## Actual v0.15 CPU training evidence (2026-11-22)
 
 - Both the new random-initialized (1,476,288-parameter) model and the v0.14 continuation (1,427,136 parameters) completed **17,080 optimizer steps** using **17,080 distinct records each**. This does NOT mean the continuation learned another 17,080 previously unseen programs: some v0.14 examples overlap.

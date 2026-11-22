@@ -1,3 +1,10 @@
+## v0.16 Java real-source pretraining and provenance
+
+- Added `java_public_corpus.py` and `train_java_public.py`, with regression tests for exact Git licensing, source group disjointness, tampering, and real tiny CPU optimizer steps.
+- Added a bounded PR-triggered GitHub Actions training job to obtain four fixed-revision permissively licensed Java repositories, prepare a verified offline source corpus, train a small native SagaLLM from random weights, and upload train report, tokenizer, both checkpoints and licenses as an artifact.
+- Model task: causal **Java next-token prediction**, not natural-language Java instruction following. No upstream build scripts or Java programs are executed in the workflow. Log loss and exact number of source files that contributed to gradients.
+- This workflow and its results must be verified before claiming actual public-source training completion; source license notices and contributor rights are not a substitute for legal review.
+
 ## Actual v0.15 CPU training evidence (2026-11-22)
 
 - Both the new random-initialized (1,476,288-parameter) model and the v0.14 continuation (1,427,136 parameters) completed **17,080 optimizer steps** using **17,080 distinct records each**. This does NOT mean the continuation learned another 17,080 previously unseen programs: some v0.14 examples overlap.
