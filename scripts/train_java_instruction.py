@@ -7,7 +7,7 @@ import argparse
 import json
 from pathlib import Path
 
-from sagallm.java_instruction_sft import train_instruction_sft
+from sagallm.java_instruction_sft import train_instruction_sft, V016_BASE_BEST_SHA256, V017_SFT_BEST_SHA256
 
 
 def main():
@@ -22,10 +22,13 @@ def main():
     p.add_argument('--max-seconds',type=float,default=360)
     p.add_argument('--compile-cases',type=int,default=10)
     p.add_argument('--lr',type=float,default=0.00015)
+    p.add_argument('--context',type=int,choices=[384],help='Opt-in 192→384 RoPE extrapolation using pinned v0.17 SFT weights')
     a=p.parse_args()
     report=train_instruction_sft(a.base,a.tokenizer,a.dataset,a.output,steps=a.steps,
          batch_size=a.batch_size,eval_every=a.eval_every,max_seconds=a.max_seconds,
-         compile_cases=a.compile_cases,lr=a.lr)
+         compile_cases=a.compile_cases,lr=a.lr,
+         target_context=a.context,
+         pinned_checkpoint_sha256=V017_SFT_BEST_SHA256 if a.context else V016_BASE_BEST_SHA256)
     print('JAVA_INSTRUCTION_SFT_SUMMARY '+json.dumps({k:v for k,v in report.items() if k!='history'},ensure_ascii=False),flush=True)
 
 

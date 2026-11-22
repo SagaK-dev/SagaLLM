@@ -1,3 +1,16 @@
+## v0.18.0 — bounded RoPE-context extension and actual Java instruction SFT
+
+- Add a SHA-pinned v0.17-to-v0.18 fine-tuning path with context limit 192→384,
+  strictly preserving all learned weights. Baseline short-input logit parity
+  verified with deterministic CPU tensors; extended-context capability itself
+  remains unproven until independent tests.
+- Record complete-response admission at both context sizes; no answer truncation,
+  family-disjoint training/validation/test splits and test-after-selection.
+- Add an opt-in `--context 384` to the Java instruction SFT CLI while
+  keeping the v0.17 pinned source workflow and 192-token behavior intact.
+- Add actual CPU/JDK workflow, extended-context micro-SFT, provenance and
+  invalid-configuration tests. Generated-code behavior execution is NOT_RUN.
+
 ## v0.17.0 — Real-Java initialized, compact-prompt instruction SFT
 
 - Confirmed hosted CPU training: 650 steps, 2,600 distinct SFT pairs; best checkpoint step 100. Held-out response loss 4.234 → 2.086, compile-only baseline 0/8 versus tuned 1/8, no behavioral validation. Evidence in `experiments/java_instruction_v017_results.json`.
