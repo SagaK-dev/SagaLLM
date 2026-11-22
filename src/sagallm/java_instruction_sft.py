@@ -289,12 +289,15 @@ def unresolved_variable_declaration_hint(stderr: str, generated_source: str) -> 
     return 'NO_SIMPLE_DECLARATION_PATTERN_SEEN'
 
 
-def compile_heldout_references(rows: list[dict], *, max_cases: int = 8) -> dict:
-    """Sanity-check canonical reference programs; javac only, never execute.
+def compile_heldout_references(rows: list[dict], *, max_cases: int = 8,
+                               case_offset: int = 0) -> dict:
+    """Sanity-check a fixed reference window; javac only, never execute.
 
     Reference compilation is diagnostic and is never used to select weights.
     """
-    cases = eval_sample(rows, max_cases, seed=67)
+    if not 1 <= max_cases <= 12 or not 0 <= case_offset <= 24:
+        raise ValueError('Invalid reference case window')
+    cases = eval_sample(rows, max_cases + case_offset, seed=67)[case_offset:case_offset+max_cases]
     details = []
     compiled = 0
     for row in cases:
