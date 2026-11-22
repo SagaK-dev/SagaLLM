@@ -1,0 +1,78 @@
+name: SagaLLM Java prompt validation-first experiment (CPU)
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/java-prompt-validation-experiment.yml'
+      - 'scripts/evaluate_java_prompt_dev.py'
+      - 'src/sagallm/java_instruction_sft.py'
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  compile-experiment:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    env:
+      OMP_NUM_THREADS: '2'
+      MKL_NUM_THREADS: '2'
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '21'
+      - name: Install CPU-only dependencies
+        run: |
+          python -m pip install 'torch>=2.3' --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install -e '.[fast-tokenizer]'
+      - name: Download pinned v0.17 checkpoint and tokenizer
+        uses: actions/download-artifact@v4
+        with:
+          name: sagallm-v017-java-instruction-sft-cpu
+          run-id: 44982940959
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: v017
+      - name: Download pinned v0.18 checkpoint
+        uses: actions/download-artifact@v4
+        with:
+          name: sagallm-v018-java-context-sft-cpu
+          run-id: 44994208434
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: v018
+      - name: Verify original checkpoint and tokenizer SHA256
+        run: |
+          echo 'a17268d80ff443e4a0347f3a29df433556506f13537c78ce282836fa8fe4e5f9  v017/java-sft-model/java-sft-best.pt' | sha256sum -c -
+          echo '9802e848f0abea9979623f461b5e63cd7aed838acd087d06b20d747db1e2a0fc  v018/java-context-model/java-sft-best.pt' | sha256sum -c -
+          echo '186566808cb03e328cac9a6b7b384a8d0aefc54ccb83fbe97782a751726682fe  v017/java-sft-model/tokenizer.json' | sha256sum -c -
+      - name: Recreate and verify project-authored synthetic Java corpus
+        run: |
+          python - <<'PY'
+          from sagallm.java_diverse_corpus import build_java_diverse_corpus, verify_java_diverse_corpus
+          build_java_diverse_corpus('java-dataset')
+          verify_java_diverse_corpus('java-dataset')
+          PY
+      - name: Select prompts only on validation, evaluate new test window once
+        run: |
+          python scripts/evaluate_java_prompt_dev.py \
+            --base v017/java-sft-model/java-sft-best.pt \
+            --best v018/java-context-model/java-sft-best.pt \
+            --tokenizer v017/java-sft-model/tokenizer.json \
+            --dataset java-dataset \
+            --dev-cases 8 --test-cases 8 \
+            --output java-prompt-validation-experiment.json
+      - name: Preserve compile-only experiment
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: sagallm-java-prompt-validation-experiment
+          path: java-prompt-validation-experiment.json
+          retention-days: 30
+          if-no-files-found: error
