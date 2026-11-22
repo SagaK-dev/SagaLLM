@@ -75,3 +75,31 @@ The original v0.17 workflow remains usable without `--context`.
 **Unverified:** effectiveness outside the original 192-token range, independent
 real-world Java coding, code editing, runtime behavior, safe execution in a
 real OCI environment, GPU training, 1B/3B weights and source-license selection.
+
+## Measured GitHub-hosted CPU experiment (2026-11-22)
+
+GitHub Actions [run 44994208434](https://github.com/SagaK-dev/SagaLLM/actions/runs/44994208434)
+finished successfully. The exact original SFT checkpoint and tokenizer hashes
+were verified and the trained model artifact was uploaded. For the complete
+per-step history and per-case hashes, see `experiments/java_context_v018_results.json`.
+
+| Item | Actual result |
+| --- | ---: |
+| Original → extended positions | 192 → 384 |
+| Train examples admitted (old → new) | 16,518 → 17,080 |
+| Validation examples admitted | 213 → 228 |
+| Test examples admitted | 200 → 228 |
+| Optimizer steps, total distinct examples | 400, 1,600 |
+| Validation-selected best step, distinct examples | 50, 200 |
+| Validation loss at extended 384-context (base → best) | 1.7710 → 1.7625 |
+| Test loss at the **same extended context** (base → best) | 2.1666 → 2.1413 |
+| Java compile-only, eight unseen-family prompts (base → best) | **2/8 → 0/8** |
+| Exact Java source matches (base → best) | 0/8 → 0/8 |
+| Model-generated Java semantic execution | NOT_RUN |
+
+**Interpretation:** more complete training examples are admitted and response-token
+loss improves marginally, **but compile-only generation regresses**. This
+experiment does not establish better Java coding capability or generalization
+at positions 193–384. The best checkpoint saw 200 extra SFT examples while the
+last checkpoint saw 1,600. The 384-context SFT model must not be described as
+having learned all 17,080 available examples.

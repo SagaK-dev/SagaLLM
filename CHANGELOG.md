@@ -173,3 +173,8 @@
 
 - Initial native PyTorch decoder-only Transformer with RoPE, RMSNorm, GQA, SwiGLU and KV cache.
 - Small offline BPE tokenizer, single-device pretraining/checkpoints, single-turn SFT, simple evaluation and local inference API.
+
+Verification note: GitHub Actions v0.18 context-SFT run `44994208434`
+completed 400 steps (1,600 distinct records); best step 50 (200 records),
+384-context heldout loss 2.1666→2.1413 while compile-only worsened 2/8→0/8.
+See `experiments/java_context_v018_results.json`.

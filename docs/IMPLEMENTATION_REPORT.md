@@ -189,3 +189,14 @@ Actual v0.17 hosted SFT run: 44982940959, 650 optimizer updates; 2,600 distinct 
 - Report original and expanded context and how many whole examples are newly
   admitted. Test data is not used for optimizer or validation selection.
   Generated-Java behavioral tests and independent coding ability remain NOT_RUN.
+
+### Verified hosted v0.18 result
+
+- Actual run 44994208434; 400 CPU optimizer steps and 1,600 unique train examples;
+  validation best step 50 after 200 examples. Train/validation/test admission
+  counts: 17,080 / 228 / 228.
+- Same-context heldout test loss 2.1666 (base) → 2.1413 (best); **Java compiler
+  success worsened 2/8 → 0/8**, exact 0/8, generated behavior NOT_RUN.
+- Checkpoint SHA-256 best `9802e848f0abea9979623f461b5e63cd7aed838acd087d06b20d747db1e2a0fc`,
+  last `74ae92a54ca864461ffff08d0db80191cbc88370f8a5347c099f182ea271e016`.
+  Tokenizer remained `186566808cb03e328cac9a6b7b384a8d0aefc54ccb83fbe97782a751726682fe`.
