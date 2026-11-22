@@ -20,12 +20,13 @@ import time
 import torch
 
 from sagallm.config import ModelConfig
-from sagallm.java_diverse_corpus import verify_java_diverse_corpus
+from sagallm.java_diverse_corpus import NEW_TRAIN, verify_java_diverse_corpus
 from sagallm.java_identifier_curriculum import verify_identifier_train_candidates
 from sagallm.java_instruction_sft import (
     V016_TOKENIZER_SHA256, eval_sample, heldout_compilation, interleaved_order,
     pack, read_split, response_loss, sha_file,
 )
+from sagallm.java_large_corpus import TRAIN_FAMILIES
 from sagallm.model import SagaTransformer
 from sagallm.tokenization import load_tokenizer
 from sagallm.training import checkpoint_load, verify_checkpoint_tokenizer
@@ -56,10 +57,14 @@ def fixed_training_schedule(broad_rows: list[dict],
             not pairs or len(broad_rows) < REQUIRED_CANONICAL_ROWS or
             len({r["family"] for r in broad_rows}) < REQUIRED_CANONICAL_FAMILIES):
         raise ValueError("Insufficient broad TRAIN-family evidence")
+    train_families = set(TRAIN_FAMILIES) | set(NEW_TRAIN)
+    if any(row["family"] not in train_families for row in broad_rows):
+        raise ValueError("Non-TRAIN task family in broad training schedule")
     if len(pairs) < 100 or any(
             left["id"] != right["id"] or
             left["prefix_ids"] != right["prefix_ids"] or
-            left["family"] != right["family"]
+            left["family"] != right["family"] or
+            left["family"] not in train_families
             for left, right in pairs):
         raise ValueError("Unpaired or undersized identifier TRAIN samples")
     broad_order = interleaved_order(broad_rows, SEED)
