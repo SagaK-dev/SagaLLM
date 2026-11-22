@@ -232,6 +232,26 @@ def classify_javac_diagnostic(stderr: str) -> str:
     return 'OTHER'
 
 
+def classify_javac_symbol_kind(stderr: str) -> str:
+    """Report only the javac unresolved-symbol *kind*, never its identifier."""
+    if not isinstance(stderr, str) or not stderr:
+        return 'NONE'
+    lines = stderr[:8192].splitlines()
+    # Restrict inspection to the first javac error, including its symbol lines.
+    start = next((index for index, line in enumerate(lines)
+                  if 'error: cannot find symbol' in line.lower()), None)
+    if start is None:
+        return 'NONE'
+    for line in lines[start + 1:start + 12]:
+        if 'error:' in line:
+            break
+        match = re.match(r'^\s*symbol:\s*(variable|method|class|constructor)\b',
+                         line, re.IGNORECASE)
+        if match:
+            return match.group(1).upper()
+    return 'UNKNOWN'
+
+
 def heldout_compilation(model, tokenizer, rows:list[dict], *, max_cases:int=10) -> dict:
     """Compiles model output, never executes it. Called only after model selection."""
     cases=eval_sample(rows,max_cases,seed=67)
@@ -258,6 +278,7 @@ def heldout_compilation(model, tokenizer, rows:list[dict], *, max_cases:int=10) 
         diagnostic_hash=None
         diagnostic_category='NONE'
         javac_error_category='NONE'
+        javac_symbol_kind='NONE'
         if len(output)>=4000:
             reason='OUTPUT_TOO_LONG'
         elif 'public class Main' not in output:
@@ -276,6 +297,8 @@ def heldout_compilation(model, tokenizer, rows:list[dict], *, max_cases:int=10) 
                     diagnostic_category='JAVAC_DIAGNOSTIC'
                     if status=='FAIL':
                         javac_error_category=classify_javac_diagnostic(stderr)
+                        if javac_error_category=='MISSING_SYMBOL':
+                            javac_symbol_kind=classify_javac_symbol_kind(stderr)
                 elif status=='FAIL':
                     diagnostic_category='JAVAC_FAILURE_NO_STDERR'
         compiles+=int(status=='PASS')
@@ -292,6 +315,7 @@ def heldout_compilation(model, tokenizer, rows:list[dict], *, max_cases:int=10) 
                         'javac_stderr_sha256':diagnostic_hash,
                         'javac_diagnostic_category':diagnostic_category,
                         'javac_error_category':javac_error_category,
+                        'javac_symbol_kind':javac_symbol_kind,
                         'source_persisted':False,
                         'java_behavior':'NOT_RUN'})
     return {'status':'SCORED_COMPILE_ONLY','evaluated':total,'compiled':compiles,
