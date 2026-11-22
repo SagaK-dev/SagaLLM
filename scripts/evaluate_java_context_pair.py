@@ -13,7 +13,7 @@ import torch
 from sagallm.java_diverse_corpus import verify_java_diverse_corpus
 from sagallm.java_instruction_sft import (
     V017_SFT_BEST_SHA256, V016_TOKENIZER_SHA256, _validate_base,
-    extend_rope_context, heldout_compilation, read_split,
+    extend_rope_context, heldout_compilation, compile_heldout_references, read_split,
     restore_verified_base_weights, sha_file,
 )
 from sagallm.model import SagaTransformer
@@ -37,6 +37,9 @@ def evaluate(base: Path, best: Path, tokenizer_file: Path, dataset: Path,
     config = extend_rope_context(original, 384)
     rows, counts = read_split(dataset, "test", tokenizer, 384,
                               original_context=original.max_position_embeddings)
+    # Validate benchmark reference sources independently of generated output.
+    # Do not use test references for checkpoint or decoding hyperparameter selection.
+    references = compile_heldout_references(rows, max_cases=cases)
     model = SagaTransformer(config)
     model.eval()
     restore_verified_base_weights(model, state, original)
@@ -53,6 +56,7 @@ def evaluate(base: Path, best: Path, tokenizer_file: Path, dataset: Path,
         "best_sha256": sha_file(best),
         "tokenizer_sha256": tokenizer_sha,
         "test_split": counts,
+        "reference_compilation": references,
         "base": baseline,
         "best": selected,
         "java_executed": False,

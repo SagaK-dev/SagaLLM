@@ -252,6 +252,75 @@ def classify_javac_symbol_kind(stderr: str) -> str:
     return 'UNKNOWN'
 
 
+def unresolved_variable_declaration_hint(stderr: str, generated_source: str) -> str:
+    """Coarse lexical signal, not Java scope or semantic analysis.
+
+    Neither the unresolved identifier nor any source/diagnostic text is returned.
+    A pattern match may appear outside scope (or in a comment), and complex
+    declaration syntax may be missed. Only the fixed category is persisted.
+    """
+    if not isinstance(stderr, str) or not isinstance(generated_source, str):
+        return 'UNKNOWN'
+    lines = stderr[:8192].splitlines()
+    start = next((i for i, line in enumerate(lines)
+                  if 'error: cannot find symbol' in line.lower()), None)
+    if start is None:
+        return 'UNKNOWN'
+    identifier = None
+    for line in lines[start+1:start+12]:
+        if 'error:' in line.lower():
+            break
+        marker = re.fullmatch(r'\s*symbol:\s*variable\s+([A-Za-z_$][A-Za-z0-9_$]{0,63})\s*',
+                              line, re.IGNORECASE)
+        if marker:
+            identifier = marker.group(1)
+            break
+    if identifier is None:
+        return 'UNKNOWN'
+    # Strictly lexical: this is NOT proof that the identifier is in scope.
+    simple_type = (r'(?:byte|short|int|long|float|double|boolean|char|'
+                   r'String|var|Object|StringBuilder|BigInteger|List|Set|Map|'
+                   r'ArrayList|HashMap)')
+    pattern = (r'(?<![A-Za-z0-9_$])(?:final\s+)?' + simple_type +
+               r'(?:\s*<[^;{}\n>]{1,80}>)?(?:\s*\[\s*\])*\s+' +
+               re.escape(identifier) + r'(?![A-Za-z0-9_$])(?=\s*(?:=|;|,|:|\)|\[))')
+    if re.search(pattern, generated_source[:4000]):
+        return 'SIMPLE_DECLARATION_PATTERN_SEEN'
+    return 'NO_SIMPLE_DECLARATION_PATTERN_SEEN'
+
+
+def compile_heldout_references(rows: list[dict], *, max_cases: int = 8) -> dict:
+    """Sanity-check canonical reference programs; javac only, never execute.
+
+    Reference compilation is diagnostic and is never used to select weights.
+    """
+    cases = eval_sample(rows, max_cases, seed=67)
+    details = []
+    compiled = 0
+    for row in cases:
+        source_text = row['source']
+        if (len(source_text) >= 4000 or '\x00' in source_text or
+                'public class Main' not in source_text):
+            status = 'SKIPPED_UNSAFE_REFERENCE'
+            category = 'NONE'
+        else:
+            with tempfile.TemporaryDirectory(prefix='sagallm-reference-javac-') as location:
+                root = Path(location)
+                source_file = root / 'Main.java'
+                source_file.write_text(source_text, encoding='utf8')
+                outcome = _compile(source_file, root, timeout=12)
+                status = outcome['status']
+                category = (classify_javac_diagnostic(outcome.get('diagnostics', ''))
+                            if status == 'FAIL' else 'NONE')
+        compiled += int(status == 'PASS')
+        details.append({'id': row['id'], 'compile': status,
+                        'javac_error_category': category,
+                        'source_persisted': False, 'java_behavior': 'NOT_RUN'})
+    return {'status': 'REFERENCE_COMPILE_ONLY', 'evaluated': len(cases),
+            'compiled': compiled, 'cases': details,
+            'behavior': 'NOT_RUN', 'used_for_model_selection': False}
+
+
 def heldout_compilation(model, tokenizer, rows:list[dict], *, max_cases:int=10) -> dict:
     """Compiles model output, never executes it. Called only after model selection."""
     cases=eval_sample(rows,max_cases,seed=67)
@@ -279,6 +348,7 @@ def heldout_compilation(model, tokenizer, rows:list[dict], *, max_cases:int=10) 
         diagnostic_category='NONE'
         javac_error_category='NONE'
         javac_symbol_kind='NONE'
+        javac_variable_declaration_hint='NONE'
         if len(output)>=4000:
             reason='OUTPUT_TOO_LONG'
         elif 'public class Main' not in output:
@@ -299,6 +369,8 @@ def heldout_compilation(model, tokenizer, rows:list[dict], *, max_cases:int=10) 
                         javac_error_category=classify_javac_diagnostic(stderr)
                         if javac_error_category=='MISSING_SYMBOL':
                             javac_symbol_kind=classify_javac_symbol_kind(stderr)
+                            if javac_symbol_kind=='VARIABLE':
+                                javac_variable_declaration_hint=unresolved_variable_declaration_hint(stderr,output)
                 elif status=='FAIL':
                     diagnostic_category='JAVAC_FAILURE_NO_STDERR'
         compiles+=int(status=='PASS')
@@ -316,6 +388,7 @@ def heldout_compilation(model, tokenizer, rows:list[dict], *, max_cases:int=10) 
                         'javac_diagnostic_category':diagnostic_category,
                         'javac_error_category':javac_error_category,
                         'javac_symbol_kind':javac_symbol_kind,
+                        'javac_variable_declaration_hint':javac_variable_declaration_hint,
                         'source_persisted':False,
                         'java_behavior':'NOT_RUN'})
     return {'status':'SCORED_COMPILE_ONLY','evaluated':total,'compiled':compiles,
