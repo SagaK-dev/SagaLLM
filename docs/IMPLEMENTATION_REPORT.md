@@ -175,3 +175,17 @@ Implemented deterministic post-ingestion corpus curation (normalized and probabl
 See `docs/JAVA_INSTRUCTION_SFT.md` for the new source-pretrained-to-instruction-tuned pipeline and its exact leakage controls, CPU budget, and evaluation limitations. Report generated-checkpoint capabilities only from its actual training workflow result.
 
 Actual v0.17 hosted SFT run: 44982940959, 650 optimizer updates; 2,600 distinct training examples, but only 400 examples at validation-selected best step 100. See `experiments/java_instruction_v017_results.json`. Held-out compile-only 1/8 and exact matches 0/8; instruction following remains NOT_ESTABLISHED.
+
+## v0.18 long-context Java instruction SFT
+
+- RoPE context bound increased 192→384 with **unchanged weight tensors** and
+  pinned original v0.17 SFT checkpoint/tokenizer. Only the context-limit
+  field may change; strict weight-shape loading and original-position parity
+  are covered by tests.
+- New workflow `java-context-sft-cpu.yml` restores exactly the hosted v0.17
+  artifact and trains against original family-disjoint Java SFT, with full
+  answer tokens and a fixed CPU budget. Local `tests/test_java_context_extension.py`
+  includes actual two-step extended-context CPU optimization.
+- Report original and expanded context and how many whole examples are newly
+  admitted. Test data is not used for optimizer or validation selection.
+  Generated-Java behavioral tests and independent coding ability remain NOT_RUN.

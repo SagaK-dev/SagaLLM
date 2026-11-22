@@ -1,6 +1,6 @@
 # SagaLLM
 
-**Prototype v0.16.0** — offline 5-shot MMLU-style evaluation, SHA-pinned dataset review, local hardware diagnostics, and CPU/Gloo readiness tests. The model itself remains experimental and untrained at 1B/3B scale.
+**Prototype v0.18.0** — offline 5-shot MMLU-style evaluation, SHA-pinned dataset review, local hardware diagnostics, and CPU/Gloo readiness tests. The model itself remains experimental and untrained at 1B/3B scale.
 
 A local-first **from-scratch** decoder-only language model research project. The model uses native PyTorch implementations of RMSNorm, rotary embeddings, grouped-query attention, SwiGLU and a tied token embedding / language-modeling head. The repository includes a small educational byte-level BPE tokenizer, disk-backed JSONL / uint32 token shards, deterministic document splits, resumable single-device training, supervised fine-tuning, held-out token-level validation, an optional local inference API, and greedy/sampling generation.
 
@@ -33,6 +33,20 @@ python -m pytest -q
 ```
 
 The `examples/toy_corpus.txt` is an artificial, repository-authored smoke-test corpus; it is **not** a licensed large-scale language training dataset. The `--license CC0-1.0` shown for this repository-authored demo does not certify permissions for third-party materials. `data/`, `checkpoints/` and binary model weights are gitignored. The default Python tokenizer is intentionally simple. The optional Rust-backed tokenizer can be selected with `--backend hf` (see `docs/TOKENIZERS.md`).
+
+## Longer-context Java SFT (v0.18)
+
+A bounded research stage extends the **exact v0.17 SFT checkpoint** from
+192 to **384 RoPE positions** without adding weights, then runs additional
+CPU instruction fine-tuning on whole-family-isolated, original Java tasks.
+The SHA-checked checkpoint and tokenizer are required; no new pretrained
+weights or API is involved. Newly admitted full Java answers are recorded,
+not truncated. Only same-experiment heldout Java loss and **compile-only**
+checks can quantify changes. Correct behavior of model-generated Java is
+**NOT_RUN** and longer-context coding ability is **NOT_ESTABLISHED**.
+See `docs/JAVA_LONG_CONTEXT_SFT.md` and
+`.github/workflows/java-context-sft-cpu.yml`. Actual hosted-training results
+must be confirmed before claiming success.
 
 ## Java production-source learning (v0.16) — pinned, attributed open source
 

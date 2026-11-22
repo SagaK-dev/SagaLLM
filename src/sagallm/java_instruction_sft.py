@@ -6,6 +6,7 @@ verified against canonical regeneration. This does not run generated Java.
 from __future__ import annotations
 
 from collections import defaultdict
+from dataclasses import replace
 import hashlib
 import json
 from pathlib import Path
@@ -29,6 +30,8 @@ MAX_BASE_CHECKPOINT_BYTES = 90 * 1024 * 1024
 # Provenance pinned to the real-source-trained, successfully tested v0.16 artifact.
 V016_BASE_BEST_SHA256 = '96005da938d3317fe2ba5185b71cdbb6ed2fee6bc4b9c39e370006d5f2917d1b'
 V016_TOKENIZER_SHA256 = '186566808cb03e328cac9a6b7b384a8d0aefc54ccb83fbe97782a751726682fe'
+# SHA-256 from the completed v0.17 GitHub Actions SFT experiment (best step 100).
+V017_SFT_BEST_SHA256 = 'a17268d80ff443e4a0347f3a29df433556506f13537c78ce282836fa8fe4e5f9'
 REQUEST_PATTERN = re.compile(r'User request \(data\):\n([^\n]+)\nCurrent source \(data\):\n', re.M)
 
 
@@ -77,13 +80,14 @@ def encode_row(row: dict,tokenizer,context:int):
     y=torch.tensor(ids[1:],dtype=torch.long)
     y[:len(prefix)-1]=-100
     return {'id':row['id'],'family':row['family'],'task':task,'source':source,
-            'x':x,'y':y,'prefix_ids':prefix,'response_tokens':len(response)}
+            'x':x,'y':y,'prefix_ids':prefix,'response_tokens':len(response),
+            'sequence_positions':len(ids)-1}
 
 
-def read_split(root:Path, split:str, tokenizer, context:int) -> tuple[list[dict],dict]:
+def read_split(root:Path, split:str, tokenizer, context:int, *, original_context:int|None=None) -> tuple[list[dict],dict]:
     if split not in ('train','validation','test'):
         raise ValueError('Unknown split')
-    items=[];seen=set();families=set();dropped=0;total=0
+    items=[];seen=set();families=set();dropped=0;total=0;newly_admitted=0
     for line in (root/(split+'.jsonl')).read_text(encoding='utf8').splitlines():
         row=json.loads(line);total+=1
         if row['id'] in seen:raise ValueError('Repeated row ID')
@@ -94,8 +98,11 @@ def read_split(root:Path, split:str, tokenizer, context:int) -> tuple[list[dict]
         else:
             items.append(encoded)
             families.add(row['family'])
+            if original_context is not None and encoded['sequence_positions']>original_context:
+                newly_admitted+=1
     return items,{'total':total,'accepted':len(items),'excluded_too_long':dropped,
-                  'families_accepted':len(families)}
+                  'families_accepted':len(families),
+                  'newly_admitted_beyond_original_context':newly_admitted}
 
 
 def interleaved_order(items:list[dict],seed:int) -> list[int]:
@@ -140,13 +147,14 @@ def response_loss(model:SagaTransformer,items:list[dict], batch_size:int=6)->flo
     return loss_sum/n
 
 
-def _validate_base(checkpoint:Path,tokenizer_file:Path,*,require_pinned:bool):
+def _validate_base(checkpoint:Path,tokenizer_file:Path,*,require_pinned:bool,
+                   pinned_checkpoint_sha256:str=V016_BASE_BEST_SHA256):
     if (not checkpoint.is_file() or checkpoint.is_symlink() or
         checkpoint.stat().st_size>MAX_BASE_CHECKPOINT_BYTES or
         not tokenizer_file.is_file() or tokenizer_file.is_symlink()):
         raise ValueError('Missing, symlinked or oversized model files')
     checkpoint_sha=sha_file(checkpoint);tok_sha=sha_file(tokenizer_file)
-    if require_pinned and (checkpoint_sha!=V016_BASE_BEST_SHA256 or tok_sha!=V016_TOKENIZER_SHA256):
+    if require_pinned and (checkpoint_sha!=pinned_checkpoint_sha256 or tok_sha!=V016_TOKENIZER_SHA256):
         raise ValueError('The source checkpoint/tokenizer differs from pinned real-Java v0.16 training')
     state=torch.load(checkpoint,map_location='cpu',weights_only=True)
     if not state.get('train_state',{}).get('tokenizer_sha256'):
@@ -156,6 +164,40 @@ def _validate_base(checkpoint:Path,tokenizer_file:Path,*,require_pinned:bool):
     if cfg.parameter_count()>MAX_CONTEXT_PARAMETERS or cfg.max_position_embeddings>512:
         raise ValueError('Model outside small-CPU safety budget')
     return state,cfg,checkpoint_sha,tok_sha
+
+
+def extend_rope_context(config:ModelConfig, target_context:int|None) -> ModelConfig:
+    """Change the RoPE position *limit*, not the learned tensor shapes.
+
+    This is extrapolation and cannot establish quality at new positions. A
+    maximum of 512 and 2x the original length keeps the CPU experiment bounded.
+    """
+    if target_context is None:
+        return config
+    if not isinstance(target_context,int) or isinstance(target_context,bool):
+        raise ValueError('Target context must be an integer')
+    if not config.max_position_embeddings < target_context <= min(512,2*config.max_position_embeddings):
+        raise ValueError('Only bounded RoPE context extension (<=2x and <=512) is allowed')
+    extended=replace(config,max_position_embeddings=target_context)
+    if extended.parameter_count()!=config.parameter_count():
+        raise ValueError('Context extension must not allocate new parameters')
+    return extended
+
+
+def restore_verified_base_weights(model:SagaTransformer, checkpoint_state:dict,
+                                  original_config:ModelConfig) -> None:
+    """Trust a SHA-checked local checkpoint, verify all shapes and load strictly.
+
+    `checkpoint_load` appropriately rejects config mismatches; this narrowly
+    permits a *RoPE limit only* extension with exactly the same learned weights.
+    Optimizer state is intentionally discarded for a new training stage.
+    """
+    if checkpoint_state.get('config')!=original_config.to_dict():
+        raise ValueError('Original checkpoint configuration differs from expected')
+    expected=extend_rope_context(original_config,model.config.max_position_embeddings) if (model.config.max_position_embeddings!=original_config.max_position_embeddings) else original_config
+    if model.config!=expected:
+        raise ValueError('Only the RoPE context bound may change')
+    model.load_state_dict(checkpoint_state['model'],strict=True)
 
 
 def heldout_compilation(model, tokenizer, rows:list[dict], *, max_cases:int=10) -> dict:
@@ -196,7 +238,8 @@ def train_instruction_sft(base_checkpoint:str|Path,tokenizer_file:str|Path,
                           batch_size:int=4,eval_every:int=100,
                           eval_count:int=30,test_count:int=30,compile_cases:int=10,
                           lr:float=0.00015,seed:int=717,max_seconds:float=360,
-                          require_pinned:bool=True)->dict:
+                          require_pinned:bool=True, target_context:int|None=None,
+                          pinned_checkpoint_sha256:str=V016_BASE_BEST_SHA256)->dict:
     if not (1<=steps<=1500 and 1<=batch_size<=8 and 1<=eval_every<=500
             and 1<=eval_count<=100 and 1<=test_count<=100 and 0<=compile_cases<=12
             and 0<lr<=0.001 and 10<=max_seconds<=600):
@@ -205,11 +248,16 @@ def train_instruction_sft(base_checkpoint:str|Path,tokenizer_file:str|Path,
     if dest.exists() or dest.is_symlink():raise FileExistsError('Refuse to replace experiment output')
     # Verify ALL splits before allocating a model. This recomputes canonical data.
     verify_java_diverse_corpus(root)
-    state,cfg,base_sha,tok_sha=_validate_base(Path(base_checkpoint),Path(tokenizer_file),require_pinned=require_pinned)
+    state,original_cfg,base_sha,tok_sha=_validate_base(
+        Path(base_checkpoint),Path(tokenizer_file),require_pinned=require_pinned,
+        pinned_checkpoint_sha256=pinned_checkpoint_sha256)
+    cfg=extend_rope_context(original_cfg,target_context)
     tokenizer=load_tokenizer(tokenizer_file)
     if tokenizer.vocab_size>cfg.vocab_size:raise ValueError('Checkpoint vocabulary mismatch')
-    train_rows,train_info=read_split(root,'train',tokenizer,cfg.max_position_embeddings)
-    valid_rows,valid_info=read_split(root,'validation',tokenizer,cfg.max_position_embeddings)
+    train_rows,train_info=read_split(root,'train',tokenizer,cfg.max_position_embeddings,
+        original_context=original_cfg.max_position_embeddings)
+    valid_rows,valid_info=read_split(root,'validation',tokenizer,cfg.max_position_embeddings,
+        original_context=original_cfg.max_position_embeddings)
     # Do not decode, tokenize, inspect or score TEST until best checkpoint chosen.
     if len(train_rows)<batch_size or not valid_rows:
         raise ValueError('Too few complete SFT examples for this context size')
@@ -220,13 +268,16 @@ def train_instruction_sft(base_checkpoint:str|Path,tokenizer_file:str|Path,
     torch.set_num_threads(2)
     torch.manual_seed(seed)
     model=SagaTransformer(cfg)
-    checkpoint_load(base_checkpoint,model)
+    restore_verified_base_weights(model,state,original_cfg)
     optimizer=torch.optim.AdamW(model.parameters(),lr=lr,weight_decay=0.01)
     validation=eval_sample(valid_rows,eval_count)
     baseline=response_loss(model,validation)
     dest.mkdir(parents=True)
     tok_target=dest/'tokenizer.json';tok_target.write_bytes(Path(tokenizer_file).read_bytes())
-    metadata={'stage':'java_instruction_sft_v017','tokenizer_sha256':tok_sha,
+    metadata={'stage':'java_instruction_sft_v018' if target_context else 'java_instruction_sft_v017',
+              'original_context_length':original_cfg.max_position_embeddings,
+              'trained_context_length':cfg.max_position_embeddings,
+              'context_extension':'ROPE_EXTRAPOLATION_UNVALIDATED' if target_context else 'NONE','tokenizer_sha256':tok_sha,
               'base_checkpoint_sha256':base_sha,'dataset_manifest_sha256':sha_file(root/'manifest.json'),
               'prompt_version':PROMPT_VERSION,'optimizer_base_lr':lr,'seed':seed}
     best_path=dest/'java-sft-best.pt'
@@ -261,14 +312,15 @@ def train_instruction_sft(base_checkpoint:str|Path,tokenizer_file:str|Path,
     checkpoint_save(dest/'java-sft-last.pt',model,optimizer,completed,cfg,
                     {**metadata,'selection':'last','distinct_training_examples_seen':len(seen)})
     # TEST first becomes accessible after best checkpoint selection is complete.
-    test_rows,test_info=read_split(root,'test',tokenizer,cfg.max_position_embeddings)
+    test_rows,test_info=read_split(root,'test',tokenizer,cfg.max_position_embeddings,
+        original_context=original_cfg.max_position_embeddings)
     if not test_rows:raise ValueError('No accepted held-out test examples')
     test_sample=eval_sample(test_rows,test_count)
     last_test=response_loss(model,test_sample)
     checkpoint_load(best_path,model)
     best_test=response_loss(model,test_sample)
     # Baseline diagnostic on the same held-out tests, after all checkpoint selection.
-    checkpoint_load(base_checkpoint,model)
+    restore_verified_base_weights(model,state,original_cfg)
     base_test=response_loss(model,test_sample)
     # Compile-only generation: baseline and best on the exact same heldout prompts.
     baseline_compile={'status':'NOT_RUN'};best_compile={'status':'NOT_RUN'}
@@ -276,12 +328,14 @@ def train_instruction_sft(base_checkpoint:str|Path,tokenizer_file:str|Path,
         baseline_compile=heldout_compilation(model,tokenizer,test_rows,max_cases=compile_cases)
         checkpoint_load(best_path,model)
         best_compile=heldout_compilation(model,tokenizer,test_rows,max_cases=compile_cases)
-    report={'status':'TRAINED_CPU','phase':'JAVA_INSTRUCTION_SFT','model_origin':'PINNED_REAL_JAVA_V016',
+    report={'status':'TRAINED_CPU','phase':'JAVA_INSTRUCTION_SFT','model_origin':'PINNED_REAL_JAVA_V017_SFT' if target_context else 'PINNED_REAL_JAVA_V016',
             'checkpoint_sha256_base':base_sha,'tokenizer_sha256':tok_sha,
             'data_manifest_sha256':sha_file(root/'manifest.json'),'prompt_version':PROMPT_VERSION,
             'dataset_source':'project-authored parametric synthetic Java v0.15; NOT independent human tasks',
             'original_split_counts':{'train':train_info,'validation':valid_info,'test':test_info},
             'model_parameters':cfg.parameter_count(),'model_context_length':cfg.max_position_embeddings,
+            'original_model_context_length':original_cfg.max_position_embeddings,
+            'context_extension':'ROPE_EXTRAPOLATION_UNVALIDATED' if target_context else 'NONE',
             'optimizer_steps_requested':steps,'optimizer_steps_completed':completed,'termination':termination,
             'distinct_training_examples_seen':len(seen),
             'best_checkpoint_step':best_step,'best_checkpoint_train_examples_seen':best_seen,

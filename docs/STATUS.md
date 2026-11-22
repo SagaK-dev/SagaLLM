@@ -1,3 +1,14 @@
+## v0.18 Java context extension (2026-11-22)
+
+- IMPLEMENTED / LOCAL_CPU_TESTED: optional SHA-pinned v0.17 SFT model RoPE
+  context limit expansion 192→384. Strict tensor loading, parameter-count and
+  original-context logit-parity assertions, full-example admission accounting.
+- HOSTED_TRAINING_PENDING: GitHub workflow for actual 384-position SFT using
+  the known v0.17 best checkpoint. No success or metric claimed before the
+  workflow's result is verified.
+- NOT_ESTABLISHED: Java instruction compliance, real-world editing, long-range
+  generalization, model-generated Java behavioral correctness, GPU/large models.
+
 ## v0.16 development — real open-source Java code learning
 
 - Source pipeline checks four exact Git commit SHA-1 hashes and independently pinned license blobs, discards untracked/modified/unsafe code, retains license files and per-file content SHA-256. Actual corpus sizes are determined when the four pinned repositories are checked out.
