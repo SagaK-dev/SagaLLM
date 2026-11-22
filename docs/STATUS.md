@@ -133,5 +133,5 @@ See [MMLU_REFERENCE.md](MMLU_REFERENCE.md) for limits.
 ### v0.17.0 Java instruction SFT extension
 
 - IMPLEMENTED: bounded, original family-separated Java instruction SFT on SHA-pinned v0.16 real-Java model; assistant-only loss, best/last checkpoints, test-only-after-model-selection, javac-only diagnostics.
-- REQUIRES ACTION RUN: real GitHub Actions CPU training and independent heldout measurement.
+- COMPLETED: real GitHub Actions CPU SFT, run 44982940959: 650 optimizer steps, 2,600 distinct SFT records processed. Validation-selected best at step 100 (400 records); 192-token context filter accepts 16,518/17,080 training examples. Validation loss 3.6726 → 1.7723; held-out test response loss 4.2338 → 2.0855. Compile-only 0/8 baseline, 1/8 tuned; exact matches 0/8; generated Java behavior NOT_RUN.
 - NOT_ESTABLISHED: general-purpose Java coding accuracy, safe generated-code execution, full-context Java editor compatibility, real GPU, 1B/3B training.

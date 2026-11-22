@@ -1,0 +1,121 @@
+{
+  "schema": "sagallm-java-instruction-sft-v017-evidence-v1",
+  "date_utc": "2026-11-22",
+  "github_actions": {
+    "run_url": "https://github.com/SagaK-dev/SagaLLM/actions/runs/44982940959",
+    "baseline_run_url": "https://github.com/SagaK-dev/SagaLLM/actions/runs/44981937649",
+    "artifact_id": 14738368209,
+    "artifact_name": "sagallm-v017-java-instruction-sft-cpu"
+  },
+  "model": {
+    "initial_checkpoint_sha256": "96005da938d3317fe2ba5185b71cdbb6ed2fee6bc4b9c39e370006d5f2917d1b",
+    "selected_checkpoint_sha256": "a17268d80ff443e4a0347f3a29df433556506f13537c78ce282836fa8fe4e5f9",
+    "last_checkpoint_sha256": "700520a9286859ed7d12a9d9aebb04eaf9933302cfdd09fbba478c452abb30d0",
+    "tokenizer_sha256": "186566808cb03e328cac9a6b7b384a8d0aefc54ccb83fbe97782a751726682fe",
+    "parameters": 1722048,
+    "context": 192
+  },
+  "dataset": {
+    "manifest_sha256": "1e9c0ff933c5096cf2d633e81ec0c90498006fab45397a28a4c073fbf181a23a",
+    "origin": "project-authored parametric synthetic Java v0.15; NOT independent human tasks",
+    "splits": {
+      "train": {
+        "total": 17080,
+        "accepted": 16518,
+        "excluded_too_long": 562,
+        "families_accepted": 90
+      },
+      "validation": {
+        "total": 228,
+        "accepted": 213,
+        "excluded_too_long": 15,
+        "families_accepted": 10
+      },
+      "test": {
+        "total": 228,
+        "accepted": 200,
+        "excluded_too_long": 28,
+        "families_accepted": 10
+      }
+    },
+    "prompt_version": "compact_java_17_sft_v1"
+  },
+  "training": {
+    "steps_completed": 650,
+    "distinct_training_examples_seen": 2600,
+    "best_checkpoint_step": 100,
+    "best_checkpoint_train_examples_seen": 400,
+    "history": [
+      {
+        "step": 100,
+        "last_train_response_loss": 0.8948567509651184,
+        "validation_response_loss": 1.7722994650609394,
+        "distinct_train_examples_seen": 400,
+        "distinct_train_families_seen": 90
+      },
+      {
+        "step": 200,
+        "last_train_response_loss": 0.5053262114524841,
+        "validation_response_loss": 1.8043533709862765,
+        "distinct_train_examples_seen": 800,
+        "distinct_train_families_seen": 90
+      },
+      {
+        "step": 300,
+        "last_train_response_loss": 0.5749944448471069,
+        "validation_response_loss": 1.9107135835248807,
+        "distinct_train_examples_seen": 1200,
+        "distinct_train_families_seen": 90
+      },
+      {
+        "step": 400,
+        "last_train_response_loss": 0.28697270154953003,
+        "validation_response_loss": 1.9316281935637285,
+        "distinct_train_examples_seen": 1600,
+        "distinct_train_families_seen": 90
+      },
+      {
+        "step": 500,
+        "last_train_response_loss": 0.3509417474269867,
+        "validation_response_loss": 1.9464089117576855,
+        "distinct_train_examples_seen": 2000,
+        "distinct_train_families_seen": 90
+      },
+      {
+        "step": 600,
+        "last_train_response_loss": 0.24864697456359863,
+        "validation_response_loss": 2.059364325337156,
+        "distinct_train_examples_seen": 2400,
+        "distinct_train_families_seen": 90
+      },
+      {
+        "step": 650,
+        "last_train_response_loss": 0.2941133975982666,
+        "validation_response_loss": 2.04153935881056,
+        "distinct_train_examples_seen": 2600,
+        "distinct_train_families_seen": 90
+      }
+    ]
+  },
+  "evaluation": {
+    "initial_validation_response_loss": 3.6726249408910023,
+    "best_validation_response_loss": 1.7722994650609394,
+    "heldout_test_response_loss_base": 4.233775711928369,
+    "heldout_test_response_loss_best": 2.085530512217633,
+    "heldout_test_response_loss_last": 2.2636584479573227,
+    "compile_baseline": {
+      "n": 8,
+      "passed": 0,
+      "exact": 0
+    },
+    "compile_best": {
+      "n": 8,
+      "passed": 1,
+      "exact": 0
+    },
+    "test_used_for_model_selection": false,
+    "java_behavior": "NOT_RUN",
+    "code_generation_reliability": "NOT_ESTABLISHED"
+  },
+  "limitations": "Synthetic project-authored parameter variants, 192-token context, no real-world task success or generated-Java runtime testing."
+}

@@ -383,3 +383,5 @@ See [Java instruction SFT](docs/JAVA_INSTRUCTION_SFT.md) and the
 small-model SFT, **not** a reliable Java Vibe Coding assistant: code is **never
 executed** and the old long-context Java editor cannot use the compact SFT
 prompt with the v0.16 192-token context.
+
+The v0.17 CPU SFT [run completed](https://github.com/SagaK-dev/SagaLLM/actions/runs/44982940959): 650 steps, 2,600 examples seen, validation-selected best at step 100. Held-out test loss 4.234 → 2.086, but only 1/8 generated Java programs compiled and 0/8 matched reference source. Full figures: `experiments/java_instruction_v017_results.json`.
