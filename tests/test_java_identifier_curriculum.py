@@ -112,3 +112,24 @@ def test_compiles_all_train_candidate_java_without_executing(tmp_path):
     assert not (folder / "_compile_only").exists()
     recorded = json.loads((folder / "audit-summary.json").read_text())
     assert recorded == report
+
+
+
+def test_qualified_system_out_is_never_renamed():
+    source = (
+        "public class Main {"
+        "public static void main(String[] args){"
+        "int out=0; out++; System.out.println(out);"
+        "}}"
+    )
+    changed = curriculum.rename_identifiers(
+        source, {"out": "resultValue"})
+    assert "int resultValue=0;" in changed
+    assert "resultValue++;" in changed
+    assert "System.out.println(resultValue)" in changed
+    assert "System.resultValue" not in changed
+    # Regression: a whitespace-separated qualified member is still protected.
+    changed_spaced = curriculum.rename_identifiers(
+        source.replace("System.out", "System . out"),
+        {"out": "resultValue"})
+    assert "System . out.println(resultValue)" in changed_spaced
