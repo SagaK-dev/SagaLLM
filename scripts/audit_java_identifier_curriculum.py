@@ -20,6 +20,8 @@ from sagallm.java_identifier_curriculum import (
 
 
 def compile_candidates(folder: Path, *, timeout: int = 120) -> dict:
+    # Absolute paths are required because javac is run with cwd=compile_root.
+    folder = folder.resolve()
     if not 1 <= timeout <= 180:
         raise ValueError("Invalid compiler timeout")
     java_compiler = shutil.which("javac")
