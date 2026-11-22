@@ -7,6 +7,7 @@ on:
     paths:
       - '.github/workflows/java-paired-compile-diagnostics.yml'
       - 'scripts/evaluate_java_context_pair.py'
+      - 'src/sagallm/java_instruction_sft.py'
 
 permissions:
   contents: read
