@@ -1,6 +1,7 @@
 """Fixed 90-family, low-LR Java SFT A/B experiment contract."""
 from __future__ import annotations
 
+import ast
 import inspect
 
 import pytest
@@ -47,9 +48,15 @@ def test_locked_protocol_parameters_and_train_only_data():
     assert ab.REQUIRED_CANONICAL_FAMILIES == 80
     assert ab.REQUIRED_CANONICAL_ROWS == 1000
     assert set(VARIABLES).isdisjoint({"collatz_max", "longest_common_prefix"})
-    # In particular, the experiment never requests the test split from read_split.
-    assert '"test"' not in inspect.getsource(ab.experiment)
-    assert "'test'" not in inspect.getsource(ab.experiment)
+    # Inspect actual calls, not comments: read_split must target train or validation.
+    tree = ast.parse(inspect.getsource(ab.experiment))
+    accessed = []
+    for node in ast.walk(tree):
+        if (isinstance(node, ast.Call) and
+                isinstance(node.func, ast.Name) and
+                node.func.id == "read_split"):
+            accessed.append(node.args[1].value)
+    assert accessed == ["train", "validation"]
 
 
 def test_fixed_schedule_is_identical_and_family_broad():
