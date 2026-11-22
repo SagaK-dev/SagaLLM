@@ -63,3 +63,11 @@ See [MMLU_REFERENCE.md](MMLU_REFERENCE.md) for limits.
   self-repair, GPU testing, multi-file project agent, 1B/3B training: **NOT_RUN**.
 - Java compilation does not provide a security sandbox; automated Java execution
   remains forbidden in the new model-generated workflow.
+
+## v0.11 original Java instruction fixture and evaluation
+
+- 10 original synthetic training examples / 1 validation / 2 test, separated by Java **task family**: IMPLEMENTED and CPU TESTED. Contains no third-party data and is not a model-quality corpus.
+- `java dataset-build` / `dataset-verify`: SHA-256-pinned fixture with contamination and integrity guards: IMPLEMENTED and CPU TESTED. Human rights attestation is `NOT_ATTESTED`.
+- `java evaluate`: real local checkpoint inference and held-out **javac syntax-only** rate; output never executed; semantic accuracy is `NOT_RUN`.
+- `scripts/java_sft_smoke.py`: two optimizer steps on random 98,624-parameter model with train-only tokenizer training: CPU RUN; held-out behavior competence `NOT_ESTABLISHED`.
+- Real-world Java generation benchmark, secure behavior test sandbox, 1B/3B training, GPU experiments: NOT_RUN.

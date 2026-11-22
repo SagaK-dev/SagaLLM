@@ -92,3 +92,17 @@ Implemented deterministic post-ingestion corpus curation (normalized and probabl
 - Local Python 3.13 / PyTorch CPU testing must be distinguished from GitHub CI
   and from real GPU validation; official Java code generation benchmarks and
   production-grade self-repair remain NOT_RUN.
+
+## SagaLLM v0.11 Java SFT / holdout compiler experiment (2026-11-22)
+
+- Added `java_coding_eval.py` for generated-only Java tasks with hash-pinned task-family holdout and `java evaluate` compile-only protocol. The model is loaded only from a trusted local checkpoint with tokenization provenance.
+- Added the real tiny `scripts/java_sft_smoke.py` two-step CPU SFT experiment. It uses only original fixture data, trains the tokenizer on the training split, and reports test loss before/after. This validates the SFT mechanism, not learned coding ability.
+- Fixed benchmark accounting so a no-op generated response cannot count as a successful new Java compilation. All runtime semantic tests remain `NOT_RUN` since no secure sandbox exists.
+- The generated dataset records `NOT_ATTESTED` for human legal review. No source code LICENSE has been selected and no external Java corpus was imported.
+
+### Actual two-step CPU study (development container; not user's PC)
+
+- Model: 98,624 random-initialized parameters; context 1024; train-only ByteBPE vocab 384; train/validation/test = 10/1/2 original synthetic tasks.
+- Held-out **test** assistant-token loss: **5.953665 before** → **5.952992 after** two SFT optimizer updates; final train-step loss **5.901787**. Difference is too small and experiment too short to infer Java coding competence.
+- Held-out compile-only generation: **0/2 compiled** (calculator/factorial). Runtime behavior: **NOT_RUN**. No model-generated Java executed.
+- GPU training, real third-party coding corpus, official Java benchmark and 1B/3B training: **NOT_RUN**. Source LICENSE remains unselected.

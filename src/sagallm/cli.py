@@ -80,6 +80,20 @@ def main(argv: list[str] | None = None) -> None:
         assistant.add_argument("--attempts", type=int, default=2, help="1..3 attempts; never runs generated code")
     jai.add_argument("--prompt", required=True)
     jai.add_argument("--apply", action="store_true", help="Explicitly write a successful, compiled proposal")
+    jdata = js.add_parser("dataset-build", help="Build small original Java SFT/held-out fixture")
+    jdata.add_argument("--output", required=True, help="New directory; never overwrite")
+    jverify = js.add_parser("dataset-verify", help="Verify Java fixture hashes and family separation")
+    jverify.add_argument("--dataset", required=True)
+    jeval = js.add_parser("evaluate", help="Compile-only evaluation of held-out Java generation")
+    jeval.add_argument("--dataset", required=True)
+    jeval.add_argument("--checkpoint", required=True)
+    jeval.add_argument("--tokenizer", required=True)
+    jeval.add_argument("--split", choices=("validation", "test"), default="test")
+    jeval.add_argument("--device", choices=("cpu", "cuda", "mps"), default="cpu")
+    jeval.add_argument("--max-examples", type=int, default=3)
+    jeval.add_argument("--max-new-tokens", type=int, default=512)
+    jeval.add_argument("--attempts", type=int, default=1)
+    jeval.add_argument("--output", help="New JSON report; never overwritten")
     jsft = js.add_parser("toy-sft", help="Write five original toy Java instruction-response examples")
     jsft.add_argument("--output", required=True, help="New JSONL file; never overwrite")
     token = sub.add_parser("tokenizer")
@@ -235,6 +249,28 @@ def main(argv: list[str] | None = None) -> None:
         elif args.action == "run":
             result = run_project(args.project, trust_local_code=args.trust_local_code,
                                  stdin=args.stdin, timeout=args.timeout, java_args=args.java_arg)
+        elif args.action == "dataset-build":
+            from .java_coding_eval import build_coding_fixture
+            result = build_coding_fixture(args.output)
+        elif args.action == "dataset-verify":
+            from .java_coding_eval import verify_coding_fixture
+            result = verify_coding_fixture(args.dataset)
+        elif args.action == "evaluate":
+            from .java_coding_eval import evaluate_java_compilation
+            from .java_ai import LocalCheckpointGenerator
+            from .java_coding_eval import verify_coding_fixture
+            verify_coding_fixture(args.dataset)  # reject modified eval data before allocating weights
+            backend = LocalCheckpointGenerator(args.checkpoint, args.tokenizer, device=args.device)
+            result = evaluate_java_compilation(args.dataset, generator=backend, split=args.split,
+                                               max_examples=args.max_examples,
+                                               max_new_tokens=args.max_new_tokens, attempts=args.attempts)
+            result["checkpoint_sha256"] = backend.checkpoint_sha256
+            result["tokenizer_sha256"] = backend.tokenizer_sha256
+            if args.output:
+                output = Path(args.output)
+                output.parent.mkdir(parents=True, exist_ok=True)
+                with output.open("x", encoding="utf-8") as handle:
+                    json.dump(result, handle, ensure_ascii=False, indent=2)
         elif args.action == "toy-sft":
             from .java_ai import build_toy_java_sft
             result = build_toy_java_sft(args.output)
