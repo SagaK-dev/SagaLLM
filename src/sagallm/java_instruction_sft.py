@@ -321,15 +321,34 @@ def compile_heldout_references(rows: list[dict], *, max_cases: int = 8) -> dict:
             'behavior': 'NOT_RUN', 'used_for_model_selection': False}
 
 
-def heldout_compilation(model, tokenizer, rows:list[dict], *, max_cases:int=10) -> dict:
-    """Compiles model output, never executes it. Called only after model selection."""
-    cases=eval_sample(rows,max_cases,seed=67)
+JAVA_EVAL_PROMPT_STYLES = ('canonical', 'declare_variables')
+
+
+def java_eval_prefix(row: dict, tokenizer, style: str) -> list[int]:
+    """Pre-registered evaluation prompts. These are never training inputs."""
+    if style not in JAVA_EVAL_PROMPT_STYLES:
+        raise ValueError('Unknown Java evaluation prompt style')
+    if style == 'canonical':
+        return row['prefix_ids']
+    # Keep the original compact SFT framing, altering only the task sentence.
+    task = row['task'] + ' Declare every variable before use.'
+    return [tokenizer.SPECIAL['<bos>']] + tokenizer.encode(compact_prompt(task))
+
+
+def heldout_compilation(model, tokenizer, rows:list[dict], *, max_cases:int=10,
+                        prompt_style:str='canonical', case_offset:int=0) -> dict:
+    """Compile model output, never execute; fixed seed and bounded case window."""
+    if prompt_style not in JAVA_EVAL_PROMPT_STYLES:
+        raise ValueError('Unknown Java evaluation prompt style')
+    if not 1 <= max_cases <= 12 or not 0 <= case_offset <= 24:
+        raise ValueError('Invalid evaluation case window')
+    cases=eval_sample(rows,max_cases+case_offset,seed=67)[case_offset:case_offset+max_cases]
     if not cases:
         return {'status':'NOT_RUN','reason':'No accepted test examples'}
     total=0;compiles=0;exact=0;details=[]
     for row in cases:
         total+=1
-        prefix=row['prefix_ids']
+        prefix=java_eval_prefix(row,tokenizer,prompt_style)
         remaining=model.config.max_position_embeddings-len(prefix)
         if remaining<2:
             details.append({'id':row['id'],'status':'INSUFFICIENT_CONTEXT'});continue
@@ -392,7 +411,8 @@ def heldout_compilation(model, tokenizer, rows:list[dict], *, max_cases:int=10) 
                         'source_persisted':False,
                         'java_behavior':'NOT_RUN'})
     return {'status':'SCORED_COMPILE_ONLY','evaluated':total,'compiled':compiles,
-            'exact_reference_matches':exact,'behavior':'NOT_RUN','cases':details}
+            'exact_reference_matches':exact,'behavior':'NOT_RUN','cases':details,
+            'prompt_style':prompt_style,'case_offset':case_offset}
 
 
 def train_instruction_sft(base_checkpoint:str|Path,tokenizer_file:str|Path,
