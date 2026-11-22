@@ -1,0 +1,90 @@
+name: SagaLLM Java identifier A/B training (validation only)
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - '.github/workflows/java-identifier-ab-training.yml'
+      - 'scripts/train_java_identifier_ab.py'
+      - 'tests/test_java_identifier_ab.py'
+      - 'src/sagallm/java_identifier_curriculum.py'
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/java-identifier-ab-training.yml'
+      - 'scripts/train_java_identifier_ab.py'
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: java-identifier-ab-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  train-validation-only:
+    runs-on: ubuntu-latest
+    timeout-minutes: 16
+    env:
+      OMP_NUM_THREADS: '2'
+      MKL_NUM_THREADS: '2'
+      PYTHONHASHSEED: '0'
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '21'
+      - name: Install bounded CPU dependencies
+        run: |
+          python -m pip install 'torch>=2.3' --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install -e '.[fast-tokenizer]'
+      - name: Download original pinned v0.18 selected checkpoint and tokenizer
+        uses: actions/download-artifact@v4
+        with:
+          name: sagallm-v018-java-context-sft-cpu
+          run-id: 44994208434
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: pinned-v018
+      - name: Check pinned checkpoint and tokenizer identities
+        run: |
+          echo '9802e848f0abea9979623f461b5e63cd7aed838acd087d06b20d747db1e2a0fc  pinned-v018/java-context-model/java-sft-best.pt' | sha256sum -c -
+          echo '186566808cb03e328cac9a6b7b384a8d0aefc54ccb83fbe97782a751726682fe  pinned-v018/java-context-model/tokenizer.json' | sha256sum -c -
+      - name: Regenerate verified canonical synthetic data
+        run: |
+          python - <<'PY'
+          from sagallm.java_diverse_corpus import build_java_diverse_corpus, verify_java_diverse_corpus
+          build_java_diverse_corpus('canonical-java-data')
+          verify_java_diverse_corpus('canonical-java-data')
+          PY
+      - name: Compile-audit 120 TRAIN-only candidate programs
+        run: |
+          python scripts/audit_java_identifier_curriculum.py \
+            --cases-per-family 6 --variants 2 \
+            --output identifier-train-candidates
+          echo 'ad18e0a328f00db2bca204c3911afd66307099e3d41ba0f0d97c964463d3c2d9  identifier-train-candidates/train-identifier-variants.jsonl' | sha256sum -c -
+      - name: Equal-budget paired control and identifier-augmented SFT
+        run: |
+          python scripts/train_java_identifier_ab.py \
+            --base pinned-v018/java-context-model/java-sft-best.pt \
+            --tokenizer pinned-v018/java-context-model/tokenizer.json \
+            --canonical canonical-java-data \
+            --candidates identifier-train-candidates \
+            --output identifier-ab-evidence
+      - name: Preserve validation-only metrics and both checkpoint candidates
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: sagallm-java-identifier-ab-validation
+          path: |
+            identifier-ab-evidence/ab-report.json
+            identifier-ab-evidence/canonical-validation-best.pt
+            identifier-ab-evidence/identifier_augmented-validation-best.pt
+            identifier-train-candidates/manifest.json
+            identifier-train-candidates/audit-summary.json
+          retention-days: 30
+          if-no-files-found: error
