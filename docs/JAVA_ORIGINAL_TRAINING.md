@@ -1,4 +1,4 @@
-# Original Java study data and real SagaLLM training (v0.12.0)
+# Original Java study data and real SagaLLM training (v0.12 / v0.13)
 
 ## What this is
 
@@ -35,18 +35,24 @@ PYTHONPATH=src python -c 'from sagallm.java_generated_data import verify_java_da
 OMP_NUM_THREADS=2 PYTHONPATH=src python scripts/train_java_original.py \
   --dataset data/java-original --output checkpoints/java-original-exp \
   --steps 1500 --max-seconds 155 --hidden-size 160 --layers 3 \
-  --progress-every 150 --compile-examples 15
+  --progress-every 50 --compile-examples 15 \
+  --patience-evals 3 --min-delta 0.001
 ```
 
 New output directories are required; the script refuses overwrites and applies
 explicit step and wall-clock caps. It trains a **random-initialized** dense
 Decoder-only SagaTransformer with assistant-response-only loss, standard AdamW,
-a tokenizer learned **only on train**, and independent validation/test losses.
+a tokenizer learned **only on train**, and independent validation/test losses. Since v0.13 the default training
+script uses **validation-only early stopping** and saves the best checkpoint
+as `java-trained.pt`, with the last optimizer state separately in `java-last.pt`.
+The test set is evaluated **once, after checkpoint selection**, and is never
+used to select checkpoints. Old v0.12 experiments measured initial test loss;
+those earlier results are unchanged and cannot be retroactively reclassified.
 The `max-seconds` cap is cooperative and applies to the optimizer loop; offline
 evaluation and compilation may add extra elapsed time. The training script
-loads only the `train.jsonl` examples into optimization steps. It records test
-loss at baseline and after training; no hyperparameter selection based on test
-loss is implemented.
+loads only the `train.jsonl` examples into optimization steps. Validation is
+used for early-stop/selection; test loss is measured once after selecting the
+best model. `test_loss_before` is now `null` to prevent test-split peeking.
 
 All model and tokenizer files are written locally and ignored by Git. A training
 checkpoint contains optimizer state and must be treated as **trusted input**;
@@ -105,3 +111,21 @@ instruction/repair data, more capable base-model pretraining, substantially
 larger training runs with early stopping, and behavior tests in an isolated
 sandbox are needed. Do not use this tiny checkpoint as an autonomous coding
 agent or execute its output without review.
+
+## v0.13 re-training result (same original v0.12 dataset)
+
+- CPU-only, random-initialized SagaTransformer, same model, seed, learning rate
+  and 320/15/15 family-disjoint data as v0.12.
+- Requested 1,500 optimizer steps; early stopping ended at step **300**, and
+  selected the step **150** checkpoint using validation loss only.
+- v0.12 step-1500 checkpoint: validation loss **4.7872**, test loss **6.0101**,
+  compiled **10/15**, exact reference **0/15**.
+- v0.13 step-150 checkpoint: validation loss **3.0580**, test loss **3.7609**,
+  compiled **8/15**, exact reference **0/15**.
+- Better held-out token loss has **not** produced reliable Java task completion;
+  compile success actually decreased. No generated Java was run.
+- Selection is based exclusively on validation. These two experiments are on
+  the *same* synthetic benchmark, so further tuning on this holdout would
+  constitute experimental overfitting. New independent tasks are needed.
+- For opt-in guarded output-based evaluation, see
+  [`JAVA_BEHAVIORAL_VALIDATION.md`](JAVA_BEHAVIORAL_VALIDATION.md).

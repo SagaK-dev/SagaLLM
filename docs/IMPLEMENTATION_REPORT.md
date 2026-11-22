@@ -1,3 +1,17 @@
+## v0.13: validation-only checkpoint selection and optional guarded Java run
+
+- Changed `scripts/train_java_original.py`: patience/min-delta-controlled
+  early stop; `java-trained.pt` is now the BEST validation-selected model and
+  `java-last.pt` stores the final optimizer state. No test data is evaluated
+  before the selected checkpoint is frozen. Historical v0.12 metrics retained.
+- Added `src/sagallm/java_behavior.py`, `scripts/evaluate_java_behavior.py`,
+  `tests/test_java_behavior.py` and `tests/test_java_early_stopping.py`.
+  Strict opt-in; no local OCI engine, so all model-generated Java execution
+  remains NOT_RUN. All 15 original test reference programs have independently
+  checked expected outputs.
+- CPU v0.13: best step 150 after 300 total, test loss 3.7609, compile 8/15,
+  exact match 0/15. No model trained at 1B/3B scale.
+
 ## v0.6 offline evaluation and dataset-attestation work (2026-11-21)
 
 - `dataset_cards.py`: added a purpose-scoped (`train`, `evaluate`, `redistribute`), human-asserted dataset review record validated against the exact file bytes using SHA-256. It is not a legal-verification service. No automatic license approval or network fetch is performed.

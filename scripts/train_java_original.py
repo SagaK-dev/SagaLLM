@@ -90,10 +90,12 @@ def compile_check(dataset_path: Path, ckpt: Path, tok_file: Path, count: int = 1
 
 def train(dataset_path: Path, output: Path, *, steps: int = 400, max_seconds: float = 180.0,
           seed: int = 20261122, lr: float = 0.0012, hidden_size: int = 160, layers: int = 3,
-          progress_every: int = 50, compile_examples: int = 15) -> dict:
+          progress_every: int = 50, compile_examples: int = 15,
+          patience_evals: int = 3, min_delta: float = 0.001) -> dict:
     if (not 1 <= steps <= 3000 or not 15 <= max_seconds <= 1800 or lr <= 0 or
         hidden_size not in (96,128,160,192) or layers not in (2,3,4) or
-        not 0 <= compile_examples <= 15):
+        not 0 <= compile_examples <= 15 or progress_every < 1 or
+        not 0 <= patience_evals <= 30 or not 0 <= min_delta < 1):
         raise ValueError("Unsafe or unsupported training budget")
     if output.exists():
         raise FileExistsError("Training output directory already exists")
@@ -128,9 +130,17 @@ def train(dataset_path: Path, output: Path, *, steps: int = 400, max_seconds: fl
         }
         initial_checkpoint = output / "random-init.pt"
         checkpoint_save(initial_checkpoint, model, opt, 0, config, meta)
+        # Strict separation: the TEST split is neither measured nor consulted
+        # during training/checkpoint selection. It is opened for evaluation once
+        # after the selected model is restored.
         metrics = {"step": [0], "train_loss": [avg_loss(model, pairs["train"][:24])],
-                   "validation_loss": [avg_loss(model, pairs["validation"])],
-                   "test_loss": [avg_loss(model, pairs["test"])]}
+                   "validation_loss": [avg_loss(model, pairs["validation"])]}
+        best_validation_loss = metrics["validation_loss"][0]
+        best_step = 0
+        non_improving_evals = 0
+        selected_checkpoint = output / "java-trained.pt"
+        checkpoint_save(selected_checkpoint, model, opt, 0, config,
+                        {**meta, "selection_rule": "lowest_validation_loss_only", "best_validation_loss": best_validation_loss})
         # For reproducible training all batches are sampled from TRAIN ONLY.
         order = list(range(len(pairs["train"])))
         rng = random.Random(seed)
@@ -138,9 +148,12 @@ def train(dataset_path: Path, output: Path, *, steps: int = 400, max_seconds: fl
         index = 0
         completed = 0
         loss_latest = None
+        stopped_early = False
+        stop_reason = "max_steps"
         start = time.monotonic()
         for step in range(1, steps+1):
             if time.monotonic()-start >= max_seconds:
+                stop_reason = "time_budget"
                 break
             if index >= len(order):
                 rng.shuffle(order)
@@ -163,35 +176,60 @@ def train(dataset_path: Path, output: Path, *, steps: int = 400, max_seconds: fl
                 metrics["step"].append(step)
                 metrics["train_loss"].append(avg_loss(model, pairs["train"][:24]))
                 metrics["validation_loss"].append(val)
-                metrics["test_loss"].append(None)  # test is held out until final training
-        final_checkpoint = output / "java-trained.pt"
-        checkpoint_save(final_checkpoint, model, opt, completed, config, {
-            **meta, "observed_steps": completed, "train_example_count": len(pairs["train"]),
+                if val < best_validation_loss - min_delta:
+                    best_validation_loss = val
+                    best_step = step
+                    non_improving_evals = 0
+                    checkpoint_save(selected_checkpoint, model, opt, step, config, {
+                        **meta, "observed_steps": step,
+                        "selection_rule": "lowest_validation_loss_only",
+                        "best_validation_loss": best_validation_loss,
+                    })
+                else:
+                    non_improving_evals += 1
+                    if patience_evals and non_improving_evals >= patience_evals:
+                        stopped_early = True
+                        stop_reason = "validation_patience_exhausted"
+                        break
+        # Preserve both last optimizer state and the independently selected best
+        # model. The legacy public name 'java-trained.pt' now denotes BEST.
+        last_checkpoint = output / "java-last.pt"
+        checkpoint_save(last_checkpoint, model, opt, completed, config, {
+            **meta, "observed_steps": completed,
+            "selection_rule": "last_step_not_used_for_model_selection",
         })
+        from sagallm.training import checkpoint_load
+        checkpoint_load(selected_checkpoint, model)
         final_train = avg_loss(model, pairs["train"][:24])
         final_validation = avg_loss(model, pairs["validation"])
-        final_test = avg_loss(model, pairs["test"])
-        metrics["step"].append(completed)
-        metrics["train_loss"].append(final_train)
-        metrics["validation_loss"].append(final_validation)
-        metrics["test_loss"].append(final_test)
+        test_pairs = [format_sft_example(row["messages"], tok, config.max_position_embeddings)
+                      for row in read_examples(dataset_path / "test.jsonl")]
+        final_test = avg_loss(model, test_pairs)  # FIRST and ONLY test loss evaluation
         del model, opt
-        evaluation = (compile_check(dataset_path, final_checkpoint, tok_file, count=compile_examples)
+        evaluation = (compile_check(dataset_path, selected_checkpoint, tok_file, count=compile_examples)
                       if compile_examples else {"status": "NOT_RUN", "reason": "compile_examples=0"})
         report = {
             "status": "TRAINED_CPU", "base_weights": "RANDOM_INIT_ONLY",
             "pretrained_weight_downloads": False, "dataset_origin": "original_deterministic_java_examples",
             "train_examples": len(pairs["train"]), "validation_examples": len(pairs["validation"]),
-            "test_examples": len(pairs["test"]), "disjoint_task_families": audit["family_disjoint"],
+            "test_examples": len(test_pairs), "disjoint_task_families": audit["family_disjoint"],
             "parameter_count": config.parameter_count(), "vocab_size": tok.vocab_size,
             "steps_requested": steps, "steps_completed": completed, "training_seconds": round(time.monotonic()-start,2),
             "train_loss_before": metrics["train_loss"][0], "train_loss_after": final_train,
             "validation_loss_before": metrics["validation_loss"][0], "validation_loss_after": final_validation,
-            "test_loss_before": metrics["test_loss"][0], "test_loss_after": final_test,
+            "test_loss_before": None, "test_loss_after": final_test,
+            "test_loss_evaluation_count": 1,
+            "test_used_for_model_selection": False,
+            "selected_checkpoint_step": best_step,
+            "best_validation_loss": best_validation_loss,
+            "stopped_early": stopped_early, "stop_reason": stop_reason,
+            "patience_evals": patience_evals, "min_delta": min_delta,
             "history": metrics, "compile_only_heldout": evaluation,
             "optimizer": "AdamW", "learning_rate": lr, "seed": seed,
             "model_config": config.to_dict(), "checkpoint": "java-trained.pt",
-            "checkpoint_sha256": sha256(final_checkpoint), "tokenizer": "tokenizer.json",
+            "checkpoint_sha256": sha256(selected_checkpoint),
+            "last_checkpoint": "java-last.pt", "last_checkpoint_sha256": sha256(last_checkpoint),
+            "tokenizer": "tokenizer.json",
             "tokenizer_sha256": sha256(tok_file), "dataset_manifest_sha256": meta["dataset_manifest_sha256"],
             "java_runtime_tests": "NOT_RUN", "independent_real_world_java_ability": "NOT_ESTABLISHED",
             "license_statement": "Original generated code; no third-party Java corpus. No legal attestation.",
@@ -213,9 +251,14 @@ if __name__ == "__main__":
     parser.add_argument("--layers", type=int, default=3)
     parser.add_argument("--progress-every", type=int, default=50)
     parser.add_argument("--compile-examples", type=int, default=15)
+    parser.add_argument("--patience-evals", type=int, default=3,
+                        help="Stop after this many non-improving validation checks (0 disables)")
+    parser.add_argument("--min-delta", type=float, default=0.001,
+                        help="Minimum absolute validation-loss improvement for checkpoint selection")
     options = parser.parse_args()
     result = train(options.dataset, options.output, steps=options.steps,
                    max_seconds=options.max_seconds, hidden_size=options.hidden_size,
                    layers=options.layers, progress_every=options.progress_every,
-                   compile_examples=options.compile_examples)
+                   compile_examples=options.compile_examples,
+                   patience_evals=options.patience_evals, min_delta=options.min_delta)
     print(json.dumps({k: v for k,v in result.items() if k not in ("model_config","history")}, ensure_ascii=False, indent=2))

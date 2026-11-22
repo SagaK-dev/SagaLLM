@@ -1,3 +1,18 @@
+## v0.13 local Java training selection and behavior checks (2026-11-22)
+
+- Training pipeline verified on CPU: 1,500 steps requested, 300 performed,
+  step 150 selected by validation; no test loss read before selection.
+- Held-out token loss: 3.7609 (vs prior 6.0101); compile score 8/15 (vs
+  prior 10/15); exact reference match 0/15; **coding ability NOT_ESTABLISHED**.
+- Behavioral oracle verified against **15/15 trusted reference Java programs**
+  on JDK 21; these are not generated code.
+- Offline/local Docker/Podman runner implemented and argument-tested with
+  a mocked engine, **real model-generated Java runtime NOT_RUN** because no
+  engine is installed. OCI isolation is best effort and requires a disposable VM.
+- Dataset and weights remain external artifacts, not committed into git.
+- Independent benchmark, licensed external Java training corpus, 1B/3B,
+  CUDA/MPS and multi-GPU training remain NOT_RUN.
+
 # Implementation status
 
 | Component | Status | Notes |

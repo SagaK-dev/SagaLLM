@@ -1,3 +1,22 @@
+## v0.13.0 — validation-selected Java SFT and guarded OCI behavior harness (2026-11-22)
+
+- Use validation-only early stopping and retain both selected best and last-step
+  checkpoints; do not access held-out test loss before selecting the model.
+- Add original 15-case Python behavioral oracles for Java test task families
+  (Fibonacci, primality and palindrome). Verify reference output against
+  15 trusted project-authored Java source programs on the local JDK.
+- Add an explicit-opt-in, local-image-only Docker/Podman behavioral evaluator
+  with offline containers, read-only source mount, restricted capabilities,
+  CPU/memory/process/time limits and bounded capture. No OCI engine is
+  installed in the development environment: generated Java behavior NOT_RUN.
+- Actual CPU re-training with unchanged 350-example dataset: from 1,500
+  requested steps, early stop at 300, best step 150; test loss **3.7609**
+  vs previous **6.0101**, but compile **8/15** vs previous **10/15** and
+  exact matches still **0/15**. Improvement in loss is not evidence of
+  reliable Java coding.
+- Add regression tests, opt-in behavioral evaluation CLI, docs, and experiment
+  provenance. No third-party Java data imported, no 1B/3B pretraining.
+
 ## v0.12.0 — original Java training dataset and CPU SFT (2026-11-22)
 
 - Add 350 **new original** Java instruction/code examples (320 train, 15 validation,
