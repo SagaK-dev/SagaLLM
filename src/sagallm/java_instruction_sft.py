@@ -217,18 +217,47 @@ def heldout_compilation(model, tokenizer, rows:list[dict], *, max_cases:int=10) 
                 max_new_tokens=min(remaining,170),temperature=0.0,
                 eos_token_id=tokenizer.SPECIAL['<eos>'],vocab_limit=tokenizer.vocab_size,
                 deadline_monotonic=time.monotonic()+25)
-        output=tokenizer.decode(sequence[0,len(prefix):].tolist())
+        generated_ids=sequence[0,len(prefix):].tolist()
+        output=tokenizer.decode(generated_ids)
         identical=output.strip()==row['source'].strip()
         exact+=int(identical)
         status='FAIL'
-        if len(output)<4000 and 'public class Main' in output and '\x00' not in output:
+        reason='NOT_COMPILED'
+        diagnostic_hash=None
+        diagnostic_category='NONE'
+        if len(output)>=4000:
+            reason='OUTPUT_TOO_LONG'
+        elif 'public class Main' not in output:
+            reason='MISSING_PUBLIC_MAIN'
+        elif '\x00' in output:
+            reason='NUL_BYTE'
+        else:
             with tempfile.TemporaryDirectory(prefix='sagallm-sft-javac-') as location:
                 root=Path(location);source=root/'Main.java';source.write_text(output,encoding='utf8')
-                status=_compile(source,root,timeout=12)['status']
+                result=_compile(source,root,timeout=12)
+                status=result['status']
+                reason=result.get('reason','JAVAC')
+                stderr=result.get('diagnostics','')
+                if stderr:
+                    diagnostic_hash=hashlib.sha256(stderr.encode('utf8')).hexdigest()
+                    diagnostic_category='JAVAC_DIAGNOSTIC'
+                elif status=='FAIL':
+                    diagnostic_category='JAVAC_FAILURE_NO_STDERR'
         compiles+=int(status=='PASS')
+        eos=tokenizer.SPECIAL['<eos>']
         details.append({'id':row['id'],'family':row['family'],
                         'compile':status,'exact':identical,
-                        'generated_sha256':hashlib.sha256(output.encode('utf8')).hexdigest()})
+                        'generated_sha256':hashlib.sha256(output.encode('utf8')).hexdigest(),
+                        'generated_tokens':len(generated_ids),
+                        'generation_eos_seen':eos in generated_ids,
+                        'generation_hit_token_cap':len(generated_ids)>=min(remaining,170) and eos not in generated_ids,
+                        'generation_stop_reason':'EOS' if eos in generated_ids else
+                            'TOKEN_CAP_OR_DEADLINE_UNKNOWN',
+                        'compile_reason':reason,
+                        'javac_stderr_sha256':diagnostic_hash,
+                        'javac_diagnostic_category':diagnostic_category,
+                        'source_persisted':False,
+                        'java_behavior':'NOT_RUN'})
     return {'status':'SCORED_COMPILE_ONLY','evaluated':total,'compiled':compiles,
             'exact_reference_matches':exact,'behavior':'NOT_RUN','cases':details}
 
