@@ -1,0 +1,111 @@
+{
+  "schema": "sagallm-java-diverse-v015-training-evidence-v1",
+  "as_of": "2026-11-22",
+  "environment": "Sandbox Python 3.13, PyTorch 2.10 CPU, JDK 21; not user-owned GPU",
+  "dataset": {
+    "manifest_sha256": "1e9c0ff933c5096cf2d633e81ec0c90498006fab45397a28a4c073fbf181a23a",
+    "counts": {
+      "train": 17080,
+      "validation": 228,
+      "test": 228
+    },
+    "task_families": 110,
+    "train_families": 90,
+    "validation_families": 10,
+    "test_families": 10,
+    "unique_java_source_strings": 17536,
+    "duplicate_exact_java_sources": 0,
+    "origin": "project-original parameterized Java 17 code examples only, no third-party Java ingested",
+    "rights_review": "NOT_LEGALLY_REVIEWED",
+    "independent_algorithms": false
+  },
+  "experiments": {
+    "random_init": {
+      "model_weights_origin": "RANDOM_INIT",
+      "parameter_count": 1476288,
+      "optimizer_steps_requested": 17080,
+      "optimizer_steps_completed": 17080,
+      "distinct_training_examples_seen": 17080,
+      "distinct_train_families_seen": 90,
+      "best_checkpoint_step": 1000,
+      "best_checkpoint_distinct_training_examples_seen": 1000,
+      "distinct_train_families_at_best": 90,
+      "validation_selection_loss_before": 6.701630692732961,
+      "validation_selection_loss_best": 4.0646802626158065,
+      "validation_full_loss_best_checkpoint": 4.060963597214013,
+      "test_loss_selected_checkpoint": 4.272491415341695,
+      "test_used_for_model_selection": false,
+      "test_loss_evaluation_count": 1,
+      "train_sample_loss_after": 0.648097597884771,
+      "training_seconds": 352.89,
+      "termination": "max_steps",
+      "checkpoint_sha256": "848f4e25416c6fa6bcc533846e1d1f6b45ef68f1d025d13badab5546667d4530",
+      "last_checkpoint_sha256": "5f786627ce5dffa506b50b427c0118c33fe874902715d39b600e1727802ea2b3",
+      "tokenizer_sha256": "ff52a85eef7cd4eccafb6d5998a730a78138ee79bd63ca060e04285017ffd7bb",
+      "initial_local_checkpoint_sha256": null,
+      "heldout_compilation": {
+        "status": "PASS_RUNTIME",
+        "evaluated": 10,
+        "compiled": 4,
+        "exact_reference_matches": 0,
+        "behavioral_execution": "NOT_RUN",
+        "semantic_correctness": "NOT_ESTABLISHED"
+      },
+      "model_context_length": 512,
+      "source_report_sha256": "8a7cd3b95d28b10e0746216c74298b711862e5f0eef187d16d1e413c39a4d069"
+    },
+    "continued_from_v014": {
+      "model_weights_origin": "PRIOR_LOCAL_SAGALLM",
+      "parameter_count": 1427136,
+      "optimizer_steps_requested": 17080,
+      "optimizer_steps_completed": 17080,
+      "distinct_training_examples_seen": 17080,
+      "distinct_train_families_seen": 90,
+      "best_checkpoint_step": 1000,
+      "best_checkpoint_distinct_training_examples_seen": 1000,
+      "distinct_train_families_at_best": 90,
+      "validation_selection_loss_before": 4.542738387459202,
+      "validation_selection_loss_best": 3.483082915607252,
+      "validation_full_loss_best_checkpoint": 3.5689058575713846,
+      "test_loss_selected_checkpoint": 4.4957299075628585,
+      "test_used_for_model_selection": false,
+      "test_loss_evaluation_count": 1,
+      "train_sample_loss_after": 0.2514996893587522,
+      "training_seconds": 459.22,
+      "termination": "max_steps",
+      "checkpoint_sha256": "157fcf889a9eb500621ef04a3560dbb0bf7570411e12e659730a5e09cca04072",
+      "last_checkpoint_sha256": "da09b90ac3c5c686e6e746432f28f9bedb569f9cf182a5847053d5be42a6cb71",
+      "tokenizer_sha256": "623dc2cc0109cdac1e72e07dc3857ed216ebfb18fb0b0a87b3f529e4907849ff",
+      "initial_local_checkpoint_sha256": "fdcf57e14b1d07877886ac394e7886a962b4a9bf131809a0d27865e7b59dcb13",
+      "heldout_compilation": {
+        "status": "PASS_RUNTIME",
+        "evaluated": 10,
+        "compiled": 6,
+        "exact_reference_matches": 0,
+        "behavioral_execution": "NOT_RUN",
+        "semantic_correctness": "NOT_ESTABLISHED"
+      },
+      "model_context_length": 384,
+      "source_report_sha256": "ce9eea8119fa65d87729645d1c29f4a5987885ced7749f8bb7885fd3a0cd602e"
+    }
+  },
+  "tests_local": {
+    "passed": 194,
+    "skipped": 4,
+    "optional_dep_skips": true,
+    "new_family_compile": 120,
+    "trusted_oracle_pass": 10
+  },
+  "external_java_repository_training": "NOT_RUN",
+  "gpu_training": "NOT_RUN",
+  "generated_java_behavior_execution": "NOT_RUN",
+  "coding_proficiency": "NOT_ESTABLISHED",
+  "notes": [
+    "17,080 unique training records in EACH run; continuation overlaps the original v0.14 training set and must not be added as 17,080 new independent programs.",
+    "Best checkpoints selected on validation only and each processed 1,000/17,080 records. Last checkpoints processed all 17,080 but are not automatically preferable.",
+    "Exact source-match zero; compiled does not imply semantic correctness.",
+    "Loss values are not directly comparable across models with different tokenizers.",
+    "No unreviewed external source code was incorporated into weights.",
+    "Optional local Java repository importer writes PENDING metadata; it does not authorize training."
+  ]
+}

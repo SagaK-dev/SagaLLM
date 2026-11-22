@@ -1,6 +1,6 @@
 # SagaLLM
 
-**Prototype v0.13.0** — offline 5-shot MMLU-style evaluation, SHA-pinned dataset review, local hardware diagnostics, and CPU/Gloo readiness tests. The model itself remains experimental and untrained at 1B/3B scale.
+**Prototype v0.15.0** — offline 5-shot MMLU-style evaluation, SHA-pinned dataset review, local hardware diagnostics, and CPU/Gloo readiness tests. The model itself remains experimental and untrained at 1B/3B scale.
 
 A local-first **from-scratch** decoder-only language model research project. The model uses native PyTorch implementations of RMSNorm, rotary embeddings, grouped-query attention, SwiGLU and a tied token embedding / language-modeling head. The repository includes a small educational byte-level BPE tokenizer, disk-backed JSONL / uint32 token shards, deterministic document splits, resumable single-device training, supervised fine-tuning, held-out token-level validation, an optional local inference API, and greedy/sampling generation.
 
@@ -33,6 +33,37 @@ python -m pytest -q
 ```
 
 The `examples/toy_corpus.txt` is an artificial, repository-authored smoke-test corpus; it is **not** a licensed large-scale language training dataset. The `--license CC0-1.0` shown for this repository-authored demo does not certify permissions for third-party materials. `data/`, `checkpoints/` and binary model weights are gitignored. The default Python tokenizer is intentionally simple. The optional Rust-backed tokenizer can be selected with `--backend hf` (see `docs/TOKENIZERS.md`).
+
+## Java diverse training v0.15.0: 17,536 synthetic examples, 110 families (2026-11-22)
+
+The **original, deterministic** Java curriculum now covers 110 parameterized
+Java 17 task families (90 training, 10 validation, 10 held-out test), with
+**17,080 / 228 / 228** instruction-and-source examples. It includes 40 new
+task types spanning strings, arrays, matrices, collections, number theory,
+and the Java standard library. Text prompts use Japanese and English.
+
+```bash
+# All files are created locally; source examples are original template-derived code.
+PYTHONPATH=src python -c "from sagallm.java_diverse_corpus import build_java_diverse_corpus; print(build_java_diverse_corpus('data/java-diverse'))"
+# Train from random weights; 17,080 unique examples, one per optimizer update.
+OMP_NUM_THREADS=2 PYTHONPATH=src python scripts/train_java_diverse.py \
+  --dataset data/java-diverse --output checkpoints/java-diverse \
+  --steps 17080 --max-seconds 1200 --compile-limit 8
+# Optional: continue from your own trusted v0.14 checkpoint and tokenizer.
+# Use --init-checkpoint ... --init-tokenizer ... (fresh optimizer).
+```
+
+The optimizer's **last checkpoint** can see all 17,080 examples; the
+**validation-selected best checkpoint** may have seen far fewer. The report
+records each quantity separately, including training families covered.
+The tests do not execute model-generated Java; compilation alone is **not**
+correct program behavior. The dataset consists of structured template
+variations, **not 17,536 independently authored real-world applications**.
+There is still no independent coding benchmark, external licensed Java corpus,
+or verified general-purpose Java coding capability. See
+`docs/JAVA_DIVERSE_TRAINING.md` and `experiments/java_diverse_v015_results.json`.
+
+**Measured CPU runs:** both models completed 17,080 optimizer updates and saw every train row. On 10 family-disjoint tasks, the random-init model compiled 4 programs and the v0.14 continuation compiled 6; neither exactly matched its reference (0/10). **Both best validation checkpoints were at step 1,000**, and generated Java semantic correctness is NOT_ESTABLISHED. Local regression tests: 194 PASS / 4 SKIP (optional HF dependencies).
 
 ## Validation-selected Java training and guarded runtime checks (v0.13)
 

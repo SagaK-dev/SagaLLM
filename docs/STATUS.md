@@ -1,3 +1,19 @@
+## Actual v0.15 CPU training evidence (2026-11-22)
+
+- Both the new random-initialized (1,476,288-parameter) model and the v0.14 continuation (1,427,136 parameters) completed **17,080 optimizer steps** using **17,080 distinct records each**. This does NOT mean the continuation learned another 17,080 previously unseen programs: some v0.14 examples overlap.
+- Family-interleaved sampling ensured **90/90 train families** contributed to both the final and the selected models. The best validation checkpoint occurred at **step 1,000**, so only 1,000 source examples contributed to that checkpoint; both last checkpoints processed every sample.
+- Held-out compile-only results on a reproducible 10-question task-family-disjoint subset: **4/10** from-scratch; **6/10** continuation. **0/10 exact reference matches in both**, and no generated Java behavior run. Test loss **4.2725 / 4.4957** respectively, but the different tokenizers make loss comparison inappropriate.
+- Local Python 3.13 + PyTorch 2.10 CPU + JDK 21: **194 tests passed, 4 optional-dependency tests skipped**. Real GPU and licensed external Java training are NOT_RUN.
+- See `experiments/java_diverse_v015_results.json` and `docs/JAVA_DIVERSE_TRAINING.md` for full SHA-256 provenance and limitations.
+
+## v0.15 Java curriculum and training (2026-11-22)
+
+- Java 17 original synthetic corpus: 17,536 instruction/code examples and 110 task families; 17,080 train / 228 validation / 228 test; 0 exact source duplicates and whole-family split separation verified.
+- Family-balanced training order, train-only tokenizer fitting, no held-out test optimization, best vs last checkpoint separation.
+- Docker/Podman code-behavior checks are still unverified on this CPU development environment; model-generated Java behavior **NOT_RUN**.
+- Local Java repository inventory added with explicit `PENDING` license status (never auto-trained).
+- This is original synthetic data, **not** 17,536 separate human-authored algorithms, and not a trained 1B/3B general-purpose LLM.
+
 ## v0.14 Java expanded dataset and trained model
 
 - Newly authored Java SFT material: **5,436 distinct source files as strings / 70 parameterized task families**, full schema- and SHA-verified regeneration. 5,220 training, 108 validation, 108 testing; disjoint families.
