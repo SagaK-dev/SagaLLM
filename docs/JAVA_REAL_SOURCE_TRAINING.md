@@ -41,7 +41,7 @@ individual-file notices and suitability for training may require further review.
 - **Group-separated** train/validation/test, using source repository + source
   category/package, not randomly splitting similar files or adjacent token
   windows; tokenizer fitted on train files only.
-- Code is transformed into next-token modeling windows, up to 4 per document.
+- Code is transformed into next-token modeling windows, up to 8 per document in the hosted workflow.
   Grouped train examples are shuffled deterministically and interleaved so
   the first pass samples one window from as many different files as possible.
 - Both best-validation and last checkpoint are saved separately; test loss is

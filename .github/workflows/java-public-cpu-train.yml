@@ -59,8 +59,8 @@ jobs:
         run: |
           python scripts/train_java_public.py \
             --corpus java-corpus --output java-model --backend hf \
-            --steps 950 --batch-size 6 --block-size 192 --per-file 4 \
-            --max-seconds 480 --eval-every 200
+            --steps 4500 --batch-size 6 --block-size 192 --per-file 8 \
+            --full-pass --max-seconds 480 --eval-every 250
       - name: Preserve immutable evidence, MIT/Apache notices and actual checkpoints
         if: success()
         uses: actions/upload-artifact@v4

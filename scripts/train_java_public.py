@@ -62,25 +62,39 @@ def eval_windows(model, windows, limit:int=32):
     return sum(losses)/len(losses)
 
 
-def balanced_first_windows(docs, window_sets, limit):
-    """Choose held-out files round-robin by repository, never only first repo."""
-    buckets={}
-    for row, windows in zip(docs, window_sets):
-        if windows:
-            buckets.setdefault(row['repo'],[]).append(windows[0])
-    ordered=[]
-    for k in range(max(map(len,buckets.values()))):
-        for name in sorted(buckets):
-            if k<len(buckets[name]):
-                ordered.append(buckets[name][k])
-                if len(ordered)==limit:return ordered
-    return ordered
+def balanced_windows(docs, window_sets, limit):
+    """Source/offset-stratified heldout windows, never only header chunks.
+
+    A deterministic digest orders files within each repository and chunk
+    position, and we cycle all positions/repositories before reusing one.
+    """
+    groups={}
+    for row,windows in zip(docs,window_sets):
+        for position,window in enumerate(windows):
+            key=(position,row['repo'])
+            groups.setdefault(key,[]).append((hashlib.sha256(
+                (row['path']+str(position)).encode('utf8')).hexdigest(),window))
+    if not groups:return []
+    for bucket in groups.values():bucket.sort(key=lambda x:x[0])
+    max_offset=max(k[0] for k in groups)+1
+    repos=sorted({k[1] for k in groups})
+    longest=max(len(v) for v in groups.values())
+    result=[]
+    for index in range(longest):
+        for position in range(max_offset):
+            for repo in repos:
+                bucket=groups.get((position,repo),[])
+                if index<len(bucket):
+                    result.append(bucket[index][1])
+                    if len(result)==limit:return result
+    return result
 
 
 def train(corpus:Path, output:Path, *, steps:int=950, max_seconds:float=480.0,
           batch_size:int=6, block_size:int=192, per_file:int=4,
           vocab_size:int=2048, backend:str='hf',
-          lr:float=0.0003, seed:int=616, eval_every:int=200) -> dict:
+          lr:float=0.0003, seed:int=616, eval_every:int=200,
+          full_pass:bool=False) -> dict:
     if not (1<=steps<=6000 and 5<=max_seconds<=900 and 1<=batch_size<=12
             and 32<=block_size<=256 and 1<=per_file<=12
             and 260<=vocab_size<=8192 and backend in {'hf','legacy'}
@@ -106,8 +120,8 @@ def train(corpus:Path, output:Path, *, steps:int=950, max_seconds:float=480.0,
                     intermediate_size=384,max_position_embeddings=block_size)
     if cfg.parameter_count()>3_000_000:raise ValueError('Model allocation exceeds guard')
     train_windows=assign_windows(docs['train'],tokenizer,block_size,per_file)
-    validation_windows=assign_windows(docs['validation'],tokenizer,block_size,1)
-    validation_select=balanced_first_windows(docs['validation'],validation_windows,24)
+    validation_windows=assign_windows(docs['validation'],tokenizer,block_size,per_file)
+    validation_select=balanced_windows(docs['validation'],validation_windows,48)
     if not validation_select:raise ValueError('Missing validation windows')
     model=SagaTransformer(cfg)
     opt=torch.optim.AdamW(model.parameters(),lr=lr,weight_decay=0.01)
@@ -131,15 +145,23 @@ def train(corpus:Path, output:Path, *, steps:int=950, max_seconds:float=480.0,
         for index in file_order:
             if part<len(train_windows[index]):order.append((index,part))
     if not order:raise ValueError('No usable Java code windows')
+    if full_pass:
+        necessary_steps=(len(order)+batch_size-1)//batch_size
+        if necessary_steps>steps:
+            raise ValueError('Full pass exceeds the allowed optimizer step budget')
+        target_steps=necessary_steps
+    else:
+        target_steps=steps
     start=time.monotonic();seen_files=set();seen_windows=set();best_val=initial_val
     best_step=0;best_files=0;best_windows=0;done=0;last_loss=None;history=[];termination='STEP_LIMIT'
     model.train()
-    for step in range(1,steps+1):
+    for step in range(1,target_steps+1):
         if time.monotonic()-start>max_seconds:
             termination='TIME_BUDGET';break
         selected=[]
         for k in range(batch_size):
             pos=(step-1)*batch_size+k
+            if full_pass and pos>=len(order):break
             idx,part=order[pos % len(order)]
             selected.append(train_windows[idx][part])
             seen_files.add(idx);seen_windows.add((idx,part))
@@ -149,8 +171,8 @@ def train(corpus:Path, output:Path, *, steps:int=950, max_seconds:float=480.0,
         if not torch.isfinite(loss):raise FloatingPointError('Nonfinite loss')
         loss.backward();torch.nn.utils.clip_grad_norm_(model.parameters(),1.0)
         opt.step();done=step;last_loss=float(loss.detach())
-        if step%eval_every==0 or step==steps:
-            val=eval_windows(model,validation_select,24)
+        if step%eval_every==0 or step==target_steps:
+            val=eval_windows(model,validation_select,48)
             history.append({'step':step,'loss_last_batch':last_loss,'validation_sample_loss':val,
                             'distinct_training_files_seen':len(seen_files),
                             'distinct_training_windows_seen':len(seen_windows)})
@@ -163,22 +185,25 @@ def train(corpus:Path, output:Path, *, steps:int=950, max_seconds:float=480.0,
                     {**metadata,'selection':'last','distinct_training_files_seen':len(seen_files)})
     checkpoint_load(best_path,model)
     model.eval()
-    validation_full=balanced_first_windows(docs['validation'],validation_windows,64)
-    test_windows=assign_windows(docs['test'],tokenizer,block_size,1)
-    test_first=balanced_first_windows(docs['test'],test_windows,64)
-    full_val=eval_windows(model,validation_full,64)
-    test_loss=eval_windows(model,test_first,64)
+    validation_full=balanced_windows(docs['validation'],validation_windows,96)
+    test_windows=assign_windows(docs['test'],tokenizer,block_size,per_file)
+    test_first=balanced_windows(docs['test'],test_windows,96)
+    full_val=eval_windows(model,validation_full,96)
+    test_loss=eval_windows(model,test_first,96)
     report={'status':'TRAINED_CPU','training_task':'JAVA_SOURCE_NEXT_TOKEN_ONLY',
             'javascript_or_java':'Java',
             'random_initialization':True,'external_pretrained_weights':False,
             'original_synthetic_sft_examples_used_in_this_run':0,
             'source_counts':integrity['counts'],'source_files_total':integrity['total'],
             'source_urls':[s.url for s in UPSTREAMS],
-            'optimizer_steps_requested':steps,'optimizer_steps_completed':done,
+            'optimizer_steps_requested':target_steps,'optimizer_steps_completed':done,
+            'full_pass_requested':full_pass,
+            'full_pass_completed':full_pass and len(seen_windows)==len(order),
             'distinct_training_files_seen':len(seen_files),
             'distinct_training_windows_seen':len(seen_windows),
             'available_training_files':len(docs['train']),
             'available_training_windows':len(order),
+            'unseen_training_windows':len(order)-len(seen_windows),
             'best_checkpoint_step':best_step,
             'best_checkpoint_distinct_training_windows_seen':best_windows,
             'best_checkpoint_distinct_training_files_seen':best_files,
@@ -217,9 +242,10 @@ if __name__=='__main__':
     p.add_argument('--lr',type=float,default=.0003)
     p.add_argument('--seed',type=int,default=616)
     p.add_argument('--eval-every',type=int,default=200)
+    p.add_argument('--full-pass',action='store_true',help='Train each available source-code window exactly once, within --steps cap')
     a=p.parse_args()
     report=train(a.corpus,a.output,steps=a.steps,max_seconds=a.max_seconds,
                  batch_size=a.batch_size,block_size=a.block_size,per_file=a.per_file,
                  vocab_size=a.vocab_size,backend=a.backend,lr=a.lr,
-                 seed=a.seed,eval_every=a.eval_every)
+                 seed=a.seed,eval_every=a.eval_every,full_pass=a.full_pass)
     print('JAVA_PUBLIC_TRAIN_SUMMARY '+json.dumps({k:v for k,v in report.items() if k!='history'},ensure_ascii=False),flush=True)

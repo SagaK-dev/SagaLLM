@@ -144,3 +144,29 @@ def test_window_targets_and_nonoverlap():
     assert wins[0][1].tolist()==[4,5,6]
     assert wins[1][0].tolist()==[6,7,8]
     assert wins[1][1].tolist()==[7,8,2]
+
+
+def test_validation_sampling_includes_deeper_code_windows():
+    import torch
+    from scripts.train_java_public import balanced_windows
+    repos=('algorithms','gson','guava','patterns')
+    docs=[{'repo':repo,'path':f'{repo}/{n}.java'} for repo in repos for n in range(5)]
+    windows=[[(torch.tensor([n,part]),torch.tensor([part])) for part in range(3)]
+             for n,_ in enumerate(docs)]
+    selected=balanced_windows(docs,windows,24)
+    assert len(selected)==24
+    assert {int(x[0][1]) for x in selected}=={0,1,2}
+
+
+def test_full_pass_uses_every_available_training_window(tmp_path,monkeypatch):
+    from scripts.train_java_public import train
+    roots=fixture_sources(tmp_path,monkeypatch)
+    corpus=tmp_path/'corpus';public.prepare_public_corpus(roots,corpus)
+    result=train(corpus,tmp_path/'full-model',steps=80,max_seconds=20,batch_size=3,
+                 block_size=48,per_file=2,vocab_size=260,backend='legacy',
+                 lr=.001,eval_every=10,full_pass=True)
+    assert result['full_pass_requested'] is True
+    assert result['full_pass_completed'] is True
+    assert result['unseen_training_windows']==0
+    assert result['distinct_training_files_seen']==result['available_training_files']
+    assert result['distinct_training_windows_seen']==result['available_training_windows']
