@@ -43,6 +43,7 @@ def test_compile_evidence_is_bounded_and_does_not_execute(monkeypatch):
     assert case["generation_stop_reason"] == "EOS"
     assert case["javac_diagnostic_category"] == "JAVAC_DIAGNOSTIC"
     assert case["javac_error_category"] == "OTHER"
+    assert case["javac_symbol_kind"] == "NONE"
     assert len(case["javac_stderr_sha256"]) == 64
     assert "diagnostics" not in case
     assert case["source_persisted"] is False
@@ -63,6 +64,7 @@ def test_missing_class_is_not_compiled(monkeypatch):
     report = sft.heldout_compilation(FakeModel(), EmptyTokenizer(), rows, max_cases=1)
     assert report["cases"][0]["compile_reason"] == "MISSING_PUBLIC_MAIN"
     assert report["cases"][0]["javac_stderr_sha256"] is None
+    assert report["cases"][0]["javac_symbol_kind"] == "NONE"
 
 
 def test_javac_error_classifier_allowlist_and_unknown():
@@ -97,3 +99,47 @@ def test_compilation_report_never_persists_raw_diagnostic(monkeypatch):
     assert "reference source must not leak" not in encoded
     assert "cannot find symbol" not in encoded
     assert "X" * 100 not in encoded
+
+
+def test_javac_symbol_kind_records_kind_not_identifier():
+    kinds = {
+        "variable": "VARIABLE",
+        "method": "METHOD",
+        "class": "CLASS",
+        "constructor": "CONSTRUCTOR",
+    }
+    for raw, expected in kinds.items():
+        stderr = ("Main.java:1: error: cannot find symbol\n"
+                  "   System.out.println(privateSecret);\n"
+                  f"  symbol:   {raw} confidentialName\n"
+                  "  location: class Main\n")
+        assert sft.classify_javac_symbol_kind(stderr) == expected
+    assert sft.classify_javac_symbol_kind(
+        "Main.java:1: error: cannot find symbol\n no symbol marker") == "UNKNOWN"
+    assert sft.classify_javac_symbol_kind(
+        "Main.java:1: error: incompatible types\n  symbol: variable hideMe") == "NONE"
+    assert sft.classify_javac_symbol_kind(
+        "Main.java:1: error: cannot find symbol\n"
+        "Main.java:2: error: other\n  symbol: variable hideMe") == "UNKNOWN"
+
+
+def test_compilation_report_exposes_only_javac_symbol_kind(monkeypatch):
+    secret = "privateSecret"
+    diagnostics = ("Main.java:1: error: cannot find symbol\n"
+                   f"  symbol:   method {secret}()\n"
+                   "  location: class Main\n")
+    monkeypatch.setattr(sft, "_compile", lambda *args, **kwargs: {
+        "status": "FAIL", "diagnostics": diagnostics, "reason": "JAVAC"
+    })
+    rows = [{"id": "case-symbol", "family": "family", "prefix_ids": [1, 2],
+             "source": "private reference source"}]
+    report = sft.heldout_compilation(FakeModel(), FakeTokenizer(), rows, max_cases=1)
+    case = report["cases"][0]
+    assert case["javac_error_category"] == "MISSING_SYMBOL"
+    assert case["javac_symbol_kind"] == "METHOD"
+    import json
+    encoded = json.dumps(report)
+    assert secret not in encoded
+    assert "private reference source" not in encoded
+    assert "symbol:" not in encoded
+    assert case["source_persisted"] is False
