@@ -19,6 +19,7 @@ from sagallm.java_instruction_sft import (
     JAVA_EVAL_PROMPT_STYLES, V016_TOKENIZER_SHA256, V017_SFT_BEST_SHA256,
     _validate_base, compile_heldout_references, extend_rope_context,
     heldout_compilation, read_split, restore_verified_base_weights, sha_file,
+    select_java_eval_style,
 )
 from sagallm.model import SagaTransformer
 from sagallm.tokenization import load_tokenizer
@@ -64,9 +65,8 @@ def evaluate(base: Path, best: Path, tokenizer_file: Path, dataset: Path,
         dev_results[style] = heldout_compilation(
             model, tokenizer, validation_rows, max_cases=dev_cases,
             prompt_style=style)
-    selected_style = max(
-        JAVA_EVAL_PROMPT_STYLES,
-        key=lambda style: dev_results[style]["compiled"])
+    selected_style = select_java_eval_style(
+        {style: result["compiled"] for style, result in dev_results.items()})
     selected_on = "VALIDATION_COMPILE_ONLY"
     # Freeze selected style before reading or scoring any test examples.
     frozen_style = selected_style
@@ -74,6 +74,8 @@ def evaluate(base: Path, best: Path, tokenizer_file: Path, dataset: Path,
     test_rows, test_counts = read_split(
         dataset, "test", tokenizer, 384,
         original_context=original.max_position_embeddings)
+    if len(validation_rows) < dev_cases or len(test_rows) < FRESH_TEST_OFFSET + test_cases:
+        raise ValueError("Too few accepted examples to compare full case windows")
     # Use the second seed-67 block, not the first 8 previously inspected cases.
     references = compile_heldout_references(
         test_rows, max_cases=test_cases, case_offset=FRESH_TEST_OFFSET)
