@@ -1,0 +1,77 @@
+name: SagaLLM pinned public Java training (CPU)
+
+on:
+  pull_request:
+    paths:
+      - 'src/sagallm/java_public_corpus.py'
+      - 'scripts/train_java_public.py'
+      - '.github/workflows/java-public-cpu-train.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: java-public-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  real-java-corpus-training:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      OMP_NUM_THREADS: '2'
+      MKL_NUM_THREADS: '2'
+      PYTHONHASHSEED: '0'
+      GIT_TERMINAL_PROMPT: '0'
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+      - name: Install CPU PyTorch and offline tokenizer
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install 'torch>=2.3' --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install -e '.[fast-tokenizer]'
+      - name: Clone four reviewed pinned public Java revisions (no scripts executed)
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p java-upstream
+          fetch() {
+            local slug="$1" url="$2" sha="$3"
+            git init -q "java-upstream/${slug}"
+            git -C "java-upstream/${slug}" remote add origin "$url"
+            git -C "java-upstream/${slug}" -c core.hooksPath=/dev/null fetch --depth=1 origin "$sha"
+            git -C "java-upstream/${slug}" -c core.hooksPath=/dev/null checkout -q --detach FETCH_HEAD
+            test "$(git -C "java-upstream/${slug}" rev-parse HEAD)" = "$sha"
+          }
+          fetch algorithms https://github.com/TheAlgorithms/Java.git f4d6708297f86629a9e415070935b903ea8b1858
+          fetch gson https://github.com/google/gson.git d9b5079eaa4567219771bba6d04289cf45c7589b
+          fetch guava https://github.com/google/guava.git 36e3995499d6c3b74b1207d362fa9e19915d2589
+          fetch patterns https://github.com/iluwatar/java-design-patterns.git 4cabb204f240240bea319605a5ffa46ded728001
+      - name: Verify pinned licensing and create split-by-category Java source corpus
+        run: |
+          python -m sagallm.java_public_corpus --sources java-upstream --output java-corpus
+          python -m sagallm.java_public_corpus --verify java-corpus
+      - name: Train native SagaLLM on real Java source code (CPU budget)
+        run: |
+          python scripts/train_java_public.py \
+            --corpus java-corpus --output java-model --backend hf \
+            --steps 4500 --batch-size 6 --block-size 192 --per-file 8 \
+            --full-pass --max-seconds 480 --eval-every 250
+      - name: Preserve immutable evidence, MIT/Apache notices and actual checkpoints
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: sagallm-v016-pinned-java-cpu
+          path: |
+            java-model/java-best.pt
+            java-model/java-last.pt
+            java-model/tokenizer.json
+            java-model/train-report.json
+            java-corpus/manifest.json
+            java-corpus/LICENSES/*.txt
+          retention-days: 30
+          if-no-files-found: error

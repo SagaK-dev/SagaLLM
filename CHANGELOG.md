@@ -1,3 +1,10 @@
+## v0.16.0 — pinned real Java code training (2026-11-22)
+
+- Add verified, fixed-commit MIT/Apache-2.0 open-source Java corpus preparation from four third-party repositories. Actual Java source **not** copied into Git; licenses/attribution and SHA-pinned source manifests retained. No upstream build scripts executed.
+- Keep repository+package/category-disjoint splits, deduplication, binary/PII screening and train-only tokenizer fitting. Record all included docs, real gradient-contributing source files and windows, best/last model distinctions.
+- Implement bounded native PyTorch next-token code learning on CPU from random initialization, plus GitHub Actions job to obtain pinned source, perform training and upload checkpoint/model evidence and license notices. No pretrained third-party weights or paid API.
+- Java instruction following/compilation/behavior not established from this pretraining; downstream Java SFT and independently executed tests are still required. License inspection is not a complete rights audit.
+
 ## v0.15.0 — original Java 110-family corpus and full-coverage CPU training (2026-11-22)
 
 - Expand the Java instruction/code curriculum to **17,536 original parameterized examples**: 17,080 train, 228 validation, 228 test; family-disjoint splits across 110 task types, 40 new types.
