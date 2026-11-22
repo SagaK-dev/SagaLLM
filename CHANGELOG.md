@@ -1,3 +1,13 @@
+## v0.15.0 — original Java 110-family corpus and full-coverage CPU training (2026-11-22)
+
+- Expand the Java instruction/code curriculum to **17,536 original parameterized examples**: 17,080 train, 228 validation, 228 test; family-disjoint splits across 110 task types, 40 new types.
+- Introduce strict canonical regeneration, source SHA-256 checks and exact duplicate rejection. No arbitrary third-party code is ingested, and no external license is asserted.
+- Add balanced-by-family shuffle to ensure early checkpoints cover varied algorithms, and explicit counters for examples/families seen by best and final checkpoints.
+- Add deterministic reference Java compilation and independent output oracle tests, local CPU training scripts and experiment evidence. Model-generated Java runtime is **NOT_RUN**.
+- Add offline, **unreviewed** Java-repository source inventory/export that skips secrets and marks every external dataset `PENDING` until a human reviews rights. No third-party Java code was actually trained.
+- Two real full-pass CPU experiments: each **17,080/17,080** training examples used; validation-selected checkpoint step **1,000**, held-out compiled **4/10** new vs **6/10** continuation, exact code match **0/10** both. The selected best checkpoints do not contain all 17,080 gradients; final checkpoints do.
+- Keep training data/weights as separate downloadable artifacts, not Git blobs. Still not a proven Java coding assistant.
+
 ## v0.14.0 — expanded original Java corpus and full-pass CPU SFT (2026-11-22)
 
 - Generate **5,436 original parameterized Java 17 code/instruction pairs** across 70 task families: 5,220 train / 108 validation / 108 held-out test, segregated by entire family. Japanese and English task requests. No third-party repository or pretrained model downloaded.
