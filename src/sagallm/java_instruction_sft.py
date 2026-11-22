@@ -245,7 +245,7 @@ def classify_javac_symbol_kind(stderr: str) -> str:
     for line in lines[start + 1:start + 12]:
         if 'error:' in line:
             break
-        match = re.match(r'^\\s*symbol:\\s*(variable|method|class|constructor)\\b',
+        match = re.match(r'^\s*symbol:\s*(variable|method|class|constructor)\b',
                          line, re.IGNORECASE)
         if match:
             return match.group(1).upper()
