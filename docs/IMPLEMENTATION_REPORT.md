@@ -169,3 +169,7 @@ Implemented deterministic post-ingestion corpus curation (normalized and probabl
 - Generated corpus and ~9 MB training checkpoint kept out of Git.
   Real GPU, behavioral safety harness, useful Java code competence,
   license attestation and larger model training still NOT_RUN.
+
+### v0.17 Java instruction SFT
+
+See `docs/JAVA_INSTRUCTION_SFT.md` for the new source-pretrained-to-instruction-tuned pipeline and its exact leakage controls, CPU budget, and evaluation limitations. Report generated-checkpoint capabilities only from its actual training workflow result.
