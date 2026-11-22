@@ -111,12 +111,17 @@ def rename_identifiers(source: str, mapping: dict[str, str]) -> str:
         raise ValueError("Replacement identifier already exists in source")
     counts = Counter()
     parts = []
+    previous_significant = ""
     for token in JAVA_TOKENS.findall(source):
-        if token in mapping:
+        # Qualified members such as System.out are not local variables, even
+        # if their name matches one of the selected local bindings.
+        if token in mapping and previous_significant != ".":
             counts[token] += 1
             parts.append(mapping[token])
         else:
             parts.append(token)
+        if token.strip():
+            previous_significant = token
     if any(counts[key] < 2 for key in mapping):
         raise ValueError("Expected both declaration and use of every identifier")
     return "".join(parts)
