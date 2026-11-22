@@ -173,3 +173,5 @@ Implemented deterministic post-ingestion corpus curation (normalized and probabl
 ### v0.17 Java instruction SFT
 
 See `docs/JAVA_INSTRUCTION_SFT.md` for the new source-pretrained-to-instruction-tuned pipeline and its exact leakage controls, CPU budget, and evaluation limitations. Report generated-checkpoint capabilities only from its actual training workflow result.
+
+Actual v0.17 hosted SFT run: 44982940959, 650 optimizer updates; 2,600 distinct training examples, but only 400 examples at validation-selected best step 100. See `experiments/java_instruction_v017_results.json`. Held-out compile-only 1/8 and exact matches 0/8; instruction following remains NOT_ESTABLISHED.

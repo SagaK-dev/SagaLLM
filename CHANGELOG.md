@@ -1,5 +1,7 @@
 ## v0.17.0 — Real-Java initialized, compact-prompt instruction SFT
 
+- Confirmed hosted CPU training: 650 steps, 2,600 distinct SFT pairs; best checkpoint step 100. Held-out response loss 4.234 → 2.086, compile-only baseline 0/8 versus tuned 1/8, no behavioral validation. Evidence in `experiments/java_instruction_v017_results.json`.
+
 - Add bounded CPU SFT from SHA-pinned v0.16 real-Java checkpoint, using original v0.15 synthetic Java instruction pairs separated by whole task family.
 - Strict token-length filtering without truncation; assistant-only labels; family-interleaved training; validation-selected best and last checkpoints.
 - Post-selection family-heldout test loss and compile-only greedy diagnostics, with explicitly unexecuted behavior.

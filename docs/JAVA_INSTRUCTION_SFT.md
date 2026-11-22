@@ -87,3 +87,28 @@ pinned, reviewed source; never silently substitute a different model.
 This stage does not alter the user's existing Java project, does not train
 1B/3B models, and does not use a GPU. The source-code license of SagaLLM
 remains an owner decision.
+
+## Measured GitHub Actions SFT (2026-11-22)
+
+GitHub Actions [run 44982940959](https://github.com/SagaK-dev/SagaLLM/actions/runs/44982940959)
+completed the actual CPU fine-tune, using exactly the prior pinned v0.16
+weights and tokenizer. See `experiments/java_instruction_v017_results.json`
+for a machine-readable summary and the uploaded Actions artifact for the full
+training report and checkpoint weights.
+
+| Measure | Real result |
+|---|---:|
+| Optimizer steps completed | 650 |
+| Distinct SFT examples used | 2,600 |
+| Best validation-selected checkpoint | Step 100; 400 examples |
+| Train rows fitting 192-token context | 16,518 / 17,080 |
+| Validation response loss (base → best) | 3.6726 → 1.7723 |
+| Held-out test response loss (base → best) | 4.2338 → 2.0855 |
+| Greedy Java compile-only test (base → best) | 0 / 8 → 1 / 8 |
+| Exact source matches (base → best) | 0 / 8 → 0 / 8 |
+| Model-generated Java behavioral execution | NOT_RUN |
+
+**Interpretation:** response prediction improved, but autonomous Java coding
+ability did not. The best checkpoint is not the final-step checkpoint.
+Only 400 new examples contributed to best-selected weights; 2,600 were
+processed by the final-step weights. Do not equate those two totals.
