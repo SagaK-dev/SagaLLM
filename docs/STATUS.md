@@ -1,3 +1,11 @@
+## v0.14 Java expanded dataset and trained model
+
+- Newly authored Java SFT material: **5,436 distinct source files as strings / 70 parameterized task families**, full schema- and SHA-verified regeneration. 5,220 training, 108 validation, 108 testing; disjoint families.
+- Efficient dependency-free ByteBPE encoder: implemented with randomized parity regression tests against original algorithm.
+- CPU Java training pipeline with exact distinct-example accounting, validation-only model selection, and test once after selection: implemented. Actual 2 runs each processed 5,220 examples; best validation checkpoint at 600. Random-init 1,427,136 params: held-out compile 2/18, exact 0/18. Prior-checkpoint continuation 774,240 params: compile 1/18, exact 0/18. Neither established useful Java ability.
+- No claim that a large generated dataset implies independent algorithm variety or reliable task-following Java. No model-generated Java behavioral execution. No external Java corpus imported or license legally attested.
+- User GPU, 1B/3B training, distributed training, DPO, source-code LICENSE: NOT_RUN / undecided.
+
 ## v0.13 local Java training selection and behavior checks (2026-11-22)
 
 - Training pipeline verified on CPU: 1,500 steps requested, 300 performed,

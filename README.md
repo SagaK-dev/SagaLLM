@@ -272,6 +272,19 @@ python scripts/check_cpu.py
 
 GitHub Actions v0.5 CPU CI passed (53 tests, run 44905032184), including native tokenizer and Transformers model loading/generation. A successful CPU CI run is not GPU validation.
 
+## Expanded Java training corpus (v0.14)
+
+SagaLLM can deterministically generate **5,436 newly authored Japanese/English Java 17 instruction/code pairs** from **70 parameterized task families**. The data is split by **entire task family**: train 5,220 / validation 108 / test 108. These are variations of generated program templates, **not thousands of independent algorithms** and not real-world repository data. No third-party Java source, copyrighted corpus, or pretrained LLM is fetched.
+
+```bash
+PYTHONPATH=src python -c 'from sagallm.java_large_corpus import build_java_large_corpus; print(build_java_large_corpus("data/java-expanded"))'
+OMP_NUM_THREADS=2 PYTHONPATH=src python scripts/train_java_expanded.py \
+  --dataset data/java-expanded --output checkpoints/java-expanded-experiment \
+  --steps 5220 --max-seconds 700 --hidden-size 192 --layers 4
+```
+
+Every model update uses exactly one train example; distinct examples **actually seen during optimizer updates** are counted separately from the number generated. The actual v0.14 CPU experiments each completed **5,220** optimizer steps, but the validation-selected best checkpoints were from **step 600** (thus each best checkpoint itself had seen only **600** training examples). Both models produced **0/18** exact Java reference matches, so reliable Java coding is not established. The tokenizer is trained on train examples only, checkpoint selection uses validation only, and held-out test loss and compilation are evaluated once after selection. Compilation does **not** establish semantic correctness. Model-generated Java is never executed in this experiment. For full usage and measured CPU results, see [docs/JAVA_EXPANDED_TRAINING.md](docs/JAVA_EXPANDED_TRAINING.md).
+
 ## Licensing
 
 **The SagaLLM source license is not yet selected by the repository owner.** Public visibility does not confer a license to reuse this repository. Third-party reference projects have their own independent licenses; see `docs/DEPENDENCIES.md`. Do not publish model weights or add a LICENSE file without the owner's decision.
