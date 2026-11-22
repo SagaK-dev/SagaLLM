@@ -44,6 +44,7 @@ def test_compile_evidence_is_bounded_and_does_not_execute(monkeypatch):
     assert case["javac_diagnostic_category"] == "JAVAC_DIAGNOSTIC"
     assert case["javac_error_category"] == "OTHER"
     assert case["javac_symbol_kind"] == "NONE"
+    assert case["javac_variable_declaration_hint"] == "NONE"
     assert len(case["javac_stderr_sha256"]) == 64
     assert "diagnostics" not in case
     assert case["source_persisted"] is False
@@ -143,3 +144,101 @@ def test_compilation_report_exposes_only_javac_symbol_kind(monkeypatch):
     assert "private reference source" not in encoded
     assert "symbol:" not in encoded
     assert case["source_persisted"] is False
+
+
+
+def test_missing_variable_declaration_hint_is_bounded_and_lexical_only():
+    stderr = ("Main.java:4: error: cannot find symbol\n"
+              " System.out.println(hiddenName);\n"
+              "                    ^\n"
+              "  symbol:   variable hiddenName\n"
+              "  location: class Main\n")
+    no_declaration = ("public class Main { void foo() {"
+                      "System.out.println(hiddenName); } }")
+    simple_declaration = ("public class Main { void foo() {"
+                          "int hiddenName = 1; System.out.println(hiddenName); } }")
+    array_declaration = ("public class Main { void foo() {"
+                         "int[] hiddenName = new int[1]; } }")
+    generic_declaration = ("public class Main { void foo() {"
+                           "List<String> hiddenName = null; } }")
+    assert sft.unresolved_variable_declaration_hint(stderr, no_declaration) == (
+        "NO_SIMPLE_DECLARATION_PATTERN_SEEN")
+    for source in (simple_declaration, array_declaration, generic_declaration):
+        assert sft.unresolved_variable_declaration_hint(stderr, source) == (
+            "SIMPLE_DECLARATION_PATTERN_SEEN")
+    # A custom declaration is outside the intentionally limited type allowlist.
+    assert sft.unresolved_variable_declaration_hint(
+        stderr, "public class Main { Custom hiddenName; }") == (
+        "NO_SIMPLE_DECLARATION_PATTERN_SEEN")
+    assert sft.unresolved_variable_declaration_hint(
+        "Main.java:1: error: cannot find symbol\n  symbol: variable confidential.name",
+        simple_declaration) == "UNKNOWN"
+    assert sft.unresolved_variable_declaration_hint(
+        "Main.java:1: error: another error\n  symbol: variable hiddenName",
+        simple_declaration) == "UNKNOWN"
+    assert sft.unresolved_variable_declaration_hint(
+        "Main.java:1: error: cannot find symbol\n"
+        "Main.java:2: error: other\n  symbol: variable hiddenName",
+        simple_declaration) == "UNKNOWN"
+    assert sft.unresolved_variable_declaration_hint(
+        None, simple_declaration) == "UNKNOWN"
+
+
+def test_generated_variable_hint_does_not_leak_identifier(monkeypatch):
+    secret = "nonPublicSecret"
+    diagnostics = ("Main.java:1: error: cannot find symbol\n"
+                   f"  symbol: variable {secret}\n"
+                   "  location: class Main\n")
+    class SourceTokenizer(FakeTokenizer):
+        def decode(self, ids):
+            return ("public class Main { public static void main(String[] a)"
+                    f" {{ int {secret} = 3; System.out.println({secret}); }} }}")
+
+    monkeypatch.setattr(sft, "_compile", lambda *args, **kwargs: {
+        "status": "FAIL", "diagnostics": diagnostics, "reason": "JAVAC"
+    })
+    rows = [{"id": "case-private", "family": "family", "prefix_ids": [1, 2],
+             "source": "private reference source"}]
+    report = sft.heldout_compilation(FakeModel(), SourceTokenizer(), rows,
+                                     max_cases=1)
+    case = report["cases"][0]
+    assert case["javac_symbol_kind"] == "VARIABLE"
+    assert case["javac_variable_declaration_hint"] == (
+        "SIMPLE_DECLARATION_PATTERN_SEEN")
+    assert case["java_behavior"] == "NOT_RUN"
+    assert case["source_persisted"] is False
+    import json
+    rendered = json.dumps(report)
+    assert secret not in rendered
+    assert "symbol:" not in rendered
+    assert "private reference source" not in rendered
+
+
+def test_reference_compilation_is_separate_and_does_not_execute(monkeypatch):
+    reference_a = "public class Main { int markerA; }"
+    reference_b = "public class Main { broken markerB; }"
+    calls = []
+    def compile_only(source_file, root, timeout):
+        code = source_file.read_text(encoding="utf8")
+        calls.append((source_file.name, timeout))
+        if "markerB" in code:
+            return {"status": "FAIL", "reason": "JAVAC",
+                    "diagnostics": "Main.java:1: error: ';' expected"}
+        return {"status": "PASS", "diagnostics": ""}
+    monkeypatch.setattr(sft, "_compile", compile_only)
+    rows = [{"id": "a", "family": "one", "source": reference_a},
+            {"id": "b", "family": "two", "source": reference_b}]
+    report = sft.compile_heldout_references(rows, max_cases=2)
+    assert report["evaluated"] == 2
+    assert report["compiled"] == 1
+    assert report["behavior"] == "NOT_RUN"
+    assert report["used_for_model_selection"] is False
+    assert len(calls) == 2
+    assert set(calls) == {("Main.java", 12)}
+    assert sorted(case["javac_error_category"] for case in report["cases"]) == (
+        ["NONE", "SYNTAX_ERROR"])
+    assert all(case["source_persisted"] is False for case in report["cases"])
+    import json
+    rendered = json.dumps(report)
+    assert "markerA" not in rendered and "markerB" not in rendered
+    assert "broken" not in rendered
