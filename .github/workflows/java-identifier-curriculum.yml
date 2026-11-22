@@ -2,6 +2,12 @@ name: SagaLLM Java train-only identifier curriculum audit
 
 on:
   workflow_dispatch:
+  pull_request:
+    paths:
+      - '.github/workflows/java-identifier-curriculum.yml'
+      - 'src/sagallm/java_identifier_curriculum.py'
+      - 'scripts/audit_java_identifier_curriculum.py'
+      - 'tests/test_java_identifier_curriculum.py'
   push:
     branches: [main]
     paths:
