@@ -54,10 +54,29 @@ def compile_candidates(folder: Path, *, timeout: int = 120) -> dict:
         )
         # Never persist javac stdout/stderr, source snippets or private paths.
         passed = outcome.returncode == 0
+        # Only finite, allowlisted diagnostics are emitted; never store the
+        # compiler's raw stderr or its temporary source paths.
+        failed = sorted({int(index) for index in
+                         re.findall(r"Candidate([0-9]{4})\\.java:\\d+: error:",
+                                    outcome.stderr) if int(index) < len(rows)})
+        stderr_lower = outcome.stderr.lower()
+        if passed:
+            failure_kind = "NONE"
+        elif "cannot find symbol" in stderr_lower:
+            failure_kind = "MISSING_SYMBOL"
+        elif "already defined" in stderr_lower:
+            failure_kind = "DUPLICATE_DECLARATION"
+        elif "expected" in stderr_lower or "illegal start" in stderr_lower:
+            failure_kind = "SYNTAX_ERROR"
+        else:
+            failure_kind = "OTHER"
         return {
             "status": "PASS" if passed else "FAIL",
             "compiled": len(rows) if passed else None,
             "attempted": len(rows),
+            "failed_candidate_indices": failed[:10],
+            "failure_kind": failure_kind,
+            "compiler_exit_code": outcome.returncode,
             "compile_only": True,
             "java_executed": False,
             "javac_annotation_processing": "DISABLED",
@@ -101,7 +120,11 @@ def audit(folder: Path, *, cases_per_family: int = 6,
     (folder / "audit-summary.json").write_text(
         json.dumps(summary, indent=2, ensure_ascii=False) + "\n", encoding="utf8")
     if result["status"] != "PASS":
-        raise RuntimeError("Compiler rejected candidate training examples")
+        raise RuntimeError(
+            "Compiler rejected candidate training examples; "
+            f"category={result['failure_kind']}; "
+            f"indices={result['failed_candidate_indices']}; "
+            f"exit={result['compiler_exit_code']}")
     return summary
 
 
