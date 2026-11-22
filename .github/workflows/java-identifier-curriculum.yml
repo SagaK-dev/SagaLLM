@@ -1,0 +1,54 @@
+name: SagaLLM Java train-only identifier curriculum audit
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - '.github/workflows/java-identifier-curriculum.yml'
+      - 'src/sagallm/java_identifier_curriculum.py'
+      - 'scripts/audit_java_identifier_curriculum.py'
+      - 'tests/test_java_identifier_curriculum.py'
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/java-identifier-curriculum.yml'
+      - 'src/sagallm/java_identifier_curriculum.py'
+      - 'scripts/audit_java_identifier_curriculum.py'
+
+permissions:
+  contents: read
+
+jobs:
+  java-identifier-curriculum:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    env:
+      OMP_NUM_THREADS: '2'
+      MKL_NUM_THREADS: '2'
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '21'
+      - name: Install offline CPU dependencies
+        run: |
+          python -m pip install 'torch>=2.3' --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install -e '.[test]'
+      - name: Create and verify TRAIN-only Java candidate corpus
+        run: |
+          python scripts/audit_java_identifier_curriculum.py \
+            --cases-per-family 6 \
+            --variants 2 \
+            --output java-identifier-train-candidates
+      - name: Preserve candidate dataset and privacy-safe audit summary
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: sagallm-java-train-only-identifier-candidates
+          path: java-identifier-train-candidates/
+          retention-days: 30
+          if-no-files-found: error
