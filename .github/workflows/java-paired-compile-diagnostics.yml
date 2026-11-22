@@ -2,6 +2,11 @@ name: SagaLLM v0.18 paired Java compile diagnostics
 
 on:
   workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/java-paired-compile-diagnostics.yml'
+      - 'scripts/evaluate_java_context_pair.py'
 
 permissions:
   contents: read
