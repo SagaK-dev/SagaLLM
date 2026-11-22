@@ -399,3 +399,10 @@ executed** and the old long-context Java editor cannot use the compact SFT
 prompt with the v0.16 192-token context.
 
 The v0.17 CPU SFT [run completed](https://github.com/SagaK-dev/SagaLLM/actions/runs/44982940959): 650 steps, 2,600 examples seen, validation-selected best at step 100. Held-out test loss 4.234 → 2.086, but only 1/8 generated Java programs compiled and 0/8 matched reference source. Full figures: `experiments/java_instruction_v017_results.json`.
+
+**v0.18 hosted verification:** run `44994208434` completed 400 updates,
+using 1,600 distinct complete Java SFT pairs and selecting step 50 (200 pairs).
+All 17,080 training pairs now fit 384 positions. Heldout compiler success
+**declined 2/8→0/8** despite lower same-context test loss (2.167→2.141).
+See `experiments/java_context_v018_results.json`; usable coding ability has
+**not** been established.

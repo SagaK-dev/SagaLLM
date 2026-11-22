@@ -146,3 +146,13 @@ See [MMLU_REFERENCE.md](MMLU_REFERENCE.md) for limits.
 - IMPLEMENTED: bounded, original family-separated Java instruction SFT on SHA-pinned v0.16 real-Java model; assistant-only loss, best/last checkpoints, test-only-after-model-selection, javac-only diagnostics.
 - COMPLETED: real GitHub Actions CPU SFT, run 44982940959: 650 optimizer steps, 2,600 distinct SFT records processed. Validation-selected best at step 100 (400 records); 192-token context filter accepts 16,518/17,080 training examples. Validation loss 3.6726 → 1.7723; held-out test response loss 4.2338 → 2.0855. Compile-only 0/8 baseline, 1/8 tuned; exact matches 0/8; generated Java behavior NOT_RUN.
 - NOT_ESTABLISHED: general-purpose Java coding accuracy, safe generated-code execution, full-context Java editor compatibility, real GPU, 1B/3B training.
+
+## v0.18 hosted experiment update
+
+- `TRAINED_CPU`: actual 384-token SFT on pinned v0.17 best checkpoint in run
+  44994208434. 400 steps / 1,600 distinct, selected best step 50 / 200.
+- 17,080 complete training rows now fit. Held-out response loss improves
+  slightly (same extended context 2.1666→2.1413), compiler rate worsens
+  (2/8→0/8). Functional Java coding ability remains NOT_ESTABLISHED.
+- Model-generated Java execution: `NOT_RUN`; long-context generalization:
+  `NOT_ESTABLISHED`.
