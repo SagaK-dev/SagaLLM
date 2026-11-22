@@ -327,6 +327,16 @@ def compile_heldout_references(rows: list[dict], *, max_cases: int = 8,
 JAVA_EVAL_PROMPT_STYLES = ('canonical', 'declare_variables')
 
 
+def select_java_eval_style(validation_compiled: dict[str, int]) -> str:
+    """Freeze a prompt on validation compilation counts, canonical on ties."""
+    if set(validation_compiled) != set(JAVA_EVAL_PROMPT_STYLES):
+        raise ValueError('All and only pre-registered styles are required')
+    if any(type(count) is not int or count < 0
+           for count in validation_compiled.values()):
+        raise ValueError('Invalid validation compilation counts')
+    return max(JAVA_EVAL_PROMPT_STYLES, key=validation_compiled.__getitem__)
+
+
 def java_eval_prefix(row: dict, tokenizer, style: str) -> list[int]:
     """Pre-registered evaluation prompts. These are never training inputs."""
     if style not in JAVA_EVAL_PROMPT_STYLES:
