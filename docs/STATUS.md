@@ -129,3 +129,9 @@ See [MMLU_REFERENCE.md](MMLU_REFERENCE.md) for limits.
 - Evidence: `docs/JAVA_ORIGINAL_TRAINING.md` and separately downloadable
   model checkpoint/tokenizer/dataset/report. **Do not upload weights to Git.**
 - Real GPU, 1B/3B, broader programming datasets, safe sandbox execution: **NOT_RUN**.
+
+### v0.17.0 Java instruction SFT extension
+
+- IMPLEMENTED: bounded, original family-separated Java instruction SFT on SHA-pinned v0.16 real-Java model; assistant-only loss, best/last checkpoints, test-only-after-model-selection, javac-only diagnostics.
+- REQUIRES ACTION RUN: real GitHub Actions CPU training and independent heldout measurement.
+- NOT_ESTABLISHED: general-purpose Java coding accuracy, safe generated-code execution, full-context Java editor compatibility, real GPU, 1B/3B training.

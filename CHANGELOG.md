@@ -1,3 +1,11 @@
+## v0.17.0 — Real-Java initialized, compact-prompt instruction SFT
+
+- Add bounded CPU SFT from SHA-pinned v0.16 real-Java checkpoint, using original v0.15 synthetic Java instruction pairs separated by whole task family.
+- Strict token-length filtering without truncation; assistant-only labels; family-interleaved training; validation-selected best and last checkpoints.
+- Post-selection family-heldout test loss and compile-only greedy diagnostics, with explicitly unexecuted behavior.
+- GitHub Actions workflow downloads the exact successful v0.16 artifact, trains a genuine SFT model and retains checkpoints.
+- The 192-token context requires a compact prompt; this is not yet compatible with the full-context `java ai-chat` editor.
+
 ## v0.16.0 — pinned real Java code training (2026-11-22)
 
 - Add verified, fixed-commit MIT/Apache-2.0 open-source Java corpus preparation from four third-party repositories. Actual Java source **not** copied into Git; licenses/attribution and SHA-pinned source manifests retained. No upstream build scripts executed.

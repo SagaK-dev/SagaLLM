@@ -372,3 +372,14 @@ sagallm hardware distributed-smoke --output reports/gloo-smoke.json
 ```
 
 On the actual GPU-equipped computer, **explicitly** run `sagallm hardware smoke --device cuda --precision fp32` (or `--device mps` on supported Apple Silicon). BF16 is an opt-in CUDA-only check. All reports distinguish `PASS_RUNTIME` from `NOT_RUN` and are always `NOT_ATTESTED` for physical ownership. No paid cloud service, GPU provisioning, pretrained checkpoint or 1B/3B training is performed. See [docs/PHYSICAL_VALIDATION.md](docs/PHYSICAL_VALIDATION.md).
+
+## Real-Java initialized Java instruction SFT (v0.17)
+
+The optional `scripts/train_java_instruction.py` starts from the SHA-pinned v0.16
+real-Java code LM, fine-tunes on the original v0.15 split-by-family instruction
+examples, and evaluates compile-only generation on unseen template families.
+See [Java instruction SFT](docs/JAVA_INSTRUCTION_SFT.md) and the
+`java-instruction-sft-cpu` GitHub Actions workflow. This is an experimental
+small-model SFT, **not** a reliable Java Vibe Coding assistant: code is **never
+executed** and the old long-context Java editor cannot use the compact SFT
+prompt with the v0.16 192-token context.
