@@ -106,3 +106,23 @@ Implemented deterministic post-ingestion corpus curation (normalized and probabl
 - Held-out **test** assistant-token loss: **5.953665 before** → **5.952992 after** two SFT optimizer updates; final train-step loss **5.901787**. Difference is too small and experiment too short to infer Java coding competence.
 - Held-out compile-only generation: **0/2 compiled** (calculator/factorial). Runtime behavior: **NOT_RUN**. No model-generated Java executed.
 - GPU training, real third-party coding corpus, official Java benchmark and 1B/3B training: **NOT_RUN**. Source LICENSE remains unselected.
+
+## v0.12.0 original Java dataset and training (2026-11-22)
+
+- Added `src/sagallm/java_generated_data.py`, original Java program variants,
+  bilingual instructions, deterministic per-split manifests and strict
+  SHA + regenerated-reference validation; 320 train, 15 validation, 15 test.
+- Added `scripts/train_java_original.py` with bounded, random-initialized
+  SagaTransformer CPU SFT, train-only tokenizer, periodic held-out validation,
+  checkpoints with optimizer and training provenance, compile-only Java held-out
+  tests and exact reference-code checks.
+- Added `tests/test_java_generated_data.py` with 7 tests including Java 17
+  compilation of all 26 original task families, tamper/forgery refusal and
+  real 3-step tiny CPU training.
+- Actual model: 774,240 parameters, 1500 optimizer steps, 512 vocab, 384
+  context, seed=20261122, CPU. Train loss 6.2038→0.2634; validation loss
+  6.1888→4.7872 (overfits after step 150); test loss 6.1769→6.0101.
+  Compilation 10/15, exact reference match 0/15. Java execution NOT_RUN.
+- Generated corpus and ~9 MB training checkpoint kept out of Git.
+  Real GPU, behavioral safety harness, useful Java code competence,
+  license attestation and larger model training still NOT_RUN.
