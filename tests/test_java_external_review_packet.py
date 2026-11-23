@@ -8,7 +8,9 @@ import shutil
 import pytest
 
 from scripts.build_java_external_review_packet import (
-    EXPECTED_SUITE_SHA256, EXPECTED_PROVENANCE_SHA256, render,
+    SUITE_SHA as EXPECTED_SUITE_SHA256,
+    SOURCES_SHA as EXPECTED_PROVENANCE_SHA256,
+    render,
 )
 
 ROOT = Path(__file__).resolve().parents[1]
