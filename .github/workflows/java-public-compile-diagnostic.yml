@@ -1,0 +1,92 @@
+name: SagaLLM public Java compile-only diagnostic (unreviewed)
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - '.github/workflows/java-public-compile-diagnostic.yml'
+      - 'scripts/evaluate_java_public_compile_diagnostic.py'
+      - 'tests/test_java_public_compile_diagnostic.py'
+      - 'examples/java_external_io_INTAKE.json'
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/java-public-compile-diagnostic.yml'
+      - 'scripts/evaluate_java_public_compile_diagnostic.py'
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  public-compile-only:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    env:
+      OMP_NUM_THREADS: '2'
+      MKL_NUM_THREADS: '2'
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '21'
+      - name: Install pinned-model CPU dependencies
+        run: |
+          python -m pip install 'torch>=2.3' --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install -e '.[fast-tokenizer,test]'
+      - name: Verify six-task exploratory protocol without Java execution
+        run: python -m pytest -q tests/test_java_public_compile_diagnostic.py
+      - name: Download pinned v0.17 checkpoint and tokenizer
+        uses: actions/download-artifact@v4
+        with:
+          name: sagallm-v017-java-instruction-sft-cpu
+          run-id: 44982940959
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: v017
+      - name: Download pinned v0.18 checkpoint
+        uses: actions/download-artifact@v4
+        with:
+          name: sagallm-v018-java-context-sft-cpu
+          run-id: 44994208434
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: v018
+      - name: Verify unchanged original model and tokenizer files
+        run: |
+          echo 'a17268d80ff443e4a0347f3a29df433556506f13537c78ce282836fa8fe4e5f9  v017/java-sft-model/java-sft-best.pt' | sha256sum -c -
+          echo '9802e848f0abea9979623f461b5e63cd7aed838acd087d06b20d747db1e2a0fc  v018/java-context-model/java-sft-best.pt' | sha256sum -c -
+          echo '186566808cb03e328cac9a6b7b384a8d0aefc54ccb83fbe97782a751726682fe  v017/java-sft-model/tokenizer.json' | sha256sum -c -
+          sha256sum examples/java_external_io_INTAKE.json
+      - name: Run one frozen public compile-only pass per model (no generated Java execution)
+        run: |
+          python scripts/evaluate_java_public_compile_diagnostic.py \
+            --v017 v017/java-sft-model/java-sft-best.pt \
+            --v018 v018/java-context-model/java-sft-best.pt \
+            --tokenizer v017/java-sft-model/tokenizer.json \
+            --suite examples/java_external_io_INTAKE.json \
+            --output exploratory-public-java-compile-only.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          item = json.loads(Path('exploratory-public-java-compile-only.json').read_text())
+          assert item['status'] == 'EXPLORATORY_PUBLIC_COMPILE_ONLY_UNREVIEWED'
+          assert item['task_count'] == 6 and item['original_io_cases'] == 27
+          assert item['io_cases_used_for_scoring'] == 0
+          assert item['v017']['evaluated'] == 6 and item['v018']['evaluated'] == 6
+          assert item['benchmark_independence_proven'] is False
+          assert item['java_executed'] is False
+          assert item['behavioral_status'] == 'NOT_RUN'
+          assert item['model_selection_permitted'] is False
+          assert 'public class Main' not in json.dumps(item)
+          PY
+      - name: Save diagnostic categories only; never persist generated Java
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: sagallm-public-java-compile-diagnostic-unreviewed
+          path: exploratory-public-java-compile-only.json
+          retention-days: 30
+          if-no-files-found: error
