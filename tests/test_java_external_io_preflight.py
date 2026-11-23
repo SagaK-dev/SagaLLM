@@ -116,4 +116,4 @@ def test_cli_output_does_not_contain_cases_or_model_code(tmp_path):
     assert "GGACGGATTCTG" not in encoded
     assert '"java_executed": true' not in encoded
     assert report["candidate_assessment_only"] is True
-    assert report["human_reviewers_verified"] if "human_reviewers_verified" in report else True
+    assert report["actual_independent_human_reviews"] == 0
