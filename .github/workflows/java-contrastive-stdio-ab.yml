@@ -1,0 +1,130 @@
+name: SagaLLM Java prompt-conditioning contrastive stdin A/B (OCI)
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - '.github/workflows/java-contrastive-stdio-ab.yml'
+      - 'scripts/train_java_contrastive_stdio_ab.py'
+      - 'tests/test_java_contrastive_stdio_ab.py'
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: contrastive-java-stdio-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  fixed-matched-ab-in-disposable-vm:
+    # Only a one-off owner PR or explicit manual dispatch can run generated
+    # Java. Never use on fork PRs, main-push, or persistent self-hosted runner.
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      (github.event.pull_request.head.repo.full_name == github.repository &&
+       github.head_ref == 'experiment/java-contrastive-stdio-ab-44' &&
+       github.actor == 'SagaK-dev')
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    env:
+      OMP_NUM_THREADS: '2'
+      MKL_NUM_THREADS: '2'
+      PYTHONHASHSEED: '0'
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+      - name: Install CPU runtime and tests
+        run: |
+          python -m pip install 'torch>=2.3' --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install -e '.[fast-tokenizer,test]'
+      - name: Verify equal-exposure A/B and strict heldback separation (no generated code)
+        run: python -m pytest -q tests/test_java_contrastive_stdio_ab.py
+      - name: Obtain original pinned v0.18 checkpoint and tokenizer
+        uses: actions/download-artifact@v4
+        with:
+          name: sagallm-v018-java-context-sft-cpu
+          run-id: 44994208434
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: v018
+      - name: Verify immutable original model identity
+        run: |
+          echo '9802e848f0abea9979623f461b5e63cd7aed838acd087d06b20d747db1e2a0fc  v018/java-context-model/java-sft-best.pt' | sha256sum -c -
+          echo '186566808cb03e328cac9a6b7b384a8d0aefc54ccb83fbe97782a751726682fe  v018/java-context-model/tokenizer.json' | sha256sum -c -
+      - name: Deterministically regenerate full canonical TRAIN and synthetic stdin curriculum
+        run: |
+          python - <<'PY'
+          from sagallm.java_diverse_corpus import build_java_diverse_corpus, verify_java_diverse_corpus
+          from sagallm.java_stdio_curriculum import build_curriculum, verify_curriculum
+          print(build_java_diverse_corpus('canonical-java-data'))
+          print(verify_java_diverse_corpus('canonical-java-data'))
+          print(build_curriculum('stdio-java-data'))
+          print(verify_curriculum('stdio-java-data'))
+          PY
+      - name: Prepare short-lived VM local JDK image (no network when executing Java)
+        shell: bash
+        run: |
+          set -euo pipefail
+          docker info --format '{{.ServerVersion}}'
+          docker pull eclipse-temurin:21-jdk
+          docker image inspect eclipse-temurin:21-jdk --format '{{.Id}}' > local-oci-jdk-image-id.txt
+          grep -Eq '^sha256:[a-f0-9]{64}$' local-oci-jdk-image-id.txt
+      - name: Train matched interleaved/contrastive variants and grade 18 new behavior cases in isolated OCI
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m scripts.train_java_contrastive_stdio_ab \
+            --base v018/java-context-model/java-sft-best.pt \
+            --tokenizer v018/java-context-model/tokenizer.json \
+            --canonical canonical-java-data \
+            --stdio stdio-java-data \
+            --output contrastive-stdio-ab-evidence \
+            --oci-image-id "$(cat local-oci-jdk-image-id.txt)" \
+            --allow-oci --acknowledge-disposable-vm
+      - name: Verify matched examples, complete runtime and non-deployment
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p = Path('contrastive-stdio-ab-evidence/ab-report.json')
+          r = json.loads(p.read_text(encoding='utf8'))
+          assert r['status'] == 'MATCHED_AB_CONTRASTIVE_VALIDATION_COMPLETE'
+          assert r['experiment'] == 'JAVA_CONTRASTIVE_STDIO_MATCHED_AB_V1'
+          assert r['stdio_train_rows'] == 320
+          assert r['validation_examples'] == 36
+          assert r['holdback_excluded_from_loss_selection'] is True
+          assert r['schedule']['same_training_examples_both_arms'] is True
+          assert r['schedule']['same_original_broad_row_positions'] is True
+          assert r['original_test_split_accessed'] is False
+          assert r['public_exercism_data_accessed'] is False
+          assert r['oci_smoke'] == 'PASS'
+          assert r['baseline_behavior']['total_cases'] == 18
+          assert not r['baseline_behavior']['unavailable']
+          assert r['behavior_cases_per_model'] == 18
+          for arm in ('control_interleaved','contrastive_same_variant'):
+              x = r['arms_results'][arm]
+              assert x['training']['steps_completed'] == 160
+              assert x['behavior']['total_cases'] == 18
+              assert not x['behavior']['unavailable']
+              assert r['prompt_conditioning_diagnostics'][arm]['six_distinct_prompts'] == 6
+          assert r['gate']['production_adoption'] is False
+          assert r['checkpoint_auto_promoted'] is False
+          assert r['production_model_unchanged'] is True
+          assert r['generated_java_executed_on_host'] is False
+          assert 'public class Main' not in json.dumps(r)
+          PY
+      - name: Upload SHA-only prompt-collapse and validation outcomes, optional research weights
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: sagallm-contrastive-stdio-matched-validation-ab
+          path: |
+            contrastive-stdio-ab-evidence/ab-report.json
+            contrastive-stdio-ab-evidence/contrastive-validation-candidate.pt
+            stdio-java-data/manifest.json
+          retention-days: 30
+          if-no-files-found: error
