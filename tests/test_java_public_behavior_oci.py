@@ -88,6 +88,27 @@ def test_expected_original_io_is_only_passed_to_oci_no_host_java(monkeypatch):
     assert "GGACGGATTCTG" not in json.dumps(score)
 
 
+def test_separates_zero_exit_wrong_stdout_from_nonzero_java_exit(monkeypatch):
+    tasks, _, _ = exp.freeze_inputs(SUITE)
+    observed = iter([
+        {"status": "FAIL", "returncode": 0, "behavior_match": False},
+        {"status": "FAIL", "returncode": 1, "behavior_match": False},
+        {"status": "PASS", "returncode": 0, "behavior_match": True},
+        {"status": "TIMEOUT", "returncode": None, "behavior_match": False},
+        {"status": "OUTPUT_LIMIT", "returncode": None, "behavior_match": False},
+    ])
+    monkeypatch.setattr(exp, "run_java_in_oci", lambda *a, **k: next(observed))
+    result = exp.assess_task("class Main{}", tasks["ex_luhn"], image=IMAGE)
+    assert result["cases_passed"] == 1
+    assert result["task_status"] == "FAIL"
+    assert result["case_failure_categories"] == [
+        "OUTPUT_MISMATCH_ZERO_EXIT", "NONZERO_EXIT", "PASS",
+        "TIMEOUT", "OUTPUT_LIMIT",
+    ]
+    assert "stdout" not in json.dumps(result).lower()
+    assert "Main{}" not in json.dumps(result)
+
+
 def test_unavailable_oci_never_looks_like_behavior_failure_or_success(monkeypatch):
     tasks, _, _ = exp.freeze_inputs(SUITE)
     seq = iter(["PASS", "RUNTIME_ERROR", "PASS", "FAIL", "PASS"])
