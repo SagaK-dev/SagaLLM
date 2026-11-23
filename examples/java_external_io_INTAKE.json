@@ -1,0 +1,162 @@
+{
+  "schema": "sagallm-independent-java-io-v1",
+  "benchmark_id": "exercism_io_intake_2026",
+  "origin": "EXTERNAL_SOURCE_INTAKE_UNREVIEWED",
+  "review_status": "PENDING_HUMAN_REVIEW",
+  "provenance_url": "https://github.com/exercism/problem-specifications/tree/4812c213a2647e2034ad5ac78155ce9265cdd171/exercises",
+  "license_id": "NOT_REVIEWED",
+  "train_overlap_review": "NOT_REVIEWED",
+  "reviewers": [],
+  "tasks": [
+    {
+      "id": "ex_hamming",
+      "family": "dna_hamming_distance",
+      "prompt": "Write a Java 17 public class Main. Read two lines representing equally long DNA strands (possibly empty); count the positions where the characters differ, then print the integer count followed by one newline.",
+      "cases": [
+        {
+          "stdin": "A\nA\n",
+          "stdout": "0\n"
+        },
+        {
+          "stdin": "G\nT\n",
+          "stdout": "1\n"
+        },
+        {
+          "stdin": "GGACTGAAATCTG\nGGACTGAAATCTG\n",
+          "stdout": "0\n"
+        },
+        {
+          "stdin": "GGACGGATTCTG\nAGGACGGATTCT\n",
+          "stdout": "9\n"
+        }
+      ]
+    },
+    {
+      "id": "ex_rna_transcription",
+      "family": "dna_rna_complement",
+      "prompt": "Write a Java 17 public class Main. Read one line containing a DNA strand (which can be empty) using only A, C, G, T; print the RNA complement, mapping A to U, C to G, G to C, and T to A, followed by one newline.",
+      "cases": [
+        {
+          "stdin": "\n",
+          "stdout": "\n"
+        },
+        {
+          "stdin": "C\n",
+          "stdout": "G\n"
+        },
+        {
+          "stdin": "G\n",
+          "stdout": "C\n"
+        },
+        {
+          "stdin": "ACGTGGTCTTAA\n",
+          "stdout": "UGCACCAGAAUU\n"
+        }
+      ]
+    },
+    {
+      "id": "ex_luhn",
+      "family": "luhn_checksum",
+      "prompt": "Write a Java 17 public class Main. Read one input line containing a candidate Luhn number. ASCII spaces may be ignored; all other non-digits invalidate the value, as does fewer than two digits. Starting from the right, double every second digit, subtract 9 from products above 9, and accept iff the sum is divisible by 10. Print lowercase true or false followed by one newline.",
+      "cases": [
+        {
+          "stdin": "1\n",
+          "stdout": "false\n"
+        },
+        {
+          "stdin": "059\n",
+          "stdout": "true\n"
+        },
+        {
+          "stdin": "055 444 285\n",
+          "stdout": "true\n"
+        },
+        {
+          "stdin": "055 444 286\n",
+          "stdout": "false\n"
+        },
+        {
+          "stdin": "8273 1232 7352 0569\n",
+          "stdout": "false\n"
+        }
+      ]
+    },
+    {
+      "id": "ex_roman_numerals",
+      "family": "roman_numeral_conversion",
+      "prompt": "Write a Java 17 public class Main. Read a single integer from 1 through 3999 on standard input. Print its standard uppercase Roman numeral using subtractive forms IV, IX, XL, XC, CD and CM, followed by one newline.",
+      "cases": [
+        {
+          "stdin": "1\n",
+          "stdout": "I\n"
+        },
+        {
+          "stdin": "4\n",
+          "stdout": "IV\n"
+        },
+        {
+          "stdin": "9\n",
+          "stdout": "IX\n"
+        },
+        {
+          "stdin": "3999\n",
+          "stdout": "MMMCMXCIX\n"
+        }
+      ]
+    },
+    {
+      "id": "ex_allergies",
+      "family": "allergy_bitmask_lookup",
+      "prompt": "Write a Java 17 public class Main. Read an integer allergy score followed by an allergen name from one line. Assign the following bits: eggs=1, peanuts=2, shellfish=4, strawberries=8, tomatoes=16, chocolate=32, pollen=64, cats=128. Print lowercase true if the given allergen bit is present in the score, otherwise lowercase false, followed by one newline.",
+      "cases": [
+        {
+          "stdin": "0 eggs\n",
+          "stdout": "false\n"
+        },
+        {
+          "stdin": "1 eggs\n",
+          "stdout": "true\n"
+        },
+        {
+          "stdin": "3 eggs\n",
+          "stdout": "true\n"
+        },
+        {
+          "stdin": "2 eggs\n",
+          "stdout": "false\n"
+        },
+        {
+          "stdin": "255 eggs\n",
+          "stdout": "true\n"
+        }
+      ]
+    },
+    {
+      "id": "ex_atbash_cipher",
+      "family": "atbash_text_encoding",
+      "prompt": "Write a Java 17 public class Main. Read one line of text. Encode it using Atbash for the Latin alphabet (a maps to z, b maps to y, and so on); treat letters case-insensitively, preserve ASCII digits, discard spaces and punctuation, lowercase the output, and group the encoded text in blocks of five separated by one ASCII space. Print the encoded line followed by one newline.",
+      "cases": [
+        {
+          "stdin": "yes\n",
+          "stdout": "bvh\n"
+        },
+        {
+          "stdin": "OMG\n",
+          "stdout": "lnt\n"
+        },
+        {
+          "stdin": "mindblowingly\n",
+          "stdout": "nrmwy oldrm tob\n"
+        },
+        {
+          "stdin": "Testing,1 2 3, testing.\n",
+          "stdout": "gvhgr mt123 gvhgr mt\n"
+        },
+        {
+          "stdin": "Truth is fiction.\n",
+          "stdout": "gifgs rhurx grlm\n"
+        }
+      ]
+    }
+  ]
+}
