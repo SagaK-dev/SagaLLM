@@ -117,8 +117,10 @@ def _bounded_capture(argv: list[str], timeout: float, output_cap: int = MAX_OUTP
     """Avoid unbounded host-side stdout capture, even if model code prints forever."""
     if os.name != "posix":
         raise RuntimeError("Bounded OCI execution currently requires POSIX (use Linux/WSL)")
+    # Evaluate stdout only. Compiler/runtime stderr must never make a wrong
+    # stdout-only model answer appear correct, and is not persisted.
     process = subprocess.Popen(argv, stdin=subprocess.DEVNULL, stdout=subprocess.PIPE,
-                               stderr=subprocess.STDOUT, start_new_session=True)
+                               stderr=subprocess.DEVNULL, start_new_session=True)
     assert process.stdout is not None
     observed = bytearray()
     selector = selectors.DefaultSelector()
@@ -209,7 +211,7 @@ def run_java_in_oci(source: str, expected: str, *, backend: str = "docker",
         except OSError:
             _cleanup_stale_container(backend, cid_file)
             return {"status": "RUNTIME_ERROR", "behavior_match": None, "returncode": None}
-        if code in (125, 126):
+        if code in (125, 126, 127):
             return {"status": "RUNTIME_ERROR", "behavior_match": None,
                     "reason": "OCI launcher failed; not a Java behavior failure", "returncode": code}
         match = (code == 0 and output == expected.encode("utf-8"))
