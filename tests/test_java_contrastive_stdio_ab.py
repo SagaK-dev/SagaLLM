@@ -89,7 +89,7 @@ def test_no_behavior_task_can_enter_loss_selection():
     assert len(id_set) == 6
     assert {item["family"] for item, _ in heldback} == set(VALIDATION_FAMILIES)
     assert all(item["id"].endswith(("-002", "-003")) for item, _ in heldback)
-    with pytest.raises(ValueError, match="required"):
+    with pytest.raises(ValueError, match="excluded"):
         ab.fixed_behavior_only(valid[:2])
 
 
