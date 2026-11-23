@@ -1,0 +1,147 @@
+{
+  "schema": "sagallm-external-java-io-intake-v1",
+  "source_repository": "exercism/problem-specifications",
+  "source_revision": "4812c213a2647e2034ad5ac78155ce9265cdd171",
+  "source_license_file": "https://github.com/exercism/problem-specifications/blob/4812c213a2647e2034ad5ac78155ce9265cdd171/LICENSE",
+  "source_license_git_blob_sha1": "6813d6298df9a46da6485050e8a5fcd61ab79879",
+  "upstream_repo_license_label": "MIT - source repository only; exercise-level provenance still requires review",
+  "candidate_suite": "java_external_io_INTAKE.json",
+  "candidate_is_not_approved": true,
+  "reviewers_attested": 0,
+  "semantic_overlap_audited": false,
+  "java_executed": false,
+  "model_generated_outputs_evaluated": false,
+  "console_adapter_author": "assistant, unreviewed",
+  "copyright_notice": "Copyright (c) 2014, 2019, 2021 Exercism",
+  "sources": [
+    {
+      "task_id": "ex_hamming",
+      "exercise": "hamming",
+      "family": "dna_hamming_distance",
+      "canonical_data_path": "exercises/hamming/canonical-data.json",
+      "canonical_data_git_blob_sha1": "93b438b75f2953b154b407eb73d3f63dadbe9ef9",
+      "metadata_path": "exercises/hamming/metadata.toml",
+      "metadata_git_blob_sha1": "320d71cddf972b51cd501a75ca51dace670fe441",
+      "metadata_source": "The Calculating Point Mutations problem at Rosalind",
+      "metadata_source_url": "https://rosalind.info/problems/hamm/",
+      "test_property": "distance",
+      "selected_case_uuids": [
+        "54681314-eee2-439a-9db0-b0636c656156",
+        "294479a3-a4c8-478f-8d63-6209815a827b",
+        "9aed5f34-5693-4344-9b31-40c692fb5592",
+        "cd2273a5-c576-46c8-a52b-dee251c3e6e5"
+      ],
+      "console_adapter": "ASSISTANT_DRAFT_UNREVIEWED",
+      "source_license_review": "PENDING_HUMAN_REVIEW",
+      "semantic_overlap_review": "PENDING_HUMAN_REVIEW"
+    },
+    {
+      "task_id": "ex_rna_transcription",
+      "exercise": "rna-transcription",
+      "family": "dna_rna_complement",
+      "canonical_data_path": "exercises/rna-transcription/canonical-data.json",
+      "canonical_data_git_blob_sha1": "d05146ed00c9af5eaeedf7a1fb2292e305420ed9",
+      "metadata_path": "exercises/rna-transcription/metadata.toml",
+      "metadata_git_blob_sha1": "4b495a9a0990bd301b0ef733fcbe2edf414e3052",
+      "metadata_source": "Hyperphysics",
+      "metadata_source_url": "https://web.archive.org/web/20220408112140/http://hyperphysics.phy-astr.gsu.edu/hbase/Organic/transcription.html",
+      "test_property": "toRna",
+      "selected_case_uuids": [
+        "b4631f82-c98c-4a2f-90b3-c5c2b6c6f661",
+        "a9558a3c-318c-4240-9256-5d5ed47005a6",
+        "6eedbb5c-12cb-4c8b-9f51-f8320b4dc2e7",
+        "79ed2757-f018-4f47-a1d7-34a559392dbf"
+      ],
+      "console_adapter": "ASSISTANT_DRAFT_UNREVIEWED",
+      "source_license_review": "PENDING_HUMAN_REVIEW",
+      "semantic_overlap_review": "PENDING_HUMAN_REVIEW"
+    },
+    {
+      "task_id": "ex_luhn",
+      "exercise": "luhn",
+      "family": "luhn_checksum",
+      "canonical_data_path": "exercises/luhn/canonical-data.json",
+      "canonical_data_git_blob_sha1": "78174b9128a1666ce43190eaafb6b00cd3c33479",
+      "metadata_path": "exercises/luhn/metadata.toml",
+      "metadata_git_blob_sha1": "5c2924db9de766bafbf6c6ce60784efc3051ccec",
+      "metadata_source": "The Luhn Algorithm on Wikipedia",
+      "metadata_source_url": "https://en.wikipedia.org/wiki/Luhn_algorithm",
+      "test_property": "valid",
+      "selected_case_uuids": [
+        "792a7082-feb7-48c7-b88b-bbfec160865e",
+        "73c2f62b-9b10-4c9f-9a04-83cee7367965",
+        "8f9f2350-1faf-4008-ba84-85cbb93ffeca",
+        "1cdcf269-6560-44fc-91f6-5819a7548737",
+        "656c48c1-34e8-4e60-9a5a-aad8a367810a"
+      ],
+      "console_adapter": "ASSISTANT_DRAFT_UNREVIEWED",
+      "source_license_review": "PENDING_HUMAN_REVIEW",
+      "semantic_overlap_review": "PENDING_HUMAN_REVIEW"
+    },
+    {
+      "task_id": "ex_roman_numerals",
+      "exercise": "roman-numerals",
+      "family": "roman_numeral_conversion",
+      "canonical_data_path": "exercises/roman-numerals/canonical-data.json",
+      "canonical_data_git_blob_sha1": "1edb968d321bc4b9473e446a5d3f1daa173a4d56",
+      "metadata_path": "exercises/roman-numerals/metadata.toml",
+      "metadata_git_blob_sha1": "16ddf8c335cdf234b6c7aca2b5ac784e9cdf2082",
+      "metadata_source": "The Roman Numeral Kata",
+      "metadata_source_url": "https://codingdojo.org/kata/RomanNumerals/",
+      "test_property": "roman",
+      "selected_case_uuids": [
+        "19828a3a-fbf7-4661-8ddd-cbaeee0e2178",
+        "05a0a1d4-a140-4db1-82e8-fcc21fdb49bb",
+        "ff3fb08c-4917-4aab-9f4e-d663491d083d",
+        "4e18e96b-5fbb-43df-a91b-9cb511fe0856"
+      ],
+      "console_adapter": "ASSISTANT_DRAFT_UNREVIEWED",
+      "source_license_review": "PENDING_HUMAN_REVIEW",
+      "semantic_overlap_review": "PENDING_HUMAN_REVIEW"
+    },
+    {
+      "task_id": "ex_allergies",
+      "exercise": "allergies",
+      "family": "allergy_bitmask_lookup",
+      "canonical_data_path": "exercises/allergies/canonical-data.json",
+      "canonical_data_git_blob_sha1": "8fcc359a472dcd70773663e0b039a1d75796d123",
+      "metadata_path": "exercises/allergies/metadata.toml",
+      "metadata_git_blob_sha1": "9c15b4c1cf7827407338402bd8aa345770b51c27",
+      "metadata_source": "Exercise by the JumpstartLab team for students at The Turing School of Software and Design.",
+      "metadata_source_url": "https://www.turing.edu/",
+      "test_property": "allergicTo",
+      "selected_case_uuids": [
+        "17fc7296-2440-4ac4-ad7b-d07c321bc5a0",
+        "07ced27b-1da5-4c2e-8ae2-cb2791437546",
+        "5035b954-b6fa-4b9b-a487-dae69d8c5f96",
+        "64a6a83a-5723-4b5b-a896-663307403310",
+        "90c8f484-456b-41c4-82ba-2d08d93231c6"
+      ],
+      "console_adapter": "ASSISTANT_DRAFT_UNREVIEWED",
+      "source_license_review": "PENDING_HUMAN_REVIEW",
+      "semantic_overlap_review": "PENDING_HUMAN_REVIEW"
+    },
+    {
+      "task_id": "ex_atbash_cipher",
+      "exercise": "atbash-cipher",
+      "family": "atbash_text_encoding",
+      "canonical_data_path": "exercises/atbash-cipher/canonical-data.json",
+      "canonical_data_git_blob_sha1": "984ea2d6be61592eaa54e3cd434f47646db8bb1d",
+      "metadata_path": "exercises/atbash-cipher/metadata.toml",
+      "metadata_git_blob_sha1": "aa2098892180f717cdd6d562c846252ccfe1a302",
+      "metadata_source": "Wikipedia",
+      "metadata_source_url": "https://en.wikipedia.org/wiki/Atbash",
+      "test_property": "encode",
+      "selected_case_uuids": [
+        "2f47ebe1-eab9-4d6b-b3c6-627562a31c77",
+        "10e48927-24ab-4c4d-9d3f-3067724ace00",
+        "31d44b11-81b7-4a94-8b43-4af6a2449429",
+        "d503361a-1433-48c0-aae0-d41b5baa33ff",
+        "79c8a2d5-0772-42d4-b41b-531d0b5da926"
+      ],
+      "console_adapter": "ASSISTANT_DRAFT_UNREVIEWED",
+      "source_license_review": "PENDING_HUMAN_REVIEW",
+      "semantic_overlap_review": "PENDING_HUMAN_REVIEW"
+    }
+  ]
+}
