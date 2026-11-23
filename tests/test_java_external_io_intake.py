@@ -60,7 +60,7 @@ def test_external_packet_license_and_blob_identity():
     assert _blob_sha1(raw) == LICENSE_BLOB_SHA1
     assert b"The MIT License" in raw
     assert b"Copyright (c) 2014, 2019, 2021 Exercism" in raw
-    assert _blob_sha1(b"hi") == "32f6e19b3b9b67e973d8a3083f3f9863f034b7a8"
+    assert _blob_sha1(b"hi") == "32f95c0d1244a78b2be1bab8de17906fabb2c4a8"
 
 
 def test_known_canonical_case_adapters_are_explicit_and_bounded():
