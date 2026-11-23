@@ -1,0 +1,56 @@
+name: SagaLLM reliable deterministic Java stdin templates
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/java-stdio-deterministic.yml'
+      - 'src/sagallm/java_stdio_templates.py'
+      - 'src/sagallm/cli.py'
+      - 'tests/test_java_stdio_templates.py'
+      - 'docs/JAVA_STDIO_TEMPLATES.md'
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/java-stdio-deterministic.yml'
+      - 'src/sagallm/java_stdio_templates.py'
+      - 'src/sagallm/cli.py'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  deterministic-reference-stdiotests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '21'
+      - name: Install tests and project
+        run: |
+          python -m pip install 'torch>=2.3' --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install -e '.[test]'
+      - name: Compile trusted deterministic Java 17 and check 39 exact I/O outputs
+        run: python -m pytest -q tests/test_java_stdio_templates.py
+      - name: Check explicit CLI does not execute code or load a checkpoint
+        run: |
+          python -m sagallm.cli java stdio \
+            --operation sum-two --offset 3 --output example-stdio
+          python - <<'PY'
+          import hashlib,json
+          from pathlib import Path
+          p = Path('example-stdio')
+          metadata = json.loads((p/'manifest.json').read_text())
+          source = (p/'Main.java').read_bytes()
+          assert metadata['mode'] == 'DETERMINISTIC_STDIO_TEMPLATE_NOT_LLM'
+          assert metadata['source_sha256'] == hashlib.sha256(source).hexdigest()
+          assert metadata['java_executed'] is False
+          assert metadata['model_used'] is False
+          assert b'System.in' in source and b'System.out.println' in source
+          PY

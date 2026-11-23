@@ -54,6 +54,19 @@ def main(argv: list[str] | None = None) -> None:
     jnew.add_argument("--output", required=True, help="New project directory; never overwrite")
     jnew.add_argument("--class-name", default="Main")
     jnew.add_argument("--template", choices=("hello", "calculator", "fizzbuzz", "guess", "todo", "prime", "factorial", "file", "swing"))
+    jstdio = js.add_parser("stdio", help="Reliable typed stdin->algorithm->stdout templates (NOT an LLM)")
+    jstdio.add_argument("--operation", required=True,
+                         choices=("sum-two", "product-two", "min-two", "max-two",
+                                  "absolute-gap", "count-greater", "sum-even",
+                                  "count-odd", "digit-sum", "upper-line",
+                                  "lower-line", "reverse-line", "clamp"))
+    jstdio.add_argument("--output", required=True, help="NEW output directory for Java source")
+    jstdio.add_argument("--class-name", default="Main")
+    jstdio.add_argument("--offset", type=int, default=0)
+    jstdio.add_argument("--threshold", type=int, default=0)
+    jstdio.add_argument("--lower-bound", type=int, default=-10)
+    jstdio.add_argument("--upper-bound", type=int, default=10)
+    jstdio.add_argument("--suffix", default="")
     jrev = js.add_parser("revise", help="Preview or apply a supported conversational revision")
     jrev.add_argument("--project", required=True)
     jrev.add_argument("--prompt", required=True)
@@ -242,6 +255,14 @@ def main(argv: list[str] | None = None) -> None:
             result = {"supported": TEMPLATES, "mode": "deterministic", "llm_based": False}
         elif args.action == "new":
             result = create_project(args.output, args.prompt, template=args.template, class_name=args.class_name)
+        elif args.action == "stdio":
+            from .java_stdio_templates import create_stdio_program
+            result = create_stdio_program(
+                args.output, args.operation, class_name=args.class_name,
+                offset=args.offset, threshold=args.threshold,
+                lower_bound=args.lower_bound, upper_bound=args.upper_bound,
+                suffix=args.suffix,
+            )
         elif args.action == "revise":
             result = propose_revision(args.project, args.prompt, apply=args.apply)
         elif args.action == "check":
