@@ -62,7 +62,7 @@ def test_packet_detects_prompt_edit_that_could_bypass_basic_oracles(tmp_path):
     suite["tasks"][0]["prompt"] += " (different prompt without human approval)"
     suite_file.write_text(json.dumps(suite), encoding="utf8")
     # Oracle checks alone do not pin task prose; the frozen SHA does.
-    with pytest.raises(ValueError, match="approval gate moved"):
+    with pytest.raises(ValueError, match="approval gate changed"):
         render(packet)
 
 
