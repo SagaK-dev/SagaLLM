@@ -35,7 +35,6 @@ def test_stdin_curriculum_is_family_disjoint_and_has_no_test_split():
 def test_all_examples_use_explicit_stdin_and_newline_stdout():
     for split in SPLITS:
         for row in expected_rows(split):
-            assert "standard input" not in row["messages"][1]["content"].lower() or True
             source = row["messages"][1]["content"]
             assert "public class Main" in source
             assert "new java.util.Scanner(System.in)" in source
