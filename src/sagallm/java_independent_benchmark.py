@@ -153,6 +153,7 @@ def _candidate(path: Path) -> str | None:
 
 def evaluate_suite(suite_path: Path, candidate_dir: Path, *,
                    allow_execution: bool = False, expected_suite_sha256: str | None = None,
+                   disposable_vm_acknowledged: bool = False,
                    backend: str = "docker", image: str = "eclipse-temurin:21-jdk") -> dict:
     suite, fingerprint, protocol = read_suite(suite_path)
     result = {
@@ -171,6 +172,9 @@ def evaluate_suite(suite_path: Path, candidate_dir: Path, *,
     }
     if not allow_execution:
         result["reason"] = "EXPLICIT_OPT_IN_REQUIRED"
+        return result
+    if not disposable_vm_acknowledged:
+        result["reason"] = "DISPOSABLE_VM_ACKNOWLEDGEMENT_REQUIRED"
         return result
     if protocol["review_gate"] != "ELIGIBLE_SELF_ATTESTED":
         result["reason"] = "HUMAN_REVIEW_REQUIRED"
@@ -194,6 +198,7 @@ def evaluate_suite(suite_path: Path, candidate_dir: Path, *,
         task_id = task["id"]
         code = _candidate(candidate_dir / (task_id + ".java"))
         if code is None:
+            any_unavailable = True
             results.append({"id": task_id, "status": "CANDIDATE_MISSING",
                             "cases_passed": 0, "cases_total": len(task["cases"])})
             continue
@@ -217,7 +222,8 @@ def evaluate_suite(suite_path: Path, candidate_dir: Path, *,
         "behavioral_status": "PARTIAL_OR_UNAVAILABLE" if any_unavailable else "EVALUATED",
         "behavior_passed_tasks": (None if any_unavailable else
                                   sum(x["status"] == "PASS" for x in results)),
-        "java_executed": True,
+        "java_executed": "POSSIBLE_IN_OCI_ONLY",
+        "oci_execution_attempted": True,
         "model_selection": "NOT_PERMITTED_NO_INDEPENDENCE_PROOF",
         "results": results,
         "source_persisted": False,
