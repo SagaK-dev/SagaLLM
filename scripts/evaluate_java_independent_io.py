@@ -1,0 +1,47 @@
+"""Validate prospective independent Java tasks and optionally run I/O in OCI.
+
+Default is NOT_RUN. This script never invokes Java unless all separate gates
+are satisfied: human-review self-attestation, exact suite SHA-256, explicit
+execution opt-in, explicit disposable-VM acknowledgement, and local OCI image.
+Never use host Java to execute model-generated code.
+"""
+from __future__ import annotations
+
+import argparse
+import json
+from pathlib import Path
+
+from sagallm.java_independent_benchmark import evaluate_suite
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--suite", required=True, type=Path)
+    parser.add_argument("--candidate-dir", required=True, type=Path)
+    parser.add_argument("--output", required=True, type=Path)
+    parser.add_argument("--allow-execution", action="store_true")
+    parser.add_argument("--acknowledge-disposable-vm", action="store_true")
+    parser.add_argument("--expected-suite-sha256")
+    parser.add_argument("--backend", choices=["docker", "podman"], default="docker")
+    parser.add_argument("--image", default="eclipse-temurin:21-jdk")
+    args = parser.parse_args()
+    if args.output.exists() or args.output.is_symlink():
+        raise FileExistsError("Refuse to overwrite behavioral evidence")
+    result = evaluate_suite(
+        args.suite, args.candidate_dir,
+        allow_execution=args.allow_execution,
+        disposable_vm_acknowledged=args.acknowledge_disposable_vm,
+        expected_suite_sha256=args.expected_suite_sha256,
+        backend=args.backend, image=args.image,
+    )
+    with args.output.open("x", encoding="utf-8") as handle:
+        json.dump(result, handle, ensure_ascii=False, sort_keys=True, indent=2)
+        handle.write("\n")
+    print(json.dumps({
+        key: value for key, value in result.items()
+        if key not in ("results",)
+    }, ensure_ascii=False, sort_keys=True))
+
+
+if __name__ == "__main__":
+    main()

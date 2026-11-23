@@ -87,7 +87,8 @@ def oci_image_ready(backend: str, image: str) -> bool:
         return False
 
 
-def build_oci_command(backend: str, *, image: str, mount_dir: Path, cid_file: Path) -> list[str]:
+def build_oci_command(backend: str, *, image: str, mount_dir: Path, cid_file: Path,
+                      stdin_file_present: bool = False) -> list[str]:
     """Return an argv list; no generated text is ever interpolated as shell code."""
     if backend not in ALLOWED_BACKENDS:
         raise ValueError("Unsupported local OCI backend")
@@ -99,6 +100,7 @@ def build_oci_command(backend: str, *, image: str, mount_dir: Path, cid_file: Pa
         "mkdir -p /tmp/classes && "
         "javac -proc:none -encoding UTF-8 -d /tmp/classes /input/Main.java && "
         "java -Xmx64m -Dfile.encoding=UTF-8 -cp /tmp/classes Main"
+        + (" < /input/stdin.txt" if stdin_file_present else "")
     )
     return [
         backend, "run", "--rm", "--pull=never", "--cidfile", str(cid_file),
@@ -115,8 +117,10 @@ def _bounded_capture(argv: list[str], timeout: float, output_cap: int = MAX_OUTP
     """Avoid unbounded host-side stdout capture, even if model code prints forever."""
     if os.name != "posix":
         raise RuntimeError("Bounded OCI execution currently requires POSIX (use Linux/WSL)")
+    # Evaluate stdout only. Compiler/runtime stderr must never make a wrong
+    # stdout-only model answer appear correct, and is not persisted.
     process = subprocess.Popen(argv, stdin=subprocess.DEVNULL, stdout=subprocess.PIPE,
-                               stderr=subprocess.STDOUT, start_new_session=True)
+                               stderr=subprocess.DEVNULL, start_new_session=True)
     assert process.stdout is not None
     observed = bytearray()
     selector = selectors.DefaultSelector()
@@ -159,7 +163,7 @@ def _cleanup_stale_container(backend: str, cid_file: Path) -> None:
 
 def run_java_in_oci(source: str, expected: str, *, backend: str = "docker",
                     image: str = JAVA_IMAGE_DEFAULT, allow_execution: bool = False,
-                    timeout: float = 12.0) -> dict:
+                    timeout: float = 12.0, stdin_data: str = "") -> dict:
     """Run a generated single-file Java program only with explicit local OCI opt-in.
 
     Does not pull images, mount the user's working directory or forward network.
@@ -177,6 +181,9 @@ def run_java_in_oci(source: str, expected: str, *, backend: str = "docker",
         return {"status": "REJECTED", "reason": "Invalid/oversized Java source", "behavior_match": None}
     if not isinstance(expected, str) or len(expected.encode("utf-8")) > MAX_OUTPUT_BYTES:
         raise ValueError("Invalid/oversized reference output")
+    if (not isinstance(stdin_data, str) or "\x00" in stdin_data or
+            len(stdin_data.encode("utf-8")) > 4096):
+        raise ValueError("Invalid/oversized standard input")
     with tempfile.TemporaryDirectory(prefix="sagallm-oci-java-") as td:
         root = Path(td)
         source_dir = root / "source"
@@ -184,10 +191,15 @@ def run_java_in_oci(source: str, expected: str, *, backend: str = "docker",
         source_file = source_dir / "Main.java"
         source_file.write_text(source, encoding="utf-8")
         source_file.chmod(0o644)
+        if stdin_data:
+            stdin_file = source_dir / "stdin.txt"
+            stdin_file.write_text(stdin_data, encoding="utf-8")
+            stdin_file.chmod(0o644)
         # Docker's unprivileged uid must traverse all source path components.
         root.chmod(0o755)
         cid_file = root / "container.cid"
-        cmd = build_oci_command(backend, image=image, mount_dir=source_dir, cid_file=cid_file)
+        cmd = build_oci_command(backend, image=image, mount_dir=source_dir,
+                                cid_file=cid_file, stdin_file_present=bool(stdin_data))
         try:
             code, output = _bounded_capture(cmd, timeout)
         except (TimeoutError, subprocess.TimeoutExpired):
@@ -199,7 +211,7 @@ def run_java_in_oci(source: str, expected: str, *, backend: str = "docker",
         except OSError:
             _cleanup_stale_container(backend, cid_file)
             return {"status": "RUNTIME_ERROR", "behavior_match": None, "returncode": None}
-        if code in (125, 126):
+        if code in (125, 126, 127):
             return {"status": "RUNTIME_ERROR", "behavior_match": None,
                     "reason": "OCI launcher failed; not a Java behavior failure", "returncode": code}
         match = (code == 0 and output == expected.encode("utf-8"))
