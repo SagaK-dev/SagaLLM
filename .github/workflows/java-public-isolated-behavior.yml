@@ -1,0 +1,115 @@
+name: SagaLLM public Java behavior in ephemeral VM + isolated OCI
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - '.github/workflows/java-public-isolated-behavior.yml'
+      - 'scripts/evaluate_java_public_behavior_oci.py'
+      - 'tests/test_java_public_behavior_oci.py'
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  isolated-model-java-io:
+    # Explicit owner branch for the one-off requested study. No fork PRs and
+    # no automatic push/main trigger can execute untrusted Java.
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      (github.event.pull_request.head.repo.full_name == github.repository &&
+       github.head_ref == 'experiment/java-oci-behavior-41' &&
+       github.actor == 'SagaK-dev')
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    env:
+      OMP_NUM_THREADS: '2'
+      MKL_NUM_THREADS: '2'
+      PYTHONHASHSEED: '0'
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+      - name: Install pinned-model CPU dependencies (no Java model execution)
+        run: |
+          python -m pip install 'torch>=2.3' --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install -e '.[fast-tokenizer,test]'
+      - name: Verify fail-closed isolation unit tests (mock-only)
+        run: python -m pytest -q tests/test_java_public_behavior_oci.py
+      - name: Download pinned original model checkpoints
+        uses: actions/download-artifact@v4
+        with:
+          name: sagallm-v017-java-instruction-sft-cpu
+          run-id: 44982940959
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: v017
+      - uses: actions/download-artifact@v4
+        with:
+          name: sagallm-v018-java-context-sft-cpu
+          run-id: 44994208434
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: v018
+      - name: Verify exact pinned checkpoint/tokenizer hashes
+        run: |
+          echo 'a17268d80ff443e4a0347f3a29df433556506f13537c78ce282836fa8fe4e5f9  v017/java-sft-model/java-sft-best.pt' | sha256sum -c -
+          echo '9802e848f0abea9979623f461b5e63cd7aed838acd087d06b20d747db1e2a0fc  v018/java-context-model/java-sft-best.pt' | sha256sum -c -
+          echo '186566808cb03e328cac9a6b7b384a8d0aefc54ccb83fbe97782a751726682fe  v017/java-sft-model/tokenizer.json' | sha256sum -c -
+          echo 'd1af64a934c304f04b2cfa822280c73cb7da7b64d09e83f62b071b945a244c74  examples/java_external_io_INTAKE.json' | sha256sum -c -
+      - name: Prepare disposable per-job VM OCI daemon and local JDK IMAGE ID
+        shell: bash
+        run: |
+          set -euo pipefail
+          # Network is used only to fetch the JDK image BEFORE running
+          # generated Java. Docker container execution always has --network=none
+          # and --pull=never. The immutable local image ID is stored in report.
+          docker info --format '{{.ServerVersion}}'
+          docker pull eclipse-temurin:21-jdk
+          docker image inspect eclipse-temurin:21-jdk --format '{{.Id}}' > oci-image-id.txt
+          grep -Eq '^sha256:[0-9a-f]{64}$' oci-image-id.txt
+      - name: Verify OCI Java smoke and execute only four SHA-locked generated programs
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m scripts.evaluate_java_public_behavior_oci \
+            --v017 v017/java-sft-model/java-sft-best.pt \
+            --v018 v018/java-context-model/java-sft-best.pt \
+            --tokenizer v017/java-sft-model/tokenizer.json \
+            --suite examples/java_external_io_INTAKE.json \
+            --oci-image-id "$(cat oci-image-id.txt)" \
+            --allow-unreviewed-public-execution \
+            --acknowledge-disposable-vm \
+            --output exploratory-public-java-oci-io.json
+      - name: Enforce real OCI evidence and never claim human review
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          r = json.loads(Path('exploratory-public-java-oci-io.json').read_text())
+          assert r['status'] == 'EXPLORATORY_PUBLIC_UNREVIEWED_ISOLATED_IO'
+          assert r['oci_smoke'] == 'PASS'
+          assert r['matched_previous_compiles'] == 4
+          assert r['attempted_cases_across_models'] == 19
+          assert r['v017']['io_cases_attempted'] == 10
+          assert r['v018']['io_cases_attempted'] == 9
+          assert r['v017']['status'] == 'EVALUATED'
+          assert r['v018']['status'] == 'EVALUATED'
+          assert r['independent_benchmark_approval'] is False
+          assert r['model_selection_permitted'] is False
+          assert r['human_review_status'] == 'REVIEW_REQUIRED'
+          assert r['model_updated'] is False
+          assert r['java_execution'] == 'OCI_ONLY'
+          assert r['generated_source_persisted'] is False
+          assert 'public class Main' not in json.dumps(r)
+          PY
+      - name: Upload per-case verdicts and isolated VM metadata ONLY
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: sagallm-public-java-isolated-behavior-unreviewed
+          path: exploratory-public-java-oci-io.json
+          retention-days: 30
+          if-no-files-found: ignore
