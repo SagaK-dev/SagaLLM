@@ -109,6 +109,7 @@ def frozen_model_source(model, tokenizer, model_version: str, task_id: str) -> s
 def assess_task(source: str, task: dict, *, image: str) -> dict:
     """Run ONLY through OCI with per-case fresh containers and bounded inputs."""
     statuses = []
+    failure_kinds = []
     for case in task["cases"]:
         outcome = run_java_in_oci(
             source, case["stdout"], backend="docker", image=image,
@@ -119,11 +120,23 @@ def assess_task(source: str, task: dict, *, image: str) -> dict:
                           "RUNTIME_ERROR", "NOT_RUN", "REJECTED"):
             raise ValueError("Unrecognized OCI outcome")
         statuses.append(status)
+        # Only retain a fixed failure reason, never raw stdout/stderr or source.
+        # FAIL with exit 0 is a *real output mismatch*. Nonzero exits may
+        # reflect malformed Java runtime logic, not compilation failure.
+        if status == "FAIL":
+            exit_code = outcome.get("returncode")
+            failure_kinds.append(
+                "OUTPUT_MISMATCH_ZERO_EXIT" if exit_code == 0 else
+                "NONZERO_EXIT" if type(exit_code) is int else
+                "FAIL_UNKNOWN_EXIT")
+        else:
+            failure_kinds.append(status)
     unavailable = any(code in ("NOT_RUN", "RUNTIME_ERROR") for code in statuses)
     return {
         "id": task["id"], "cases_total": len(statuses),
         "cases_passed": sum(s == "PASS" for s in statuses),
         "case_statuses": statuses,  # no raw input or stdout
+        "case_failure_categories": failure_kinds,
         "task_status": ("UNAVAILABLE" if unavailable else
                         "PASS" if all(s == "PASS" for s in statuses) else "FAIL"),
         "generated_source_stored": False,
