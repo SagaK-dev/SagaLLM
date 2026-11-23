@@ -204,3 +204,17 @@ def test_stdin_is_only_fixed_readonly_oci_input_and_never_shell_interpolated(tmp
     with pytest.raises(ValueError):
         run_java_in_oci("public class Main {}", "", stdin_data="x" * 4097,
                         allow_execution=True)
+
+
+
+def test_stdout_grading_ignores_stderr_from_subprocess():
+    # Safe Python fixture, NOT Java model code or a container bypass.
+    import sys
+    from sagallm.java_behavior import _bounded_capture
+    code, output = _bounded_capture([
+        sys.executable, "-c",
+        "import sys;sys.stderr.write('expected-but-wrong\\n');"
+        "sys.stdout.write('actual\\n')",
+    ], timeout=4)
+    assert code == 0
+    assert output == b"actual\n"
