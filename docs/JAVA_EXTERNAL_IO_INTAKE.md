@@ -96,3 +96,48 @@ No generated Java is executed or compiled by this audit.
 The manifest/JSON fields must **not** be changed to approved status just
 because the source blobs match. Upstream authorship, licensing, semantic
 overlap and actual reviewer attestation remain unverified.
+
+
+## Additional pre-review consistency audit (Python only)
+
+The companion module `java_external_io_preflight.py` independently computes
+the expected answer for every selected stdin case with **six small Python
+algorithms** and compares it with the 27 pinned Exercism-derived outputs.
+This checks the proposed console adaptation; it does not execute the Java
+model, test Java implementations, or provide independent human review.
+
+Run:
+
+```bash
+PYTHONPATH=src python scripts/audit_java_external_io_preflight.py \
+  --root . --output java-io-pre-review-audit.json
+```
+
+The report records `PRE_REVIEW_ORACLE_CHECKS_PASS` only when all 27 vectors
+match these separately implemented Python specifications. This is still a
+machine-level consistency check, not proof that the underlying problem
+wording, input handling, or test coverage is complete.
+
+### Suggested review priorities
+
+| External exercise | Related SagaLLM curriculum topics, not proven same problem | Missing coverage in this selected set |
+| --- | --- | --- |
+| Hamming | `char_count`, `array_count_greater` (train) | Unequal-length errors excluded |
+| RNA Transcription | `replace`, `lower` (train) | Individual A and T cases excluded |
+| Luhn | `digit_sum`, `numeric_string`, `divisible` (train) | Punctuation, tabs, empty/space-only |
+| Roman Numerals | `hex_format`, `binary_format` (train) | No individual 40/90/400/900 cases |
+| Allergies | `bit_count`, `power_two` (train); `set_intersection` (validation) | Only the eggs bit is tested |
+| Atbash Cipher | `replace`, `lower` (train); `reverse_string` (validation) | Decode and Unicode not tested |
+
+**Important:** These are manual review leads picked from confirmed existing
+family names, not an automated semantic-overlap score or contamination proof.
+An exact family-label mismatch is a weak filter. Public Exercism materials
+also have significant exposure and may have been present in model pretraining.
+The validator intentionally leaves `conceptual_overlap_resolved=false`,
+`independence_proven=false`, `review_gate=REVIEW_REQUIRED`,
+and `behavior=NOT_RUN`.
+
+The source attribution and ownership chain must be assessed by qualified
+human reviewers, including whether public Exercism canonical test cases
+and assistant-generated Java console adapters are licensed and fit for the
+intended use. No placeholder or AI-generated reviewer identity may be used.
