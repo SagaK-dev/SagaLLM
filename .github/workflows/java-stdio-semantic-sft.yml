@@ -1,0 +1,129 @@
+name: SagaLLM Java stdin / algorithm / stdout SFT validation
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - '.github/workflows/java-stdio-semantic-sft.yml'
+      - 'src/sagallm/java_stdio_curriculum.py'
+      - 'scripts/train_java_stdio_semantic_sft.py'
+      - 'tests/test_java_stdio_curriculum.py'
+      - 'tests/test_java_stdio_semantic_sft.py'
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: java-stdio-semantic-sft-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  train-validate-in-ephemeral-vm:
+    # One-off evaluation of generated Java requires an isolated GH-hosted VM.
+    # Never execute on fork PRs, main push, or a persistent self-hosted runner.
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      (github.event.pull_request.head.repo.full_name == github.repository &&
+       github.head_ref == 'experiment/java-stdio-semantic-curriculum-42' &&
+       github.actor == 'SagaK-dev')
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    env:
+      OMP_NUM_THREADS: '2'
+      MKL_NUM_THREADS: '2'
+      PYTHONHASHSEED: '0'
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '21'
+      - name: Install pinned-model CPU dependencies
+        run: |
+          python -m pip install 'torch>=2.3' --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install -e '.[fast-tokenizer,test]'
+      - name: Prove source oracles and isolation gates, including trusted reference Java
+        run: |
+          python -m pytest -q tests/test_java_stdio_curriculum.py tests/test_java_stdio_semantic_sft.py
+      - name: Download original v0.18 model and tokenizer
+        uses: actions/download-artifact@v4
+        with:
+          name: sagallm-v018-java-context-sft-cpu
+          run-id: 44994208434
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: pinned-v018
+      - name: Verify original pinned model and tokenizer unchanged
+        run: |
+          echo '9802e848f0abea9979623f461b5e63cd7aed838acd087d06b20d747db1e2a0fc  pinned-v018/java-context-model/java-sft-best.pt' | sha256sum -c -
+          echo '186566808cb03e328cac9a6b7b384a8d0aefc54ccb83fbe97782a751726682fe  pinned-v018/java-context-model/tokenizer.json' | sha256sum -c -
+      - name: Build and verify canonical TRAIN and new stdin family-separated curriculum
+        run: |
+          python - <<'PY'
+          from sagallm.java_diverse_corpus import build_java_diverse_corpus, verify_java_diverse_corpus
+          from sagallm.java_stdio_curriculum import build_curriculum, verify_curriculum
+          print(build_java_diverse_corpus('original-java-corpus'))
+          print(verify_java_diverse_corpus('original-java-corpus'))
+          print(build_curriculum('stdio-java-corpus'))
+          print(verify_curriculum('stdio-java-corpus'))
+          PY
+      - name: Prepare local JDK image and record SHA; OCI network remains disabled
+        shell: bash
+        run: |
+          set -euo pipefail
+          docker info --format '{{.ServerVersion}}'
+          docker pull eclipse-temurin:21-jdk
+          docker image inspect eclipse-temurin:21-jdk --format '{{.Id}}' > local-java-image-id.txt
+          grep -Eq '^sha256:[0-9a-f]{64}$' local-java-image-id.txt
+      - name: Fit v0.18 with targeted stdin training; compare base and selected validation Java inside OCI
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m scripts.train_java_stdio_semantic_sft \
+            --base pinned-v018/java-context-model/java-sft-best.pt \
+            --tokenizer pinned-v018/java-context-model/tokenizer.json \
+            --canonical original-java-corpus \
+            --stdio stdio-java-corpus \
+            --output stdio-semantic-sft-evidence \
+            --oci-image-id "$(cat local-java-image-id.txt)" \
+            --allow-oci --acknowledge-ephemeral-vm
+      - name: Assert family isolation, measured behavior, no automatic model deployment
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          r = json.loads(Path('stdio-semantic-sft-evidence/report.json').read_text())
+          assert r['status'] == 'VALIDATION_STDIO_BEHAVIOR_EVALUATED'
+          assert r['experiment'] == 'JAVA_STDIO_SEMANTIC_SFT_V1'
+          assert r['stdio_train_accepted'] == 320
+          assert r['stdio_validation_accepted'] == 36
+          assert r['broad_exposures'] == 320
+          assert r['stdio_exposures'] == 320
+          assert r['original_test_split_loaded'] is False
+          assert r['public_exercism_tasks_used'] is False
+          assert r['oci_smoke'] == 'PASS'
+          assert r['baseline_behavior']['total_cases'] == 18
+          assert r['selected_behavior']['total_cases'] == 18
+          assert not r['baseline_behavior']['unavailable']
+          assert not r['selected_behavior']['unavailable']
+          assert r['gate']['production_adoption'] is False
+          assert r['model_promotion'] is False
+          assert r['production_model_unchanged'] is True
+          assert 'public class Main' not in json.dumps(r)
+          PY
+      - name: Save loss, per-case OCI outcomes, and candidate weights only (no Java code)
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: sagallm-stdio-semantic-train-validation-only
+          path: |
+            stdio-semantic-sft-evidence/report.json
+            stdio-semantic-sft-evidence/stdio-validation-candidate.pt
+            stdio-java-corpus/manifest.json
+          retention-days: 30
+          if-no-files-found: error
