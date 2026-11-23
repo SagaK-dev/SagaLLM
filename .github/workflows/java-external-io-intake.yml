@@ -1,0 +1,83 @@
+name: SagaLLM pinned external Java I/O intake audit (NO EXECUTION)
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/java-external-io-intake.yml'
+      - 'src/sagallm/java_external_io_intake.py'
+      - 'scripts/audit_java_external_io_intake.py'
+      - 'tests/test_java_external_io_intake.py'
+      - 'examples/java_external_io_INTAKE.json'
+      - 'examples/java_external_io_sources.json'
+      - 'third_party_notices/exercism-problem-specifications-LICENSE.txt'
+      - 'docs/JAVA_EXTERNAL_IO_INTAKE.md'
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/java-external-io-intake.yml'
+      - 'src/sagallm/java_external_io_intake.py'
+      - 'scripts/audit_java_external_io_intake.py'
+      - 'examples/java_external_io_INTAKE.json'
+      - 'examples/java_external_io_sources.json'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  pinned-upstream-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 7
+    env:
+      PYTHONPATH: src
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+      - name: Install pytest only (no model dependencies or Java)
+        run: python -m pip install 'pytest>=8,<10'
+      - name: Verify unreviewed six-task packet and unit tests
+        run: python -m pytest -q tests/test_java_external_io_intake.py
+      - name: Download exact pinned upstream data and attribution files
+        shell: bash
+        run: |
+          set -euo pipefail
+          revision='4812c213a2647e2034ad5ac78155ce9265cdd171'
+          for slug in hamming rna-transcription luhn roman-numerals allergies atbash-cipher; do
+            mkdir -p "pinned-upstream/exercises/$slug"
+            for file in canonical-data.json metadata.toml; do
+              curl --fail --show-error --silent --location --retry 2 --max-time 20 \
+                "https://raw.githubusercontent.com/exercism/problem-specifications/$revision/exercises/$slug/$file" \
+                --output "pinned-upstream/exercises/$slug/$file"
+            done
+          done
+      - name: Audit all 27 cases against pinned Git blobs without executing Java
+        run: |
+          python scripts/audit_java_external_io_intake.py \
+            --root . --upstream-root pinned-upstream \
+            --output external-java-io-pinned-audit.json
+          python - <<'PY'
+          import json
+          with open('external-java-io-pinned-audit.json', encoding='utf-8') as file:
+              result = json.load(file)
+          assert result['status'] == 'PINNED_UPSTREAM_CASES_VERIFIED'
+          assert result['exercise_candidates'] == 6
+          assert result['io_cases'] == 27
+          assert result['upstream_git_blobs_checked'] == 12
+          assert result['exact_family_label_overlap_count'] == 0
+          assert result['semantic_overlap_review'] == 'PENDING_HUMAN_REVIEW'
+          assert result['exercise_level_rights_review'] == 'PENDING_HUMAN_REVIEW'
+          assert result['review_gate'] == 'REVIEW_REQUIRED'
+          assert result['model_selection_permitted'] is False
+          assert result['behavior'] == 'NOT_RUN'
+          assert result['model_outputs_evaluated'] is False
+          PY
+      - name: Upload provenance-only JSON (never source programs or model outputs)
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: sagallm-external-java-io-intake-audit-not-reviewed
+          path: external-java-io-pinned-audit.json
+          retention-days: 30
+          if-no-files-found: error
