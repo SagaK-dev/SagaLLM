@@ -1,0 +1,114 @@
+{
+  "schema": "sagallm-pinned-report-manifest-v1",
+  "repository": "SagaK-dev/SagaLLM",
+  "entries": [
+    {
+      "run_id": 44994208434,
+      "artifact_id": 14743051466,
+      "commit_sha": "c531d43d1d1d2e9da18a14045bfced3cfcaa2720",
+      "archive_sha256": "b039250f6ebecb4f8631ba38050cf219eb41b53308ea8d0b13bb45f566477789",
+      "member": "java-context-model/train-report.json",
+      "report_sha256": "9e86df9f571bf1196e52dfe3ab087162e46ef69fcf108e41216d8a7324318077",
+      "slug": "v018-context-sft"
+    },
+    {
+      "run_id": 45167198398,
+      "artifact_id": 14815096856,
+      "commit_sha": "40dcce6fe2e4bd2ab83ea70cf5a9cd12368c0312",
+      "archive_sha256": "f1716f3111bd8df1bf63282f1970b9b9aadf340aeb18f5133e66a5ea9d55955e",
+      "member": "ab-report.json",
+      "report_sha256": "1f59f98acafc5b2939f5dc043717beb3b76dd5ff923506064377ca8a7221c468",
+      "slug": "contrastive-stdio-ab"
+    },
+    {
+      "run_id": 45369765716,
+      "artifact_id": 14907598947,
+      "commit_sha": "6f36acc0cfb856e82788660acef39829f91586b4",
+      "archive_sha256": "14c827a9d2424978201c32328bc8a547e109b84c86a0d106409de64703687bfa",
+      "member": "m1-conditioning-report.json",
+      "report_sha256": "191a4699aeabff3a5bd36143aa3379170b0f51c8fcb0fe23aa68f7223e583e07",
+      "slug": "m1-conditioning"
+    },
+    {
+      "run_id": 45369987553,
+      "artifact_id": 14909315041,
+      "commit_sha": "db48c97ef11d9ea9b0feb07e49bc53458a25706c",
+      "archive_sha256": "6306fbb6ac22e4fa246d15cc7ec29a2a5e80135ed2b218ff77a2d47c687ca988",
+      "member": "m1-conditioning-report.json",
+      "report_sha256": "3e19d9f621c8f46011cad1560d596ad4f2f6743124757b93c8783b8012111c92",
+      "slug": "m1-conditioning-rerun"
+    },
+    {
+      "run_id": 45372372592,
+      "artifact_id": 14909651235,
+      "commit_sha": "6eb20c4d581c3aaaf5db4f91a9c4517d2c2bbaca",
+      "archive_sha256": "8f93dcdcf83ad6acc151d03950fab1ecbdf9193affb7d9fffd604919250df532",
+      "member": "ranking-report.json",
+      "report_sha256": "ed9e5b9fafa0b0c6c5c193ddb0ae852487346af1f145a680acc5896a5f5675d6",
+      "slug": "m3-alignment-v1-blocked"
+    },
+    {
+      "run_id": 45373241422,
+      "artifact_id": 14909169047,
+      "commit_sha": "babcbe130905d4acc7e4617497f0ebcea68569a9",
+      "archive_sha256": "2d4d6bf653c394ddf75016b26099efcf2fc5eb09ec1edd1086d7baedbedcc97f",
+      "member": "ranking-report.json",
+      "report_sha256": "90c8b9bb12e381c415e798d88875fc401143a0c703a3b0424cfab6c2283932cd",
+      "slug": "m3-ranking-v2"
+    },
+    {
+      "run_id": 45374203447,
+      "artifact_id": 14910008423,
+      "commit_sha": "06cf1027868e4014aa73761907e61fc6e0ee1a5e",
+      "archive_sha256": "7d8db07a0483b0c55555e08a126613b6c318b4a4aa46e4871bb568737c9b16c6",
+      "member": "frozen-replay.json",
+      "report_sha256": "2676251393c7d589aabd50cc651229f4bc6576dec88be048a13dd295d6e2ef71",
+      "slug": "m3-frozen-replay"
+    },
+    {
+      "run_id": 45374793097,
+      "artifact_id": 14911170944,
+      "commit_sha": "8825779b00c96b247a3fef5d9a432ef270d77f90",
+      "archive_sha256": "ffc0c21fc07002303de1383fc8dd28da3d3ce6e85b6d2c8da4539b97bb92f2b3",
+      "member": "parameter-binding.json",
+      "report_sha256": "b222a4d7ea8149b30f73c159459ee774a097902298f612ec2df4888d654fcc68",
+      "slug": "m3-parameter-binding"
+    },
+    {
+      "run_id": 45377422360,
+      "artifact_id": 14912381648,
+      "commit_sha": "fdf53625d8e64596748113b53fd6f4c63e2a1c74",
+      "archive_sha256": "068d733b1a1059a1e904ed8931467a85aaf9f5a16968a6837ce2fb4b604bb447",
+      "member": "parameter-ce-report.json",
+      "report_sha256": "26f143575842073c9b4119ecefcb3b50935891bba6c4c9fc60b0b0c8353a89b7",
+      "slug": "m3-parameter-ce"
+    },
+    {
+      "run_id": 45378356573,
+      "artifact_id": 14911808494,
+      "commit_sha": "3b8dd807c39b83f0115cb0c2fc60c98467e20074",
+      "archive_sha256": "46b2df5cdb251e7abb3c11796c9cc0bc92402133474e1d56e9f0c0ee4253075f",
+      "member": "prompt-signal.json",
+      "report_sha256": "535d10f4c9873f945040ddadfbadcd5041024878d59db6fda5203cda9038ab6e",
+      "slug": "m3-prompt-signal"
+    },
+    {
+      "run_id": 45386333879,
+      "artifact_id": 14915953140,
+      "commit_sha": "0f15a7116315ea74089f2f1a29dd1e9899e89acc",
+      "archive_sha256": "e428e95300195cfcde474592f721b9be45995789bbe51b31549cc780bd1c878d",
+      "member": "activation-swap.json",
+      "report_sha256": "3d8436e4cfee22aee4918a8718a5eb270d94f7a3af832adb724ff4691e47742c",
+      "slug": "m3-activation-swap"
+    },
+    {
+      "run_id": 45389874625,
+      "artifact_id": 14918332077,
+      "commit_sha": "289302990252d1d7b28e4ae59f9d4786fd2ad7d9",
+      "archive_sha256": "3d11a755525af609243262f5c196cb6a7d297dedd6cc4f8222997074c4ae027e",
+      "member": "prompt-bias.json",
+      "report_sha256": "e6829df208ef4807073a27df08053c241c0871995d2f42b3c5c6f4daed6864f4",
+      "slug": "m3-prompt-bias"
+    }
+  ]
+}
