@@ -22,7 +22,8 @@ stages, and no duplicate checkpoint hash. Missing real historical records
 mean do not evaluate. Evidence files capped at 16 MiB.
 
 Generation keys: seed, max_new_tokens (1..2048), decoding (greedy),
-prompt_sha256 (actual prompt template bytes, declared), generation_code_sha_declared.
+prompt_path (relative artifact path), prompt_sha256 (checked exact template
+bytes), generation_code_sha_declared. Prompt template limit is 128 KB.
 Get the current evaluator module fingerprint:
 
     PYTHONPATH=src python -c 'from sagallm.java_model_freeze import evaluator_sha256; print(evaluator_sha256())'

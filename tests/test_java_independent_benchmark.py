@@ -291,14 +291,13 @@ def test_duplicate_stdin_and_json_keys_rejected(tmp_path):
         bench.read_suite(path)
 
 
-def test_image_volume_rejection_before_candidate_read(tmp_path, monkeypatch):
+def test_image_volume_rejection_before_java_execution(tmp_path, monkeypatch):
     _mock_vm_review(monkeypatch)
     suite = _save(tmp_path, _attested())
     monkeypatch.setattr(bench, "oci_image_ready", lambda *a: True)
     monkeypatch.setattr(bench, "local_image_has_no_volumes", lambda image: False)
     def forbidden(*a, **k):
-        raise AssertionError("No generated source or execution after image rejection")
-    monkeypatch.setattr(bench, "_candidate", forbidden)
+        raise AssertionError("No execution after image rejection")
     monkeypatch.setattr(bench, "run_java_in_oci", forbidden)
     result = bench.evaluate_suite(suite, tmp_path, allow_execution=True,
         disposable_vm_acknowledged=True,

@@ -184,7 +184,8 @@ def _candidate(path: Path) -> str | None:
     if (not path.is_file() or path.is_symlink()
             or path.stat().st_size > MAX_SOURCE_BYTES):
         return None
-    raw = path.read_bytes()
+    with path.open("rb") as handle:
+        raw = handle.read(MAX_SOURCE_BYTES + 1)
     if not raw or len(raw) > MAX_SOURCE_BYTES or b"\x00" in raw:
         return None
     try:

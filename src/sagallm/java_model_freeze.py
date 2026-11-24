@@ -44,7 +44,7 @@ def _relative(root: Path, name: str) -> Path:
 
 def _generation(settings: dict):
     if (not isinstance(settings, dict)
-            or set(settings) != {"seed", "max_new_tokens", "decoding", "prompt_sha256",
+            or set(settings) != {"seed", "max_new_tokens", "decoding", "prompt_path", "prompt_sha256",
                                  "generation_code_sha_declared"}
             or type(settings["seed"]) is not int or not 0 <= settings["seed"] < 2**32
             or type(settings["max_new_tokens"]) is not int
@@ -74,6 +74,10 @@ def verify_model_freeze(suite_path: Path, suite_sha: str, *,
             or freeze["oci_image"] != image):
         raise ValueError("Model freeze binding mismatch")
     _generation(freeze["generation"])
+    prompt = _relative(artifact_root, freeze["generation"]["prompt_path"])
+    if prompt.stat().st_size > 128_000:
+        raise ValueError("Prompt template too large")
+    _hash_file(prompt, freeze["generation"]["prompt_sha256"])
     tokenizer = freeze["tokenizer"]
     if not isinstance(tokenizer, dict) or set(tokenizer) != {"path", "sha256"}:
         raise ValueError("Malformed tokenizer declaration")
@@ -139,7 +143,9 @@ def verify_model_freeze(suite_path: Path, suite_sha: str, *,
     return {"schema": SCHEMA, "freeze_sha256": freeze_sha,
             "suite_sha256": suite_sha, "checkpoint_sha256": parent,
             "tokenizer_sha256": tokenizer["sha256"], "lineage": lineage,
-            "generation": freeze["generation"], "evaluator_sha256": freeze["evaluator_sha256"],
+            "generation": {key: value for key, value in freeze["generation"].items()
+                           if key != "prompt_path"},
+            "evaluator_sha256": freeze["evaluator_sha256"],
             "oci_image": image, "shard_audit": audit,
             "declared_lineage_consistent": True, "training_lineage_verified": False,
             "freeze_precedes_inference_verified": False,

@@ -17,6 +17,8 @@ def setup(tmp_path, monkeypatch):
     ev2 = tmp_path / "sft-evidence.json"
     save(ev1, {"mock": True})
     save(ev2, {"mock": True})
+    prompt = tmp_path / "prompt.txt"
+    prompt.write_text("mock generation template")
     model = save(tmp_path / "freeze.json", {
         "schema": freeze.SCHEMA, "suite_sha256": sha(s), "provenance_sha256": sha(p),
         "inventory_sha256": sha(inv), "shard_manifest_sha256": result["manifest_sha256"],
@@ -31,7 +33,8 @@ def setup(tmp_path, monkeypatch):
              "training_code_sha_declared": "a"*40, "evidence_path": ev2.name,
              "evidence_sha256": sha(ev2), "source_indices": [0]}],
         "generation": {"seed": 17, "max_new_tokens": 256, "decoding": "greedy",
-                       "prompt_sha256": "d"*64, "generation_code_sha_declared": "c"*40},
+                       "prompt_path": prompt.name, "prompt_sha256": sha(prompt),
+                       "generation_code_sha_declared": "c"*40},
         "evaluator_sha256": freeze.evaluator_sha256(), "oci_image": "mock-image"})
     return s, p, inv, shard_root, model
 
@@ -55,7 +58,7 @@ def test_consistent_declared_chain_and_shard_gate(tmp_path, monkeypatch):
     assert report["shard_audit"]["scanned_records"] == 7
 
 
-@pytest.mark.parametrize("mode", ["parent", "source", "evidence", "code", "image", "evaluator", "tokenizer", "checkpoint", "generation"])
+@pytest.mark.parametrize("mode", ["parent", "source", "evidence", "code", "image", "evaluator", "tokenizer", "checkpoint", "generation", "prompt"])
 def test_reject_repinning_inconsistent_fields(tmp_path, monkeypatch, mode):
     state = setup(tmp_path, monkeypatch)
     model = state[-1]
@@ -76,6 +79,8 @@ def test_reject_repinning_inconsistent_fields(tmp_path, monkeypatch, mode):
         obj["tokenizer"]["sha256"] = "0"*64
     elif mode == "checkpoint":
         (tmp_path / "parent.pt").write_bytes(b"changed")
+    elif mode == "prompt":
+        (tmp_path / "prompt.txt").write_text("changed")
     else:
         obj["generation"]["max_new_tokens"] = 4096
     save(model, obj)
@@ -136,3 +141,39 @@ def test_actual_runtime_gate_precedes_engine(tmp_path, monkeypatch, mode, reason
     assert report["reason"] == reason
     assert report["behavioral_status"] == "NOT_RUN"
     assert report["java_executed"] is False
+
+
+def test_actual_gate_with_pinned_sources_and_mocked_oci(tmp_path, monkeypatch):
+    s, p, inv, shard_root, model = setup(tmp_path, monkeypatch)
+    root = tmp_path / "candidates"
+    root.mkdir()
+    tasks = json.loads(s.read_text())["tasks"]
+    pins = {}
+    for task in tasks:
+        code = root / (task["id"] + ".java")
+        code.write_bytes(b"public class Main {}\n")
+        pins[task["id"]] = sha(code)
+    candidate = save(tmp_path / "candidate.json", {
+        "schema": freeze.CANDIDATES, "model_freeze_sha256": sha(model),
+        "candidates": pins})
+    monkeypatch.setattr(bench, "review_gate", lambda *a, **k: ("ELIGIBLE_SELF_ATTESTED", "a"*64))
+    monkeypatch.setattr(bench, "local_docker_context", lambda: True)
+    monkeypatch.setattr(bench, "local_image_has_no_volumes", lambda image: True)
+    monkeypatch.setattr(bench, "oci_image_ready", lambda *a: True)
+    calls = []
+    def simulated(source, expected, **kw):
+        calls.append(source)
+        return {"status": "PASS"}
+    monkeypatch.setattr(bench, "run_java_in_oci", simulated)
+    report = bench.evaluate_suite(s, root, allow_execution=True,
+        disposable_vm_acknowledged=True, expected_suite_sha256=sha(s),
+        image="mock-image", freeze_path=model, expected_freeze_sha256=sha(model),
+        provenance_path=p, expected_provenance_sha256=sha(p),
+        inventory_path=inv, expected_inventory_sha256=sha(inv),
+        shard_root=shard_root, artifact_root=tmp_path,
+        candidate_freeze_path=candidate, expected_candidate_freeze_sha256=sha(candidate))
+    assert len(calls) == 10
+    assert report["behavior_passed_tasks"] == 5
+    assert report["model_freeze"]["training_lineage_verified"] is False
+    assert "prompt_path" not in report["model_freeze"]["generation"]
+    assert report["model_selection"] == "NOT_PERMITTED_NO_INDEPENDENCE_PROOF"
