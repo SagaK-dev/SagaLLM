@@ -45,3 +45,5 @@ the evaluator. Structural success means ELIGIBLE_SELF_ATTESTED, not verified
 identity or VM isolation. No real review exists yet. M4 remains NOT_RUN.
 Common CI environment checks are defense in depth, not proof of execution
 location. Only local Docker is supported for this independent path.
+
+The independent evaluator also rejects image-declared volumes. The shared OCI runner sets `--log-driver=none` and an explicit `/bin/sh` entrypoint. Verify these settings on the actual approved engine; mocked tests do not establish that the runtime enforces them.

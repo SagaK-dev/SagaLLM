@@ -115,3 +115,18 @@ def local_docker_context() -> bool:
     except (OSError, UnicodeError, subprocess.TimeoutExpired):
         return False
     return True
+
+
+def local_image_has_no_volumes(image: str) -> bool:
+    """Reject image-declared writable anonymous volumes for this path."""
+    try:
+        result = subprocess.run(
+            ["docker", "image", "inspect", "--format", "{{json .Config.Volumes}}", image],
+            stdin=subprocess.DEVNULL, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL,
+            timeout=5, check=False)
+        if result.returncode or len(result.stdout) > 16384:
+            return False
+        volumes = json.loads(result.stdout)
+        return volumes is None or volumes == {}
+    except (OSError, ValueError, UnicodeError, subprocess.TimeoutExpired):
+        return False

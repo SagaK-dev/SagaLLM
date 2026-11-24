@@ -113,3 +113,17 @@ def test_docker_context_only_local_mock(monkeypatch):
     monkeypatch.setattr(vm.subprocess, "run", lambda *a, **k:
                         SimpleNamespace(returncode=0, stdout=b"remote\n"))
     assert not vm.local_docker_context()
+
+
+@pytest.mark.parametrize("output,code,expected", [
+    (b"null", 0, True), (b"{}", 0, True),
+    (b'{"/data":{}}', 0, False), (b"invalid", 0, False),
+    (b"null", 1, False), (b"[]", 0, False),
+])
+def test_image_volume_inspection_mock(monkeypatch, output, code, expected):
+    def fake(argv, **kwargs):
+        assert argv == ["docker", "image", "inspect", "--format",
+                        "{{json .Config.Volumes}}", IMAGE]
+        return SimpleNamespace(returncode=code, stdout=output)
+    monkeypatch.setattr(vm.subprocess, "run", fake)
+    assert vm.local_image_has_no_volumes(IMAGE) is expected

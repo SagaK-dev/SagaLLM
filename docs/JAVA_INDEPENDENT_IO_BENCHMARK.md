@@ -33,8 +33,12 @@ not demonstrate model coding ability.
    `origin=EXTERNALLY_SOURCED_HUMAN_TASKS`,
    `review_status=APPROVED_FOR_INDEPENDENT_EVALUATION`,
    `train_overlap_review=ATTESTED_NO_KNOWN_OVERLAP`, and supply a valid
-   `license_id`, `provenance_url` and reviewer records. Simply changing
-   these strings without genuine reviews is insufficient.
+   `license_id`, `provenance_url` and reviewer records. At least five tasks
+   are required for execution eligibility. Each reviewer record must include
+   `task_ids` listing every task exactly once, a real date, and a distinct
+   review URL. The linked reviews must actually address task rights,
+   provenance, I/O correctness and overlap; scope metadata is not proof.
+   Simply changing these strings without genuine reviews is insufficient.
 4. Freeze and SHA-256 pin the exact benchmark JSON BEFORE any model
    inference, scoring, or test-result inspection.
 5. On a dedicated disposable Linux VM with locally audited Docker/Podman
@@ -90,3 +94,5 @@ executed against SagaLLM, and no Java quality improvement is established.
 ## M4 execution gate
 
 See [JAVA_M4_VM_REVIEW.md](JAVA_M4_VM_REVIEW.md). The independent evaluator rejects common CI environments, non-Linux hosts, mutable image tags, non-default or remote Docker contexts, and missing or mismatched review evidence. These are defense-in-depth checks, not proof of VM isolation. Podman is deferred for this independent evaluation path.
+
+OCI image-declared volumes are rejected for independent evaluation. The shared runner disables Docker/Podman logging and overrides the image entrypoint with the fixed shell; actual engine behavior still requires VM review. Duplicate JSON keys and duplicate stdin cases are rejected.

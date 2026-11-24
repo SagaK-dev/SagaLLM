@@ -7,6 +7,7 @@ best-effort OCI runner and should run only inside a disposable Linux VM.
 """
 from __future__ import annotations
 
+from datetime import date
 import hashlib
 import json
 from pathlib import Path
@@ -14,11 +15,12 @@ import re
 from urllib.parse import urlsplit
 
 from .java_behavior import MAX_SOURCE_BYTES, oci_image_ready, run_java_in_oci
-from .java_vm_review import local_docker_context, review_gate
+from .java_vm_review import local_docker_context, local_image_has_no_volumes, review_gate
 
 SCHEMA = "sagallm-independent-java-io-v1"
 MAX_SUITE_BYTES = 128_000
 MAX_TASKS = 12
+MIN_REVIEWED_TASKS = 5
 MAX_CASES_PER_TASK = 6
 MAX_STDIN_BYTES = 4096
 MAX_STDOUT_BYTES = 8192
@@ -31,10 +33,14 @@ DATE_PATTERN = re.compile(r"20[0-9]{2}-[01][0-9]-[0-3][0-9]\Z")
 def _https(url: object) -> bool:
     if not isinstance(url, str) or len(url) > 500:
         return False
-    parts = urlsplit(url)
-    return (parts.scheme == "https" and bool(parts.hostname)
-            and not parts.username and not parts.password
-            and all(ord(ch) >= 32 for ch in url))
+    if any(ch.isspace() or ord(ch) < 32 for ch in url):
+        return False
+    try:
+        parts = urlsplit(url)
+        return (parts.scheme == "https" and bool(parts.hostname)
+                and not parts.username and not parts.password)
+    except ValueError:
+        return False
 
 
 def _text(value: object, max_bytes: int, *, nonempty: bool = False) -> bool:
@@ -44,8 +50,29 @@ def _text(value: object, max_bytes: int, *, nonempty: bool = False) -> bool:
             and len(value.encode("utf-8")) <= max_bytes)
 
 
+def _valid_review_date(value: object) -> bool:
+    if not isinstance(value, str) or not DATE_PATTERN.fullmatch(value):
+        return False
+    try:
+        return date.fromisoformat(value) <= date.today()
+    except ValueError:
+        return False
+
+
+def _unique_object(pairs):
+    result = {}
+    for key, value in pairs:
+        if key in result:
+            raise ValueError("Duplicate JSON key")
+        result[key] = value
+    return result
+
+
 def _review_structure(suite: dict) -> tuple[bool, list[str]]:
     blockers = []
+    task_ids = {task["id"] for task in suite["tasks"]}
+    if len(task_ids) < MIN_REVIEWED_TASKS:
+        blockers.append("MINIMUM_FIVE_TASKS_REQUIRED")
     if suite.get("origin") != "EXTERNALLY_SOURCED_HUMAN_TASKS":
         blockers.append("ORIGIN_NOT_ATTESTED")
     if suite.get("review_status") != REVIEW_STATUS:
@@ -61,15 +88,22 @@ def _review_structure(suite: dict) -> tuple[bool, list[str]]:
         blockers.append("TWO_HUMAN_REVIEWS_REQUIRED")
     else:
         identities = set()
+        links = set()
         for entry in reviewers:
             if (not isinstance(entry, dict)
                     or not _text(entry.get("reviewer_id"), 100, nonempty=True)
-                    or not DATE_PATTERN.fullmatch(str(entry.get("date", "")))
+                    or not _valid_review_date(entry.get("date"))
                     or not _https(entry.get("review_url"))):
                 blockers.append("INVALID_REVIEW_RECORD")
-                break
-            identities.add(entry["reviewer_id"])
-        if len(identities) < 2:
+                continue
+            identities.add(entry["reviewer_id"].strip().casefold())
+            links.add(entry["review_url"])
+            scope = entry.get("task_ids")
+            if (not isinstance(scope, list)
+                    or any(not isinstance(item, str) for item in scope)
+                    or len(scope) != len(task_ids) or set(scope) != task_ids):
+                blockers.append("PER_TASK_REVIEW_SCOPE_REQUIRED")
+        if len(identities) < 2 or len(links) < 2:
             blockers.append("DISTINCT_REVIEWERS_REQUIRED")
     # This is only a schema check. In particular we do not authenticate
     # any reviewer or verify the external license / source provenance.
@@ -106,11 +140,15 @@ def validate_suite(suite: object) -> dict:
         cases = item["cases"]
         if not isinstance(cases, list) or not 2 <= len(cases) <= MAX_CASES_PER_TASK:
             raise ValueError("Each task needs 2..6 I/O tests")
+        inputs = set()
         for case in cases:
             if (not isinstance(case, dict) or set(case) != {"stdin", "stdout"} or
                     not _text(case["stdin"], MAX_STDIN_BYTES) or
                     not _text(case["stdout"], MAX_STDOUT_BYTES)):
                 raise ValueError("Invalid or unbounded I/O example")
+            if case["stdin"] in inputs:
+                raise ValueError("Duplicate stdin in task")
+            inputs.add(case["stdin"])
             total += 1
         ids.add(task_id)
         families.add(family)
@@ -132,8 +170,11 @@ def read_suite(path: Path) -> tuple[dict, str, dict]:
     if (not path.is_file() or path.is_symlink()
             or path.stat().st_size > MAX_SUITE_BYTES):
         raise ValueError("Missing, symlinked or oversized benchmark suite")
-    raw = path.read_bytes()
-    suite = json.loads(raw)
+    with path.open("rb") as handle:
+        raw = handle.read(MAX_SUITE_BYTES + 1)
+    if len(raw) > MAX_SUITE_BYTES:
+        raise ValueError("Oversized benchmark suite")
+    suite = json.loads(raw, object_pairs_hook=_unique_object)
     report = validate_suite(suite)
     # This hash pins the entire authored/reviewed material, not only prompts.
     return suite, hashlib.sha256(raw).hexdigest(), report
@@ -207,6 +248,9 @@ def evaluate_suite(suite_path: Path, candidate_dir: Path, *,
         return result
     if not oci_image_ready(backend, image):
         result["reason"] = "LOCAL_OCI_RUNTIME_OR_IMAGE_UNAVAILABLE"
+        return result
+    if not local_image_has_no_volumes(image):
+        result["reason"] = "OCI_IMAGE_VOLUME_CHECK_FAILED"
         return result
     results = []
     any_unavailable = False

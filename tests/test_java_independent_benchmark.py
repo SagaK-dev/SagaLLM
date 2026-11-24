@@ -21,6 +21,12 @@ def _draft():
 
 def _attested():
     suite = _draft()
+    # Additional synthetic mock tasks only; not an independent benchmark.
+    for i in range(2):
+        task = copy.deepcopy(suite["tasks"][0])
+        task["id"] = f"mock_task_{i}"
+        task["family"] = f"mock_family_{i}"
+        suite["tasks"].append(task)
     suite["origin"] = "EXTERNALLY_SOURCED_HUMAN_TASKS"
     suite["review_status"] = bench.REVIEW_STATUS
     suite["license_id"] = "CC0-1.0"
@@ -32,6 +38,8 @@ def _attested():
         {"reviewer_id": "reviewer_b", "date": "2026-11-23",
          "review_url": "https://example.org/review/2"},
     ]
+    for reviewer in suite["reviewers"]:
+        reviewer["task_ids"] = [task["id"] for task in suite["tasks"]]
     # Mock-only fixture; credentials are fabricated, never evidence of real review.
     return suite
 
@@ -73,6 +81,7 @@ def _mock_vm_review(monkeypatch):
     # Existing runtime tests are mocked; the actual gate is tested separately.
     monkeypatch.setattr(bench, "review_gate", lambda *a, **k: ("ELIGIBLE_SELF_ATTESTED", "a" * 64))
     monkeypatch.setattr(bench, "local_docker_context", lambda: True)
+    monkeypatch.setattr(bench, "local_image_has_no_volumes", lambda image: True)
 
 
 def test_explicit_exec_requires_disposable_vm_review_and_frozen_sha(tmp_path, monkeypatch):
@@ -129,10 +138,10 @@ def test_mocked_oci_receives_each_stdin_and_exact_expected_stdout(tmp_path, monk
         suite, candidates, allow_execution=True,
         disposable_vm_acknowledged=True,
         expected_suite_sha256=fingerprint)
-    assert len(calls) == 9
+    assert len(calls) == 15
     assert calls[0] == ("10 90 60 120\n", "30\n")
     assert report["behavioral_status"] == "EVALUATED"
-    assert report["behavior_passed_tasks"] == 3
+    assert report["behavior_passed_tasks"] == 5
     assert report["java_executed"] == "POSSIBLE_IN_OCI_ONLY"
     assert report["model_selection"] == "NOT_PERMITTED_NO_INDEPENDENCE_PROOF"
     assert report["review_metadata_verified_externally"] is False
@@ -242,3 +251,47 @@ def test_missing_vm_review_never_reaches_engine(tmp_path, monkeypatch):
     assert report["reason"] == "PINNED_VM_REVIEW_REQUIRED"
     assert report["behavioral_status"] == "NOT_RUN"
     assert report["java_executed"] is False
+
+def test_review_scope_and_minimum_count():
+    suite = _attested()
+    suite["tasks"] = suite["tasks"][:3]
+    assert "MINIMUM_FIVE_TASKS_REQUIRED" in bench.validate_suite(suite)["review_blockers"]
+    suite = _attested()
+    suite["reviewers"][0]["task_ids"].pop()
+    assert "PER_TASK_REVIEW_SCOPE_REQUIRED" in bench.validate_suite(suite)["review_blockers"]
+    suite = _attested()
+    suite["reviewers"][1]["reviewer_id"] = " REVIEWER_A "
+    assert "DISTINCT_REVIEWERS_REQUIRED" in bench.validate_suite(suite)["review_blockers"]
+    suite = _attested()
+    suite["reviewers"][1]["review_url"] = suite["reviewers"][0]["review_url"]
+    assert "DISTINCT_REVIEWERS_REQUIRED" in bench.validate_suite(suite)["review_blockers"]
+    suite = _attested()
+    suite["reviewers"][0]["date"] = "2026-02-30"
+    assert "INVALID_REVIEW_RECORD" in bench.validate_suite(suite)["review_blockers"]
+
+
+def test_duplicate_stdin_and_json_keys_rejected(tmp_path):
+    suite = _draft()
+    suite["tasks"][0]["cases"].append(copy.deepcopy(suite["tasks"][0]["cases"][0]))
+    with pytest.raises(ValueError, match="Duplicate stdin"):
+        bench.validate_suite(suite)
+    path = tmp_path / "bad.json"
+    path.write_text('{"schema":"a","schema":"b"}', encoding="utf-8")
+    with pytest.raises(ValueError, match="Duplicate JSON key"):
+        bench.read_suite(path)
+
+
+def test_image_volume_rejection_before_candidate_read(tmp_path, monkeypatch):
+    _mock_vm_review(monkeypatch)
+    suite = _save(tmp_path, _attested())
+    monkeypatch.setattr(bench, "oci_image_ready", lambda *a: True)
+    monkeypatch.setattr(bench, "local_image_has_no_volumes", lambda image: False)
+    def forbidden(*a, **k):
+        raise AssertionError("No generated source or execution after image rejection")
+    monkeypatch.setattr(bench, "_candidate", forbidden)
+    monkeypatch.setattr(bench, "run_java_in_oci", forbidden)
+    result = bench.evaluate_suite(suite, tmp_path, allow_execution=True,
+        disposable_vm_acknowledged=True,
+        expected_suite_sha256=hashlib.sha256(suite.read_bytes()).hexdigest())
+    assert result["reason"] == "OCI_IMAGE_VOLUME_CHECK_FAILED"
+    assert result["behavioral_status"] == "NOT_RUN"
