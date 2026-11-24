@@ -1,0 +1,243 @@
+{
+  "status": "TRAINED_CPU",
+  "phase": "JAVA_INSTRUCTION_SFT",
+  "model_origin": "PINNED_REAL_JAVA_V017_SFT",
+  "checkpoint_sha256_base": "a17268d80ff443e4a0347f3a29df433556506f13537c78ce282836fa8fe4e5f9",
+  "tokenizer_sha256": "186566808cb03e328cac9a6b7b384a8d0aefc54ccb83fbe97782a751726682fe",
+  "data_manifest_sha256": "1e9c0ff933c5096cf2d633e81ec0c90498006fab45397a28a4c073fbf181a23a",
+  "prompt_version": "compact_java_17_sft_v1",
+  "dataset_source": "project-authored parametric synthetic Java v0.15; NOT independent human tasks",
+  "original_split_counts": {
+    "train": {
+      "total": 17080,
+      "accepted": 17080,
+      "excluded_too_long": 0,
+      "families_accepted": 90,
+      "newly_admitted_beyond_original_context": 562
+    },
+    "validation": {
+      "total": 228,
+      "accepted": 228,
+      "excluded_too_long": 0,
+      "families_accepted": 10,
+      "newly_admitted_beyond_original_context": 15
+    },
+    "test": {
+      "total": 228,
+      "accepted": 228,
+      "excluded_too_long": 0,
+      "families_accepted": 10,
+      "newly_admitted_beyond_original_context": 28
+    }
+  },
+  "model_parameters": 1722048,
+  "model_context_length": 384,
+  "original_model_context_length": 192,
+  "context_extension": "ROPE_EXTRAPOLATION_UNVALIDATED",
+  "optimizer_steps_requested": 400,
+  "optimizer_steps_completed": 400,
+  "termination": "STEP_LIMIT",
+  "distinct_training_examples_seen": 1600,
+  "best_checkpoint_step": 50,
+  "best_checkpoint_train_examples_seen": 200,
+  "initial_validation_response_loss": 1.7709837684969931,
+  "best_validation_response_loss": 1.762501925124219,
+  "heldout_test_response_loss_before_sft": 2.166559224415739,
+  "heldout_test_response_loss_best_sft": 2.1412840964611513,
+  "heldout_test_response_loss_last_sft": 2.221755030543305,
+  "test_used_for_model_selection": false,
+  "compile_only_base": {
+    "status": "SCORED_COMPILE_ONLY",
+    "evaluated": 8,
+    "compiled": 2,
+    "exact_reference_matches": 0,
+    "behavior": "NOT_RUN",
+    "cases": [
+      {
+        "id": "prime-0014",
+        "family": "prime",
+        "compile": "FAIL",
+        "exact": false,
+        "generated_sha256": "38b6f3d59fdba42c7fc4042a5713e10c274edebd4eabdedbf9f70778d043ab73"
+      },
+      {
+        "id": "lcm-0011",
+        "family": "lcm",
+        "compile": "FAIL",
+        "exact": false,
+        "generated_sha256": "b3c847b0b2de18a8c04af86f1bc7e7a75e13dcb9952dec560019b828fbb462e4"
+      },
+      {
+        "id": "longest_common_prefix-0025",
+        "family": "longest_common_prefix",
+        "compile": "PASS",
+        "exact": false,
+        "generated_sha256": "e3284d272397843965bf4b93ec1d4842b0ffdcf39da5a5b63cbc1cca099497a3"
+      },
+      {
+        "id": "fibonacci-0004",
+        "family": "fibonacci",
+        "compile": "FAIL",
+        "exact": false,
+        "generated_sha256": "8f49a639ef197a968898803eca4e6181484a2d6a24151073e856267b103ca7f2"
+      },
+      {
+        "id": "array_two_sum-0012",
+        "family": "array_two_sum",
+        "compile": "FAIL",
+        "exact": false,
+        "generated_sha256": "4a4ed2ba22432db28edc75b9ab3a5f56da0ad9f97f707ce4d08116240a6aa883"
+      },
+      {
+        "id": "matrix_spiral-0014",
+        "family": "matrix_spiral",
+        "compile": "FAIL",
+        "exact": false,
+        "generated_sha256": "8f49a639ef197a968898803eca4e6181484a2d6a24151073e856267b103ca7f2"
+      },
+      {
+        "id": "palindrome-0009",
+        "family": "palindrome",
+        "compile": "FAIL",
+        "exact": false,
+        "generated_sha256": "4f5316d7c0d58a76a48eb42f589336981654dfb1b6d0e0e71fedf6cb76acef7a"
+      },
+      {
+        "id": "collatz_max-0029",
+        "family": "collatz_max",
+        "compile": "PASS",
+        "exact": false,
+        "generated_sha256": "64c99a73561a7268e7edd9c20c087ce7e72b7488927d0ce703563b520b693989"
+      }
+    ]
+  },
+  "compile_only_best": {
+    "status": "SCORED_COMPILE_ONLY",
+    "evaluated": 8,
+    "compiled": 0,
+    "exact_reference_matches": 0,
+    "behavior": "NOT_RUN",
+    "cases": [
+      {
+        "id": "prime-0014",
+        "family": "prime",
+        "compile": "FAIL",
+        "exact": false,
+        "generated_sha256": "d07941ddc251ed21080855bd9452af711cb9cbcaba86416566c14ac7db292943"
+      },
+      {
+        "id": "lcm-0011",
+        "family": "lcm",
+        "compile": "FAIL",
+        "exact": false,
+        "generated_sha256": "09966931ae3b953e0023b43239c9dd615bfb003e462fb2204b15edc47f016e34"
+      },
+      {
+        "id": "longest_common_prefix-0025",
+        "family": "longest_common_prefix",
+        "compile": "FAIL",
+        "exact": false,
+        "generated_sha256": "a30f88b5e245d9d18de29f485b38b118b2f5887d1ae1eeadfe361be0fbed47d9"
+      },
+      {
+        "id": "fibonacci-0004",
+        "family": "fibonacci",
+        "compile": "FAIL",
+        "exact": false,
+        "generated_sha256": "b14f839a5162b87e9030f5bbcde256ce7be6e1fb55d615fcc7d387c67c8e4509"
+      },
+      {
+        "id": "array_two_sum-0012",
+        "family": "array_two_sum",
+        "compile": "FAIL",
+        "exact": false,
+        "generated_sha256": "b4309d534a7c85a278742bacd9cb9c67cd4988282777db76a64e8875595bf96f"
+      },
+      {
+        "id": "matrix_spiral-0014",
+        "family": "matrix_spiral",
+        "compile": "FAIL",
+        "exact": false,
+        "generated_sha256": "80956baa7f14c22bc0fc568020baf894833559425329316d105db4f0fd3a71a3"
+      },
+      {
+        "id": "palindrome-0009",
+        "family": "palindrome",
+        "compile": "FAIL",
+        "exact": false,
+        "generated_sha256": "66cd190c976505dcbeb735636f0227618da9611727bf970c019518b2df291685"
+      },
+      {
+        "id": "collatz_max-0029",
+        "family": "collatz_max",
+        "compile": "FAIL",
+        "exact": false,
+        "generated_sha256": "e2725b0b4c1aa0db059ee7ea3d2eff71eab33593fbfbdf274a4a84c57279acef"
+      }
+    ]
+  },
+  "java_code_executed": false,
+  "java_behavior_test": "NOT_RUN",
+  "java_coding_ability": "NOT_ESTABLISHED",
+  "history": [
+    {
+      "step": 50,
+      "last_train_response_loss": 0.8837375640869141,
+      "validation_response_loss": 1.762501925124219,
+      "distinct_train_examples_seen": 200,
+      "distinct_train_families_seen": 90
+    },
+    {
+      "step": 100,
+      "last_train_response_loss": 0.7500844597816467,
+      "validation_response_loss": 1.7847076558032215,
+      "distinct_train_examples_seen": 400,
+      "distinct_train_families_seen": 90
+    },
+    {
+      "step": 150,
+      "last_train_response_loss": 0.7368276119232178,
+      "validation_response_loss": 1.807302497923962,
+      "distinct_train_examples_seen": 600,
+      "distinct_train_families_seen": 90
+    },
+    {
+      "step": 200,
+      "last_train_response_loss": 0.5223426222801208,
+      "validation_response_loss": 1.8320859593047192,
+      "distinct_train_examples_seen": 800,
+      "distinct_train_families_seen": 90
+    },
+    {
+      "step": 250,
+      "last_train_response_loss": 0.5549771785736084,
+      "validation_response_loss": 1.8561834852606116,
+      "distinct_train_examples_seen": 1000,
+      "distinct_train_families_seen": 90
+    },
+    {
+      "step": 300,
+      "last_train_response_loss": 0.487770676612854,
+      "validation_response_loss": 1.8645804698650654,
+      "distinct_train_examples_seen": 1200,
+      "distinct_train_families_seen": 90
+    },
+    {
+      "step": 350,
+      "last_train_response_loss": 0.5128968358039856,
+      "validation_response_loss": 1.8802655711917011,
+      "distinct_train_examples_seen": 1400,
+      "distinct_train_families_seen": 90
+    },
+    {
+      "step": 400,
+      "last_train_response_loss": 0.5455242991447449,
+      "validation_response_loss": 1.8872362372908131,
+      "distinct_train_examples_seen": 1600,
+      "distinct_train_families_seen": 90
+    }
+  ],
+  "best_checkpoint_sha256": "ba560cdb4f894657cc844b0ab6651470a8ea70e3ea540b3528ad4be444df1213",
+  "last_checkpoint_sha256": "1020a41c979808cf3cf2095cb519e409a53235dccf9493e9208b6027243aa18f",
+  "training_seconds": 44.89
+}

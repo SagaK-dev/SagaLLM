@@ -1,0 +1,72 @@
+{
+  "schema_version": 1,
+  "input": {
+    "run_id": 44982940959,
+    "attempt": 1,
+    "event": "pull_request",
+    "head_sha": "5d1eb19596d631704d42585b029eb8fb70e697f7",
+    "checkout_sha": "19c11751744db72b07e6d7882b9538e2e5b77171",
+    "run_url": "https://github.com/SagaK-dev/SagaLLM/actions/runs/44982940959",
+    "artifact_id": 14738368209,
+    "artifact_url": "https://github.com/SagaK-dev/SagaLLM/actions/runs/44982940959/artifacts/14738368209",
+    "archive_sha256": "c25fa1833b64a620540d93067ce2c91a8c3916589dd5b565c8892661f9373581",
+    "artifact_expires_at": "2026-12-22T03:59:24Z",
+    "best_sha256": "a17268d80ff443e4a0347f3a29df433556506f13537c78ce282836fa8fe4e5f9",
+    "tokenizer_sha256": "186566808cb03e328cac9a6b7b384a8d0aefc54ccb83fbe97782a751726682fe",
+    "data_manifest_sha256": "1e9c0ff933c5096cf2d633e81ec0c90498006fab45397a28a4c073fbf181a23a"
+  },
+  "runs": {
+    "44994208434": {
+      "run_id": 44994208434,
+      "attempt": 1,
+      "event": "pull_request",
+      "head_sha": "c531d43d1d1d2e9da18a14045bfced3cfcaa2720",
+      "checkout_sha": "060b7f538a6d975a27d3083cad6bb1894d2de505",
+      "run_url": "https://github.com/SagaK-dev/SagaLLM/actions/runs/44994208434",
+      "artifact_id": 14743051466,
+      "artifact_url": "https://github.com/SagaK-dev/SagaLLM/actions/runs/44994208434/artifacts/14743051466",
+      "archive_sha256": "b039250f6ebecb4f8631ba38050cf219eb41b53308ea8d0b13bb45f566477789",
+      "artifact_expires_at": "2026-12-22T06:34:04Z",
+      "environment": {
+        "os": "26.04.1",
+        "image": "20261116.202.1",
+        "python": "3.11.18",
+        "torch": "2.15.0+cpu",
+        "jdk": "21.0.13+9",
+        "tokenizers": "0.23.3"
+      },
+      "best_sha256": "9802e848f0abea9979623f461b5e63cd7aed838acd087d06b20d747db1e2a0fc",
+      "last_sha256": "74ae92a54ca864461ffff08d0db80191cbc88370f8a5347c099f182ea271e016",
+      "train_report_sha256": "9e86df9f571bf1196e52dfe3ab087162e46ef69fcf108e41216d8a7324318077",
+      "repository_report": "experiments/java_context_v018_results.json",
+      "repository_report_sha256": "266f238066317ad92f60a07830e5f1e298e1577dd77a1d758eeef5d600d3bf8c",
+      "raw_report_has_extra_lf": true
+    },
+    "44995129073": {
+      "run_id": 44995129073,
+      "attempt": 1,
+      "event": "workflow_dispatch",
+      "head_sha": "e3438df3de5f13702ade326a8a3b5222e0c86191",
+      "checkout_sha": "e3438df3de5f13702ade326a8a3b5222e0c86191",
+      "run_url": "https://github.com/SagaK-dev/SagaLLM/actions/runs/44995129073",
+      "artifact_id": 14743162578,
+      "artifact_url": "https://github.com/SagaK-dev/SagaLLM/actions/runs/44995129073/artifacts/14743162578",
+      "archive_sha256": "1984dcfe432521b3c53ffda88051c6783368b3fcb0c60a2cdf272a2466532b84",
+      "artifact_expires_at": "2026-12-22T06:46:32Z",
+      "environment": {
+        "os": "26.04.1",
+        "image": "20261116.202.1",
+        "python": "3.11.18",
+        "torch": "2.15.0+cpu",
+        "jdk": "21.0.13+9",
+        "tokenizers": "0.23.3"
+      },
+      "best_sha256": "ba560cdb4f894657cc844b0ab6651470a8ea70e3ea540b3528ad4be444df1213",
+      "last_sha256": "1020a41c979808cf3cf2095cb519e409a53235dccf9493e9208b6027243aa18f",
+      "train_report_sha256": "062e154a9ae2f37cbd16439b27cf1c72b1aa9b59bfd894a7eb5e52b101e6ebe6",
+      "repository_report": "experiments/java_context_v018_manual_44995129073.json",
+      "repository_report_sha256": "062e154a9ae2f37cbd16439b27cf1c72b1aa9b59bfd894a7eb5e52b101e6ebe6",
+      "raw_report_has_extra_lf": false
+    }
+  }
+}
