@@ -1,0 +1,57 @@
+name: SagaLLM frozen M3 artifact replay (NO JAVA EXECUTION)
+on:
+  pull_request:
+    paths:
+      - 'scripts/audit_java_m3_v2.py'
+      - 'scripts/evaluate_java_m3_v2.py'
+      - 'tests/test_java_m3_v2_replay.py'
+      - '.github/workflows/java-m3-frozen-replay.yml'
+permissions:
+  contents: read
+  actions: read
+jobs:
+  replay:
+    if: >-
+      github.event.pull_request.head.repo.full_name == github.repository &&
+      github.head_ref == 'evaluation/java-m3-frozen-replay-2026-11-24' &&
+      github.actor == 'SagaK-dev'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    env:
+      OMP_NUM_THREADS: '2'
+      MKL_NUM_THREADS: '2'
+      CUDA_VISIBLE_DEVICES: ''
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+      - run: |
+          python -m pip install 'torch>=2.3' --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install -e '.[test,fast-tokenizer]'
+          python -m pytest -q tests/test_java_m3_v2_replay.py
+      - uses: actions/download-artifact@v4
+        with:
+          name: sagallm-v018-java-context-sft-cpu
+          run-id: 44994208434
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: v018
+      - name: Download exact research ZIP and replay only
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh api repos/SagaK-dev/SagaLLM/actions/artifacts/14909169047/zip > m3.zip
+          python -m scripts.evaluate_java_m3_v2 --archive m3.zip \
+            --base v018/java-context-model/java-sft-best.pt \
+            --tokenizer v018/java-context-model/tokenizer.json \
+            --holdback examples/java_m3_development_holdback.json \
+            --output frozen-replay.json
+          sha256sum frozen-replay.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: sagallm-m3-frozen-replay
+          path: frozen-replay.json
+          if-no-files-found: error
+          retention-days: 30

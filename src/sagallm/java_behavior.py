@@ -88,7 +88,7 @@ def oci_image_ready(backend: str, image: str) -> bool:
 
 
 def build_oci_command(backend: str, *, image: str, mount_dir: Path, cid_file: Path,
-                      stdin_file_present: bool = False) -> list[str]:
+                      stdin_file_present: bool = False, compile_only: bool = False) -> list[str]:
     """Return an argv list; no generated text is ever interpolated as shell code."""
     if backend not in ALLOWED_BACKENDS:
         raise ValueError("Unsupported local OCI backend")
@@ -98,10 +98,11 @@ def build_oci_command(backend: str, *, image: str, mount_dir: Path, cid_file: Pa
     # Container shell script is static; the untrusted program is read-only input data.
     shell_script = (
         "mkdir -p /tmp/classes && "
-        "javac -proc:none -encoding UTF-8 -d /tmp/classes /input/Main.java && "
-        "java -Xmx64m -Dfile.encoding=UTF-8 -cp /tmp/classes Main"
-        + (" < /input/stdin.txt" if stdin_file_present else "")
+        "javac -proc:none -encoding UTF-8 -d /tmp/classes /input/Main.java"
     )
+    if not compile_only:
+        shell_script += (" && java -Xmx64m -Dfile.encoding=UTF-8 -cp /tmp/classes Main"
+                         + (" < /input/stdin.txt" if stdin_file_present else ""))
     return [
         backend, "run", "--rm", "--pull=never", "--cidfile", str(cid_file),
         "--network=none", "--read-only", "--cap-drop=ALL",
@@ -163,12 +164,14 @@ def _cleanup_stale_container(backend: str, cid_file: Path) -> None:
 
 def run_java_in_oci(source: str, expected: str, *, backend: str = "docker",
                     image: str = JAVA_IMAGE_DEFAULT, allow_execution: bool = False,
-                    timeout: float = 12.0, stdin_data: str = "") -> dict:
+                    timeout: float = 12.0, stdin_data: str = "", compile_only: bool = False) -> dict:
     """Run a generated single-file Java program only with explicit local OCI opt-in.
 
     Does not pull images, mount the user's working directory or forward network.
     Output matching is an exact stdout comparison, NOT a security attestation.
     """
+    if type(compile_only) is not bool or (compile_only and (stdin_data or expected)):
+        raise ValueError("Compile-only accepts no stdin or expected stdout")
     if not allow_execution:
         return {"status": "NOT_RUN", "reason": "Explicit allow_execution required", "behavior_match": None}
     if not 2 <= timeout <= 30:
@@ -199,7 +202,8 @@ def run_java_in_oci(source: str, expected: str, *, backend: str = "docker",
         root.chmod(0o755)
         cid_file = root / "container.cid"
         cmd = build_oci_command(backend, image=image, mount_dir=source_dir,
-                                cid_file=cid_file, stdin_file_present=bool(stdin_data))
+                                cid_file=cid_file, stdin_file_present=bool(stdin_data),
+                                compile_only=compile_only)
         try:
             code, output = _bounded_capture(cmd, timeout)
         except (TimeoutError, subprocess.TimeoutExpired):
@@ -214,6 +218,9 @@ def run_java_in_oci(source: str, expected: str, *, backend: str = "docker",
         if code in (125, 126, 127):
             return {"status": "RUNTIME_ERROR", "behavior_match": None,
                     "reason": "OCI launcher failed; not a Java behavior failure", "returncode": code}
+        if compile_only:
+            return {"status": "PASS" if code == 0 else "FAIL", "returncode": code,
+                    "behavior_match": None, "compile_only": True}
         match = (code == 0 and output == expected.encode("utf-8"))
         return {"status": "PASS" if match else "FAIL", "behavior_match": match,
                 "returncode": code, "observed_stdout_sha256": hashlib.sha256(output).hexdigest(),
