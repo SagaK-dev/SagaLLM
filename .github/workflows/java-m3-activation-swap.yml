@@ -1,0 +1,55 @@
+name: SagaLLM M3 activation swap diagnostic (NO JAVA EXECUTION)
+on:
+  pull_request:
+    paths:
+      - 'scripts/diagnose_java_m3_activation_swap.py'
+      - 'tests/test_java_m3_activation_swap.py'
+      - '.github/workflows/java-m3-activation-swap.yml'
+permissions:
+  contents: read
+  actions: read
+jobs:
+  diagnose:
+    if: >-
+      github.event.pull_request.head.repo.full_name == github.repository &&
+      github.head_ref == 'diagnostic/java-m3-activation-patching-2026-11-24' &&
+      github.actor == 'SagaK-dev'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    env:
+      OMP_NUM_THREADS: '2'
+      MKL_NUM_THREADS: '2'
+      CUDA_VISIBLE_DEVICES: ''
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+      - run: |
+          python -m pip install 'torch>=2.3' --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install -e '.[test,fast-tokenizer]'
+          python -m pytest -q tests/test_java_m3_activation_swap.py
+      - uses: actions/download-artifact@v4
+        with:
+          name: sagallm-v018-java-context-sft-cpu
+          run-id: 44994208434
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: v018
+      - name: Audit pinned archives and run matched activation swaps
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh api repos/SagaK-dev/SagaLLM/actions/artifacts/14912381648/zip > ce.zip
+          gh api repos/SagaK-dev/SagaLLM/actions/artifacts/14911808494/zip > prior.zip
+          python -m scripts.diagnose_java_m3_activation_swap --archive ce.zip \
+            --prior prior.zip --base v018/java-context-model/java-sft-best.pt \
+            --tokenizer v018/java-context-model/tokenizer.json --output activation-swap.json
+          sha256sum activation-swap.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: sagallm-m3-activation-swap
+          path: activation-swap.json
+          if-no-files-found: error
+          retention-days: 30
