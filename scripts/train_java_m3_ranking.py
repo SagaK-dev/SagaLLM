@@ -32,6 +32,7 @@ from sagallm.java_stdio_curriculum import (
 from sagallm import java_diverse_corpus as broad_data
 from scripts.train_java_contrastive_stdio_ab import FAMILY_PAIRS
 from scripts.train_java_stdio_semantic_sft import PINNED_V018
+from scripts.java_m3_operation_masks import train_positions
 
 SEEDS = (4201, 4202, 4203)
 STEPS = 160
@@ -121,9 +122,16 @@ def target(row, eos):
     return ids[:-1]
 
 
-def make_aux(row, other, eos):
+def make_aux(row, other, eos, *, tokenizer=None, mask_mode="edit-v1"):
     tgt, ref = target(row,eos), target(other,eos)
-    pos = substitution_positions(tgt,ref)
+    if mask_mode=="edit-v1":
+        pos=substitution_positions(tgt,ref)
+    elif mask_mode=="operation-span-v2":
+        if tokenizer is None:
+            raise ValueError("Tokenizer required for operation spans")
+        pos=train_positions(row,tgt,tokenizer)
+    else:
+        raise ValueError("Unknown mask protocol")
     if not pos:
         return None
     seqs=[]
@@ -139,7 +147,7 @@ def make_aux(row, other, eos):
     return tuple(seqs),pos
 
 
-def pairs(rows,eos):
+def pairs(rows,eos, *, tokenizer=None, mask_mode="edit-v1"):
     lookup={r["id"]:r for r in rows}
     if len(rows)!=320 or len(lookup)!=320:
         raise ValueError("Wrong stdio TRAIN size")
@@ -155,7 +163,7 @@ def pairs(rows,eos):
                 raise ValueError("Pair family mismatch")
             ordered.append(ids)
             for x,y in ((a,b),(b,a)):
-                v=make_aux(x,y,eos)
+                v=make_aux(x,y,eos,tokenizer=tokenizer,mask_mode=mask_mode)
                 table[x["id"]]=v
                 if v is not None:
                     counts[pair_name]+=1
@@ -164,7 +172,7 @@ def pairs(rows,eos):
     # Commit to the exact training-only position masks before model loading.
     mask_manifest={k:list(v[1]) if v is not None else [] for k,v in sorted(table.items())}
     coverage={left+"__"+right:counts[left+"__"+right] for left,right in FAMILY_PAIRS}
-    admission={"admitted_rows":sum(counts.values()),"excluded_rows":320-sum(counts.values()),
+    admission={"mask_protocol":mask_mode,"admitted_rows":sum(counts.values()),"excluded_rows":320-sum(counts.values()),
                "rows_per_pair_type":coverage,
                "aligned_token_positions":sum(len(v[1]) for v in table.values() if v),
                "mask_sha256":sha(canonical(mask_manifest)),
@@ -380,7 +388,9 @@ def run(args):
         raise ValueError("ID overlap")
     if {r["task"] for r in broad+stdio+valid}&{r["task"] for r in fresh}:
         raise ValueError("Exact task text overlap")
-    aux,ordered,admission=pairs(stdio,eos)
+    aux,ordered,admission=pairs(stdio,eos,tokenizer=tok,mask_mode=args.mask_mode)
+    if args.mask_mode=='operation-span-v2' and admission['admitted_rows']!=320:
+        admission['passed']=False
     if not admission["passed"]:
         # Keep the preregistered gate unchanged. A blocked run publishes
         # bounded counts, not learned weights or an invented model score.
@@ -420,7 +430,7 @@ def run(args):
                 raise ValueError("Actual exposure mismatch")
             p=args.output/f"{seed}-{arm}.pt"
             torch.save({"model":weights,"config":cfg.to_dict(),"base_sha256":PINNED_V018,
-                        "tokenizer_sha256":V016_TOKENIZER_SHA256,"seed":seed,"arm":arm,
+                        "tokenizer_sha256":V016_TOKENIZER_SHA256,"seed":seed,"arm":arm,"mask_protocol":args.mask_mode,
                         "selected_step":stats["selected_step"],"production":False},p)
             stats["checkpoint_sha256"]=sha(p.read_bytes())
             stats["schedule_sha256"]=schedule_hashes[str(seed)]
@@ -442,7 +452,7 @@ def run(args):
             "broad_train_sha256":TRAIN_SHA,"stdio_manifest_sha256":STDIO_SHA,
             "holdback_sha256":SUITE_SHA,"alignment":admission,
             "seeds":list(SEEDS),"steps_per_arm":STEPS,"batch_size":4,"learning_rate":LR,
-            "margin":MARGIN,"same_schedule_per_seed":True,"same_aux_graph":True,
+            "margin":MARGIN,"mask_protocol":args.mask_mode,"regression_margin_protocol":"edit-v1 unchanged diagnostic","same_schedule_per_seed":True,"same_aux_graph":True,
             "selection_ids":[r["id"] for r in selection],"regression_ids":list(REGRESSION),
             "fresh_ids":[r["id"] for r in fresh],"baseline":baseline,"results":results,
             "original_test_records_read":False,"public_benchmark_used":False,
@@ -465,6 +475,7 @@ def main():
     p=argparse.ArgumentParser(description=__doc__)
     for name in ("base","tokenizer","holdback","curriculum","output"):
         p.add_argument("--"+name,type=Path,required=True)
+    p.add_argument('--mask-mode', choices=['edit-v1','operation-span-v2'], default='edit-v1')
     run(p.parse_args())
 
 

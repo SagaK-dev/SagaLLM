@@ -68,3 +68,43 @@ def test_schedule_exact_exposure():
     assert len({v for _,p in a for v in p})==320
     with pytest.raises(ValueError):
         r.schedule_for(broad,[pairs[0]]*160,4201)
+
+
+def test_operation_spans_cover_every_canonical_train_row():
+    from sagallm.tokenization import ByteBPETokenizer
+    from sagallm.java_stdio_curriculum import expected_rows
+    raw_rows=expected_rows("train")
+    tok=ByteBPETokenizer.train([x["messages"][1]["content"] for x in raw_rows]+[r.compact_prompt(r.encode_row(x,ByteBPETokenizer(),1024)["task"]) for x in raw_rows],vocab_size=512)
+    rows=[r.encode_row(x,tok,384) for x in raw_rows]
+    assert all(x is not None for x in rows)
+    aux,_,audit=r.pairs(rows,2,tokenizer=tok,mask_mode="operation-span-v2")
+    assert audit["passed"] and audit["admitted_rows"]==320
+    assert all(v==64 for v in audit["rows_per_pair_type"].values())
+    assert all(v is not None for v in aux.values())
+
+
+def test_operation_span_boundary_and_ambiguous_fail_closed():
+    from scripts.java_m3_operation_masks import span_positions
+    class Tok:
+        SPECIAL={"<eos>":2}
+        def decode(self,ids):
+            return "".join({4:"x=",5:"a+b;",6:"\n"}[i] for i in ids)
+    assert span_positions("x=a+b;\n","a+b",[4,5,6],Tok())==(1,)
+    for source,operation,ids in (
+        ("a+ba+b","a+b",[5,5]),("wrong","wrong",[4]),("x=a+b;\n","a+b",[4,2,5,6])
+    ):
+        with pytest.raises(ValueError):
+            span_positions(source,operation,ids,Tok())
+
+
+def test_operation_annotations_reject_validation_and_tampering():
+    from scripts.java_m3_operation_masks import train_positions
+    from sagallm.tokenization import ByteBPETokenizer
+    from sagallm.java_stdio_curriculum import expected_rows
+    tok=ByteBPETokenizer()
+    raw=expected_rows("train")[0]
+    row=r.encode_row(raw,tok,1024)
+    assert train_positions(row,r.target(row,2),tok)
+    for patch in ({"source":"modified"},{"task":"wrong"},{"id":"validation-stdin_add_offset-000"}):
+        with pytest.raises(ValueError):
+            train_positions({**row,**patch},r.target(row,2),tok)

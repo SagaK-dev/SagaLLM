@@ -51,3 +51,34 @@ This research branch is independent of both drafts.
   on fresh holdback vs control in at least two of three seeds; no unavailable
   results. This proposal cannot be called a behavior gain before actual run.
   Independent human review and production promotion remain separate.
+
+
+## V1 measured admission failure and V2 protocol revision (before training)
+
+Run [45372372592](https://github.com/SagaK-dev/SagaLLM/actions/runs/45372372592),
+commit 6eb20c4d581c3aaaf5db4f91a9c4517d2c2bbaca, artifact 14909651235, ZIP digest
+8f93dcdcf83ad6acc151d03950fab1ecbdf9193affb7d9fffd604919250df532,
+report digest ed9e5b9fafa0b0c6c5c193ddb0ae852487346af1f145a680acc5896a5f5675d6
+(from hosted log). V1 admitted 194/320 rows, 282 positions; pair coverage
+64, 64, 2, 64, 0 in FAMILY_PAIRS order. The five-type gate failed and zero
+optimizer steps completed. A successful reporting workflow was not a training pass.
+
+V2 is a new preregistered lexical mask protocol, not a relaxation or a
+successful rerun of V1. Keep V1 selectable and preserve all V1 evidence.
+Use the uniquely identified operation expression or statement from each of
+the ten canonical ASCII TRAIN templates (including structurally different
+string methods). Match exact canonical task, source, variant and token IDs.
+Reconstruct token boundaries by concatenating ASCII token decodings; require
+exact equality to the source. Select all tokens intersecting the annotated
+region, including boundary-crossing BPE tokens; no EOS or other special token.
+This is a template-specific proxy, not a semantic parser; it may include
+shared operands/punctuation. Unlike V1, it does not require the other
+algorithm's source to have a corresponding substitution. The same target
+and mask are used under its own and wrong prompt. Require all 320 directions
+and all five pair types before loading weights; no dropped TRAIN row.
+Keep all original seeds, schedules, optimizer, validation selection, hinge
+margin, coefficients, holdback bytes and no-execution gate unchanged.
+The old edit-v1 regression margin remains the fixed diagnostic metric,
+not a model-selection criterion. No evaluation output was seen before this
+revision: V1 never trained or inferred. V2 is not evidence of improvement
+until its run completes and separately approved exact I/O is measured.
