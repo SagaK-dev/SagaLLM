@@ -1,8 +1,9 @@
-# SagaLLM Development Plan — 2026-11-24 (revision 3)
+# SagaLLM Development Plan — 2026-11-24 (revision 4)
 
 Original baseline: 961130d684a459ee513e96d6be17511cb47315c8 (PR #44).
 Revision 2 baseline: 4346405a5749bfca79538822409c8f0862f79eaf (PR #55).
 Revision 3 baseline: 69c93973de170eaf90fbe91325e751124768cfce (PR #56).
+Revision 4 baseline: 080b86a01a07549fbf91add4e72494b753f48797 (PR #57).
 This plan is a controlled research roadmap; implementation and evaluation status must be recorded separately.
 
 ## Evidence and current decision
@@ -30,7 +31,7 @@ Primary hypothesis: prompt-conditioning collapse (different instructions yield i
 
 Windows are planning targets, not promises of external reviews, GPU allocation or metric improvement.
 
-## Revision 3 — evidence and work breakdown
+## Revision 4 — evidence and work breakdown
 
 - M0: PR #54 archived 12 exact reports and 177-run metadata; verifier 45391237711 SUCCESS; merged. Full rights/secret audit and Issue #22 closure criteria are separate.
 - M1/M3: the exploratory diagnostics and matched interventions in PRs #46–53 did run; their reports are archived. No validated gain/root cause established. First-layer attention-bias pilot run 45389874625 improved both-choice counts in only 1/7 models vs preregistered 5/7; do not tune on the exposed probes. M3 status: exploratory experiments completed, further experiments require a new hypothesis and independent gate; no promotion.
@@ -41,8 +42,8 @@ Windows are planning targets, not promises of external reviews, GPU allocation o
 | --- | --- | --- |
 | M2.1 | Private provenance and corpus inventory; exact byte pins, no private content in Git/CI | Merged via PR #56 |
 | M2.2 | Mandatory re-run of local intake on execution path; missing, tampered, blocked or incomplete inputs reject before candidate/engine access; mocked positive/negative tests | Merged via PR #56 |
-| M2.3 | Near-duplicate and semantic/structural review leads, bilingual paraphrases, calibrated synthetic positives/negatives; bounded resources and no false independence claim | Heuristic screen implemented in revision 3; CI pending; general semantic/AST detection not established |
-| M2.4 | Exposure inventory coverage per checkpoint, including pretraining and dev probes, scalable pinned shard scanning; audit missing sources, no arbitrary sample as full coverage | NEXT: exact checkpoint exposure manifest and bounded shard scan |
+| M2.3 | Near-duplicate and semantic/structural review leads, bilingual paraphrases, calibrated synthetic positives/negatives; bounded resources and no false independence claim | Merged via PR #57; final-head runs 45402092921 / 45402092849 / 45402092826 SUCCESS; general semantic/AST detection not established |
+| M2.4 | Exposure inventory coverage per checkpoint, including pretraining and dev probes, scalable pinned shard scanning; audit missing sources, no arbitrary sample as full coverage | Checkpoint/tokenizer-bound byte-preserving shard preparation and offline scan implemented in revision 4; CI pending; lineage authenticity and runtime integration remain open |
 | M2.5 | 5–12 new privately held-back human tasks, author separated from reviewers, two real per-task reviews, rights and semantic audit, exact freeze before inference | BLOCKED_ON_HUMAN_REVIEW |
 | M4.1 | Freeze model/tokenizer/checkpoint/generation settings and evaluator revision; hash each candidate; classify compile, behavior, timeout, unavailable separately, matched comparisons | PARTIAL / PLANNED |
 | M4.2 | Actual reviewed disposable Linux VM and second independent audit; Java 17, exact stdout, no generated Java on shared CI | NOT_RUN |
@@ -50,6 +51,8 @@ Windows are planning targets, not promises of external reviews, GPU allocation o
 | M5/M6 | Cost/rights/compute feasibility and release hardening only after independent evidence and owner authorization | NOT_AUTHORIZED / NOT_READY |
 
 M2.3 acceptance is deliberately scoped to deterministic lexical near-duplicate and bilingual concept-rule leads with synthetic positive/negative tests, explicit resource limits and fail-closed integration. Translation, semantic equivalence and code AST similarity are not established; those require separate calibration on rights-reviewed examples before stronger claims.
+
+M2.4 uses a separately pinned declared source inventory and checkpoint/tokenizer bytes, ordered shard hashes and exact reconstruction of each source hash. Limits are 8 GiB total, 2,048 shards, 16 MiB or 20,000 records per shard. This is a bounded offline path, not yet the mandatory evaluator path, and not evidence of actual training lineage. Next: connect the shard gate to a frozen model-specific evaluation manifest and verify multi-stage parent checkpoint provenance; measure on rights-reviewed larger corpora before scale-up.
 
 Machine preflight is not proof: it cannot verify inventory completeness,
 authorship, legal rights or semantic independence. No self-attested status
