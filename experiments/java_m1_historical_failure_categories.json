@@ -1,0 +1,28 @@
+{
+  "status": "HISTORICAL_REPORT_CATEGORY_RECOUNT",
+  "run_id": 45167198398,
+  "run_sha": "40dcce6fe2e4bd2ab83ea70cf5a9cd12368c0312",
+  "artifact_id": 14815096856,
+  "report_sha256": "1f59f98acafc5b2939f5dc043717beb3b76dd5ff923506064377ca8a7221c468",
+  "cases_per_arm": 18,
+  "arms": {
+    "base_v018": {
+      "nonzero_exit_or_javac_error": 18,
+      "output_mismatch_zero_exit": 0,
+      "pass": 0
+    },
+    "control_interleaved": {
+      "nonzero_exit_or_javac_error": 8,
+      "output_mismatch_zero_exit": 10,
+      "pass": 0
+    },
+    "contrastive_same_variant": {
+      "nonzero_exit_or_javac_error": 8,
+      "output_mismatch_zero_exit": 10,
+      "pass": 0
+    }
+  },
+  "new_execution": "NOT_RUN",
+  "root_cause": "NOT_ESTABLISHED",
+  "independent_benchmark": "NOT_ESTABLISHED"
+}
