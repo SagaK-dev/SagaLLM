@@ -79,3 +79,71 @@ Issue #36 remains REVIEW_REQUIRED: follow JAVA_EXTERNAL_IO_REVIEW_GUIDE.md.
 The existing public candidate intake has been previously exposed and must
 not be used for model selection; recruit two real independent reviewers and
 obtain new held-back human-authored tasks where necessary.
+
+
+## Verified result — 2026-11-24
+
+- Workflow [45369765716](https://github.com/SagaK-dev/SagaLLM/actions/runs/45369765716), job 138360683835, exact commit 6f36acc0cfb856e82788660acef39829f91586b4; succeeded, ten diagnostic unit tests passed.
+- Artifact 14907598947. Downloaded archive SHA-256:
+  14c827a9d2424978201c32328bc8a547e109b84c86a0d106409de64703687bfa.
+  Extracted report SHA-256:
+  191a4699aeabff3a5bd36143aa3379170b0f51c8fcb0fe23aa68f7223e583e07.
+  Both were independently hashed after download; the report digest matches the job log.
+- PyTorch 2.15.0+cpu. Six unique prompt token sequences; round-trip checks passed.
+  Prompt lengths 58/62/69 by family; reference lengths 87/117/97.
+- Base: all six EOS (78–79 generated tokens including EOS), three distinct
+  source hashes, six historical hash matches, no literal System.in marker
+  in any source, mean swapped-minus-own NLL +0.00618227 (4/6 positive).
+- Contrastive: all six EOS (80 tokens each), one distinct source hash,
+  six historical hash matches, six literal System.in markers, mean
+  swapped-minus-own NLL +0.00853705 (6/6 positive).
+- The literal token-ID collision and generation-cap explanations are
+  ruled out for this exact probe (not for arbitrary other prompts/models).
+  The cap A/B is **SKIPPED_NO_CAP_STOPS** per the preregistered rule.
+  Weak conditioning remains a plausible research hypothesis, not a
+  demonstrated cause. Small NLL margins are descriptive, not a statistical
+  proof; the diagnostic averages the whole reference, including shared syntax.
+  Literal markers do not prove stdin behavior or syntactic validity.
+- No new javac or Java runtime evaluation. The historical 0/18 scores are
+  unchanged. Control weights not available. Root cause NOT_ESTABLISHED;
+  production adoption false; independent benchmark NOT_ESTABLISHED.
+
+See [machine-readable summary](../experiments/java_m1_conditioning_results.json).
+
+## M3 candidate preregistration — explicit conditioning objective (NOT_RUN)
+
+Do not repeat only the failed same-variant minibatch reordering. Hypothesis:
+a same-target, wrong-prompt penalty on algorithm-specific TRAIN response
+tokens may increase task-dependent generation. Use a paired experiment from
+the original SHA-pinned v0.18. Control: ordinary response-masked SFT; treatment:
+the same SFT plus an explicit conditional ranking term. Define same-variant,
+different-algorithm TRAIN pairs before optimization. Keep optimizer schedule,
+learning rate, training examples, order, batch size, context, and seeds
+(4201, 4202, 4203) equal; include the same wrong-prompt forward computation
+in control with auxiliary coefficient zero. For each paired TRAIN target,
+compute mean NLL on precomputed response token positions where the two
+algorithm references differ, using a deterministic token-sequence alignment
+fixed before training (exclude EOS and unaligned/ambiguous cases; log
+admission counts). Use hinge penalty max(0, 0.05 + NLL_own - NLL_wrong)
+with coefficient 1.0 in treatment. Never use historical TEST, public
+Exercism, or validation targets for gradients. If alignment/admission fails
+or equal exposure cannot be proved, stop before training.
+
+Before running, freeze a new synthetic development holdback disjoint from
+optimizer and checkpoint selection and document any semantic overlap.
+The six existing validation prompts and 18 cases remain fixed regression
+diagnostics, not model-selection criteria. Use fresh heldback prompts and
+exact I/O on an explicitly approved disposable VM + restricted OCI;
+freeze IDs, hashes and selection rules before inference. Validation-loss
+checkpoint selection only on a separate validation slice. Record each
+seed, conditional margin on algorithm-specific tokens, EOS/limit,
+unique source hashes, compile status, exact I/O, full-task passes, and
+unavailable cases. Proposed research gate: >=2 additional exact cases on
+the fixed 18-case regression vs control and base, no decrease in fully
+correct tasks, improved distinct-source count, plus improvement over
+control on the new holdback in at least two of three seeds. No automatic
+model promotion. If no genuinely new holdback is available, report
+BLOCKED rather than reusing exposed evaluation as independent evidence.
+This is a preregistered experiment proposal; no training or behavior
+execution has been initiated by this document. Independent human review
+in M2/#36 remains a separate required gate.

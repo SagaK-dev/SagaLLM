@@ -1,0 +1,49 @@
+{
+  "status": "INFERENCE_DIAGNOSTIC_COMPLETE",
+  "run_id": 45369765716,
+  "run_sha": "6f36acc0cfb856e82788660acef39829f91586b4",
+  "job_id": 138360683835,
+  "artifact_id": 14907598947,
+  "zip_sha256": "14c827a9d2424978201c32328bc8a547e109b84c86a0d106409de64703687bfa",
+  "report_sha256": "191a4699aeabff3a5bd36143aa3379170b0f51c8fcb0fe23aa68f7223e583e07",
+  "downloaded_archive_and_report_sha256_verified": true,
+  "torch_version": "2.15.0+cpu",
+  "diagnostic_tests_passed": 10,
+  "fixed_prompts": 6,
+  "prompt_token_sequences_distinct": 6,
+  "tokenizer_roundtrip": "PASS",
+  "generation_cap": 170,
+  "models": {
+    "base_v018": {
+      "eos": 6,
+      "limit": 0,
+      "generated_tokens_min": 78,
+      "generated_tokens_max": 79,
+      "unique_source_hashes": 3,
+      "historical_hash_matches": 6,
+      "stdin_literal_marker_count": 0,
+      "mean_swapped_minus_own_nll": 0.0061822733333333334,
+      "positive_margins": 4,
+      "historical_exact_io_pass": 0
+    },
+    "contrastive_same_variant": {
+      "eos": 6,
+      "limit": 0,
+      "generated_tokens_min": 80,
+      "generated_tokens_max": 80,
+      "unique_source_hashes": 1,
+      "historical_hash_matches": 6,
+      "stdin_literal_marker_count": 6,
+      "mean_swapped_minus_own_nll": 0.008537048333333333,
+      "positive_margins": 6,
+      "historical_exact_io_pass": 0
+    }
+  },
+  "cap_experiment": "SKIPPED_NO_CAP_STOPS",
+  "literal_token_id_collision": "NOT_OBSERVED_ON_FIXED_SIX_PROMPTS",
+  "root_cause": "NOT_ESTABLISHED",
+  "new_java_compilation": "NOT_RUN",
+  "new_java_execution": "NOT_RUN",
+  "independent_benchmark": "NOT_ESTABLISHED",
+  "production_promotion": false
+}
