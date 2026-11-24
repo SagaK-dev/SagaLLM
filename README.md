@@ -53,12 +53,28 @@ A bounded research stage extends the **exact v0.17 SFT checkpoint** from
 CPU instruction fine-tuning on whole-family-isolated, original Java tasks.
 The SHA-checked checkpoint and tokenizer are required; no new pretrained
 weights or API is involved. Newly admitted full Java answers are recorded,
-not truncated. Only same-experiment heldout Java loss and **compile-only**
-checks can quantify changes. Correct behavior of model-generated Java is
-**NOT_RUN** and longer-context coding ability is **NOT_ESTABLISHED**.
-See `docs/JAVA_LONG_CONTEXT_SFT.md` and
-`.github/workflows/java-context-sft-cpu.yml`. Actual hosted-training results
-must be confirmed before claiming success.
+not truncated. The CPU SFT **did run**: hosted run
+[44994208434](https://github.com/SagaK-dev/SagaLLM/actions/runs/44994208434)
+completed 400 steps (1,600 distinct training examples); best checkpoint was
+selected at step 50. The downloaded v0.17 and v0.18 artifacts, tokenizer,
+best/last weights, data manifest and report have been SHA-256 verified.
+On eight held-out compile-only tasks, baseline compiled **2/8** and best
+v0.18 **0/8**, with 0 exact-reference matches in each. The original
+training workflow did **not** execute generated Java.
+
+A later, separate **synthetic** isolated-OCI matched A/B
+[run 45167198398](https://github.com/SagaK-dev/SagaLLM/actions/runs/45167198398)
+evaluated six prompts/18 exact I/O cases per condition: base **0/18**,
+interleaved **0/18**, contrastive **0/18**. No improvement was validated;
+no model weights were promoted. These internal synthetic tests **do not**
+establish independent human-reviewed coding ability. Longer-context
+generalization remains **NOT_ESTABLISHED**, and independent human benchmark
+evaluation remains **NOT_RUN**.
+
+See [v0.18 artifact audit](experiments/java_context_v018_artifact_audit.json),
+[matched A/B artifact audit](experiments/java_contrastive_v018_ab_evidence.json),
+[development plan](docs/DEVELOPMENT_PLAN_2026_11.md), and
+[offline evidence auditor](docs/JAVA_CONTRASTIVE_AB_AUDIT.md).
 
 ## Java production-source learning (v0.16) — pinned, attributed open source
 

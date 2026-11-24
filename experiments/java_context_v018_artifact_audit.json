@@ -1,0 +1,54 @@
+{
+  "evidence_type": "V018_HOSTED_CPU_TRAINING_ARTIFACT_HASH_AUDIT",
+  "audit_date_utc": "2026-11-24",
+  "v017_input": {
+    "workflow_run": "https://github.com/SagaK-dev/SagaLLM/actions/runs/44982940959",
+    "run_id": 44982940959,
+    "head_sha": "5d1eb19596d631704d42585b029eb8fb70e697f7",
+    "artifact_id": 14738368209,
+    "artifact_name": "sagallm-v017-java-instruction-sft-cpu",
+    "archive_sha256": "c25fa1833b64a620540d93067ce2c91a8c3916589dd5b565c8892661f9373581",
+    "best_checkpoint_sha256": "a17268d80ff443e4a0347f3a29df433556506f13537c78ce282836fa8fe4e5f9",
+    "tokenizer_sha256": "186566808cb03e328cac9a6b7b384a8d0aefc54ccb83fbe97782a751726682fe"
+  },
+  "v018_training": {
+    "workflow_run": "https://github.com/SagaK-dev/SagaLLM/actions/runs/44994208434",
+    "run_id": 44994208434,
+    "head_sha": "c531d43d1d1d2e9da18a14045bfced3cfcaa2720",
+    "job_conclusion": "success",
+    "artifact_id": 14743051466,
+    "artifact_name": "sagallm-v018-java-context-sft-cpu",
+    "archive_sha256": "b039250f6ebecb4f8631ba38050cf219eb41b53308ea8d0b13bb45f566477789",
+    "files_sha256": {
+      "java-context-model/java-sft-best.pt": "9802e848f0abea9979623f461b5e63cd7aed838acd087d06b20d747db1e2a0fc",
+      "java-context-model/java-sft-last.pt": "74ae92a54ca864461ffff08d0db80191cbc88370f8a5347c099f182ea271e016",
+      "java-context-model/tokenizer.json": "186566808cb03e328cac9a6b7b384a8d0aefc54ccb83fbe97782a751726682fe",
+      "java-context-model/train-report.json": "9e86df9f571bf1196e52dfe3ab087162e46ef69fcf108e41216d8a7324318077",
+      "java-context-data/manifest.json": "1e9c0ff933c5096cf2d633e81ec0c90498006fab45397a28a4c073fbf181a23a"
+    },
+    "archived_report_hashes_match_extracted_files": true,
+    "context_length": 384,
+    "optimizer_steps_completed": 400,
+    "distinct_examples_seen": 1600,
+    "best_checkpoint_step": 50,
+    "best_checkpoint_examples_seen": 200,
+    "compile_only": {
+      "base": {"compiled": 2, "total": 8, "exact_reference": 0},
+      "best": {"compiled": 0, "total": 8, "exact_reference": 0}
+    },
+    "reported_test_used_for_selection": false,
+    "generated_java_behavior": "NOT_RUN",
+    "independent_java_evaluation": "NOT_RUN",
+    "long_context_coding_quality": "NOT_ESTABLISHED"
+  },
+  "verification": {
+    "v017_archive_sha256_matches_github_digest": true,
+    "v018_archive_sha256_matches_github_digest": true,
+    "v017_input_model_and_tokenizer_sha256_match_workflow_pins": true,
+    "v018_report_model_last_tokenizer_and_data_sha256_match_extracted_files": true,
+    "training_run_provenance": "GITHUB_WORKFLOW_API_AND_DOWNLOADED_ARTIFACT",
+    "independent_training_reproduction": "NOT_RUN",
+    "source_code_java_execution_on_host": "NOT_RUN"
+  },
+  "limitations": "Artifact identity and report integrity are verified. This is not independent performance validation and does not authorize production weight promotion."
+}
