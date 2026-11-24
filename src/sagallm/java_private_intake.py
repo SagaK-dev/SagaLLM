@@ -11,6 +11,8 @@ from pathlib import Path
 import re
 import unicodedata
 
+from .java_overlap_screen import SimilarityScreen, VERSION as SIMILARITY_VERSION
+
 from . import java_coding_eval, java_generated_data, java_large_corpus
 from . import java_diverse_corpus, java_stdio_curriculum
 from .java_independent_benchmark import (
@@ -188,6 +190,11 @@ def _scan(root: Path, entries: list[dict], tasks: list[dict]) -> tuple[list[dict
     shapes = [_shape(t) for t in normalized]
     families = known_families()
     hits = set()
+    similarity = SimilarityScreen([t["prompt"] for t in tasks])
+    for i, text in enumerate(normalized):
+        for other, kind in similarity.compare(text):
+            if i != other:
+                hits.add((max(i, other), "suite", kind))
     for i, task in enumerate(tasks):
         for group, labels in families.items():
             if task["family"] in labels or task["id"] in labels:
@@ -229,6 +236,8 @@ def _scan(root: Path, entries: list[dict], tasks: list[dict]) -> tuple[list[dict
                 for value in _texts(row, entry["format"]):
                     text = _normalize(value)
                     shape = _shape(text)
+                    for i, kind in similarity.compare(text):
+                        hits.add((i, group, kind))
                     for i, task in enumerate(tasks):
                         if text == normalized[i]:
                             hits.add((i, group, "NORMALIZED_PROMPT_MATCH"))
@@ -267,6 +276,7 @@ def audit_private_intake(suite_path: Path, *, expected_suite_sha256: str,
     blockers.extend(protocol["review_blockers"])
     return {
         "schema": SCHEMA, "suite_sha256": digest,
+        "similarity_screen_version": SIMILARITY_VERSION,
         "provenance_sha256": p_sha, "inventory_sha256": i_sha,
         "task_count": protocol["tasks"], "case_count": protocol["io_cases"],
         "scanned_files": files, "missing_exposure_groups": missing,

@@ -1,7 +1,8 @@
-# SagaLLM Development Plan — 2026-11-24 (revision 2)
+# SagaLLM Development Plan — 2026-11-24 (revision 3)
 
 Original baseline: 961130d684a459ee513e96d6be17511cb47315c8 (PR #44).
 Revision 2 baseline: 4346405a5749bfca79538822409c8f0862f79eaf (PR #55).
+Revision 3 baseline: 69c93973de170eaf90fbe91325e751124768cfce (PR #56).
 This plan is a controlled research roadmap; implementation and evaluation status must be recorded separately.
 
 ## Evidence and current decision
@@ -19,34 +20,36 @@ Primary hypothesis: prompt-conditioning collapse (different instructions yield i
 
 | Priority / provisional window | Work and deliverable | Acceptance gate | Status |
 | --- | --- | --- | --- |
-| M0 / 11-24 to 11-27 | Reproducible evidence audit, pinned report-byte hash, integrity/tamper unit tests, run provenance ledger | Six matched prompt IDs, 18 cases/model, correct collision recount, SHA pin and non-promotion, fail closed on errors | IMPLEMENTED / LOCAL_AUDIT_PASS; GitHub CI and review pending |
-| M1 / 11-27 to 12-04 | Root-cause diagnostic matrix for generated-code format, tokenization, compile errors, source-hash collisions and prompt encoding | Same fixed seed, inputs and candidates; a falsifiable single-variable hypothesis pre-registered | NOT_RUN |
+| M0 / 11-24 to 11-27 | Reproducible evidence audit, pinned report-byte hash, integrity/tamper unit tests, run provenance ledger | Six matched prompt IDs, 18 cases/model, correct collision recount, SHA pin and non-promotion, fail closed on errors | ARCHIVE_INTEGRATED; Issue #22 closure criteria separate |
+| M1 / 11-27 to 12-04 | Root-cause diagnostic matrix for generated-code format, tokenization, compile errors, source-hash collisions and prompt encoding | Same fixed seed, inputs and candidates; a falsifiable single-variable hypothesis pre-registered | EXPLORATORY_RUNS_COMPLETED; ROOT_CAUSE_NOT_ESTABLISHED |
 | M2 / 12-01 to 12-15 | Collect 5–12 truly independent human-authored Java 17 I/O tasks; rights/license provenance and two distinct real reviews per task | Frozen task and I/O suite SHA, reviewer links/dates and family-overlap clearance before inference | BLOCKED_ON_HUMAN_REVIEW (#36) |
-| M3 / 12-05 to 12-22 | One-variable-at-a-time interventions: instruction representation, generation termination, task conditioning and modest capacity/data changes | Equal exposure and compute, no test leakage; full exact-stdout, distinct source-hash and unavailable-case analysis | NOT_RUN |
+| M3 / 12-05 to 12-22 | One-variable-at-a-time interventions: instruction representation, generation termination, task conditioning and modest capacity/data changes | Equal exposure and compute, no test leakage; full exact-stdout, distinct source-hash and unavailable-case analysis | EXPLORATORY_RUNS_COMPLETED; NO_VALIDATED_GAIN |
 | M4 / 12-15 to 01-05 | Run approved independent suite on disposable reviewed VM/OCI only | Opt-in, image digest, no network, non-root, resource limits; compile + exact stdout, corner cases and operator attestations | NOT_RUN |
 | M5 / 01-05 to 01-20 | CPU/GPU cost and rights reviewed pilot; 1B/3B resource feasibility | Pilot independent metrics + rights gate first. No scale-up or claimed GPU training without approval and physical evidence | NOT_AUTHORIZED |
 | M6 / 01-20 onward | Release hardening, inference safeguards, documented rollback, status/release evidence | Explicit independent evaluation, security review and artifact provenance for any production model promotion | NOT_READY |
 
 Windows are planning targets, not promises of external reviews, GPU allocation or metric improvement.
 
-## Revision 2 — evidence and work breakdown
+## Revision 3 — evidence and work breakdown
 
 - M0: PR #54 archived 12 exact reports and 177-run metadata; verifier 45391237711 SUCCESS; merged. Full rights/secret audit and Issue #22 closure criteria are separate.
 - M1/M3: the exploratory diagnostics and matched interventions in PRs #46–53 did run; their reports are archived. No validated gain/root cause established. First-layer attention-bias pilot run 45389874625 improved both-choice counts in only 1/7 models vs preregistered 5/7; do not tune on the exposed probes. M3 status: exploratory experiments completed, further experiments require a new hypothesis and independent gate; no promotion.
 - M4: PR #55 merged, post-merge CPU and independent protocol CI 45394516042 / 45394515953 SUCCESS. Only infrastructure is verified; actual VM and independent Java behavior NOT_RUN.
-- M2: PR #56 initial intake CI 45397977503 / 45397976772 SUCCESS. Real human-authored tasks and two genuine reviews remain missing.
+- M2: PR #56 merged as 69c93973de170eaf90fbe91325e751124768cfce; final-head dedicated intake / protocol / CPU CI 45400145607 / 45400145435 / 45400145739 SUCCESS. Real human-authored tasks and two genuine reviews remain missing.
 
 | Work item | Deliverable and acceptance gate | Revision status |
 | --- | --- | --- |
-| M2.1 | Private provenance and corpus inventory; exact byte pins, no private content in Git/CI | Implemented on PR #56 |
-| M2.2 | Mandatory re-run of local intake on execution path; missing, tampered, blocked or incomplete inputs reject before candidate/engine access; mocked positive/negative tests | Implement in this revision; CI required |
-| M2.3 | Near-duplicate and semantic/structural review leads, bilingual paraphrases, calibrated synthetic positives/negatives; bounded resources and no false independence claim | NEXT |
-| M2.4 | Exposure inventory coverage per checkpoint, including pretraining and dev probes, scalable pinned shard scanning; audit missing sources, no arbitrary sample as full coverage | PLANNED |
+| M2.1 | Private provenance and corpus inventory; exact byte pins, no private content in Git/CI | Merged via PR #56 |
+| M2.2 | Mandatory re-run of local intake on execution path; missing, tampered, blocked or incomplete inputs reject before candidate/engine access; mocked positive/negative tests | Merged via PR #56 |
+| M2.3 | Near-duplicate and semantic/structural review leads, bilingual paraphrases, calibrated synthetic positives/negatives; bounded resources and no false independence claim | Heuristic screen implemented in revision 3; CI pending; general semantic/AST detection not established |
+| M2.4 | Exposure inventory coverage per checkpoint, including pretraining and dev probes, scalable pinned shard scanning; audit missing sources, no arbitrary sample as full coverage | NEXT: exact checkpoint exposure manifest and bounded shard scan |
 | M2.5 | 5–12 new privately held-back human tasks, author separated from reviewers, two real per-task reviews, rights and semantic audit, exact freeze before inference | BLOCKED_ON_HUMAN_REVIEW |
 | M4.1 | Freeze model/tokenizer/checkpoint/generation settings and evaluator revision; hash each candidate; classify compile, behavior, timeout, unavailable separately, matched comparisons | PARTIAL / PLANNED |
 | M4.2 | Actual reviewed disposable Linux VM and second independent audit; Java 17, exact stdout, no generated Java on shared CI | NOT_RUN |
 | M3.1 | New preregistered intervention and fresh unexposed development data; compare against pinned baseline with matched exposure/compute and report negative results | PLANNED; do not reuse exposed probes for selection |
 | M5/M6 | Cost/rights/compute feasibility and release hardening only after independent evidence and owner authorization | NOT_AUTHORIZED / NOT_READY |
+
+M2.3 acceptance is deliberately scoped to deterministic lexical near-duplicate and bilingual concept-rule leads with synthetic positive/negative tests, explicit resource limits and fail-closed integration. Translation, semantic equivalence and code AST similarity are not established; those require separate calibration on rights-reviewed examples before stronger claims.
 
 Machine preflight is not proof: it cannot verify inventory completeness,
 authorship, legal rights or semantic independence. No self-attested status

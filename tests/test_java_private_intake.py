@@ -280,3 +280,35 @@ def test_actual_intake_gate_precedes_engine_and_candidates(tmp_path, monkeypatch
         assert report["private_intake_gate"] == "PREFLIGHT_ONLY"
         assert len(report["private_intake_report_canonical_sha256"]) == 64
         assert report["private_intake"]["independence_proven"] is False
+
+
+def test_similarity_lead_blocks_actual_evaluator_without_engine(tmp_path, monkeypatch):
+    from sagallm import java_independent_benchmark as bench
+    paths = approved_mock(tmp_path)
+    s, p, inv, root = paths
+    suite = json.loads(s.read_text())
+    suite["tasks"][0]["prompt"] = "Find shortest path in a weighted graph."
+    save(s, suite)
+    meta = json.loads(p.read_text())
+    meta["suite_sha256"] = sha(s)
+    meta["tasks"][0]["task_sha256"] = task_sha256(suite["tasks"][0])
+    save(p, meta)
+    change_exposure(paths, "development", {"text": "重み付きグラフで最短経路を求める。"})
+    report = run(paths)
+    assert report["similarity_screen_version"] == "java-overlap-heuristic-v1"
+    assert {"task_index": 0, "group": "development", "kind": "BILINGUAL_CONCEPT_RULE_MATCH"} in report["overlap_leads"]
+    assert report["machine_status"] == "BLOCKED"
+    assert "重み付き" not in json.dumps(report, ensure_ascii=False)
+    monkeypatch.setattr(bench, "review_gate", lambda *a, **k: ("ELIGIBLE_SELF_ATTESTED", "a"*64))
+    def forbidden(*a, **k):
+        raise AssertionError("Similarity blocker must stop evaluation before engine/source")
+    for name in ("local_docker_context", "oci_image_ready", "_candidate", "run_java_in_oci"):
+        monkeypatch.setattr(bench, name, forbidden)
+    result = bench.evaluate_suite(
+        s, tmp_path, allow_execution=True, disposable_vm_acknowledged=True,
+        expected_suite_sha256=sha(s), provenance_path=p,
+        expected_provenance_sha256=sha(p), inventory_path=inv,
+        expected_inventory_sha256=sha(inv), exposure_root=root)
+    assert result["reason"] == "PRIVATE_INTAKE_BLOCKED"
+    assert result["behavioral_status"] == "NOT_RUN"
+    assert result["java_executed"] is False
