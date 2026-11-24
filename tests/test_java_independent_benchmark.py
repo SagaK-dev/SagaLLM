@@ -80,8 +80,10 @@ def test_no_opt_in_means_no_oci_or_candidate_access(tmp_path, monkeypatch):
 def _mock_vm_review(monkeypatch):
     # Existing runtime tests are mocked; the actual gate is tested separately.
     monkeypatch.setattr(bench, "review_gate", lambda *a, **k: ("ELIGIBLE_SELF_ATTESTED", "a" * 64))
-    monkeypatch.setattr(bench, "_private_intake_gate",
+    monkeypatch.setattr(bench, "_model_freeze_gate",
                         lambda *a, **k: ("PREFLIGHT_ONLY", None))
+    monkeypatch.setattr(bench, "_pinned_candidates",
+                        lambda p, d, f, ids, root: {i: bench._candidate(root / (i + ".java")) for i in ids})
     monkeypatch.setattr(bench, "local_docker_context", lambda: True)
     monkeypatch.setattr(bench, "local_image_has_no_volumes", lambda image: True)
 
@@ -139,7 +141,8 @@ def test_mocked_oci_receives_each_stdin_and_exact_expected_stdout(tmp_path, monk
     report = bench.evaluate_suite(
         suite, candidates, allow_execution=True,
         disposable_vm_acknowledged=True,
-        expected_suite_sha256=fingerprint)
+        expected_suite_sha256=fingerprint, candidate_freeze_path=tmp_path / "mock.json",
+        expected_candidate_freeze_sha256="a" * 64)
     assert len(calls) == 15
     assert calls[0] == ("10 90 60 120\n", "30\n")
     assert report["behavioral_status"] == "EVALUATED"
@@ -168,7 +171,8 @@ def test_missing_and_symlinked_candidates_do_not_run(tmp_path, monkeypatch):
     report = bench.evaluate_suite(
         suite, candidate_dir, allow_execution=True,
         disposable_vm_acknowledged=True,
-        expected_suite_sha256=hashlib.sha256(suite.read_bytes()).hexdigest())
+        expected_suite_sha256=hashlib.sha256(suite.read_bytes()).hexdigest(),
+        candidate_freeze_path=tmp_path / "mock.json", expected_candidate_freeze_sha256="a" * 64)
     assert report["behavioral_status"] == "PARTIAL_OR_UNAVAILABLE"
     assert report["behavior_passed_tasks"] is None
     assert all(x["status"] == "CANDIDATE_MISSING" for x in report["results"])
@@ -252,7 +256,8 @@ def test_missing_vm_review_never_reaches_engine(tmp_path, monkeypatch):
     monkeypatch.setattr(bench, "_candidate", forbidden)
     report = bench.evaluate_suite(suite, tmp_path, allow_execution=True,
         disposable_vm_acknowledged=True,
-        expected_suite_sha256=hashlib.sha256(suite.read_bytes()).hexdigest())
+        expected_suite_sha256=hashlib.sha256(suite.read_bytes()).hexdigest(),
+        candidate_freeze_path=tmp_path / "mock.json", expected_candidate_freeze_sha256="a" * 64)
     assert report["reason"] == "PINNED_VM_REVIEW_REQUIRED"
     assert report["behavioral_status"] == "NOT_RUN"
     assert report["java_executed"] is False
@@ -297,6 +302,7 @@ def test_image_volume_rejection_before_candidate_read(tmp_path, monkeypatch):
     monkeypatch.setattr(bench, "run_java_in_oci", forbidden)
     result = bench.evaluate_suite(suite, tmp_path, allow_execution=True,
         disposable_vm_acknowledged=True,
-        expected_suite_sha256=hashlib.sha256(suite.read_bytes()).hexdigest())
+        expected_suite_sha256=hashlib.sha256(suite.read_bytes()).hexdigest(),
+        candidate_freeze_path=tmp_path / "mock.json", expected_candidate_freeze_sha256="a" * 64)
     assert result["reason"] == "OCI_IMAGE_VOLUME_CHECK_FAILED"
     assert result["behavioral_status"] == "NOT_RUN"

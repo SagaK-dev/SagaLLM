@@ -3,6 +3,8 @@ on:
   pull_request:
     paths:
       - 'src/sagallm/java_private_intake.py'
+      - 'src/sagallm/java_model_freeze.py'
+      - 'tests/test_java_model_freeze.py'
       - 'src/sagallm/java_exposure_shards.py'
       - 'scripts/java_exposure_shards.py'
       - 'tests/test_java_exposure_shards.py'
@@ -16,6 +18,8 @@ on:
     branches: [main]
     paths:
       - 'src/sagallm/java_private_intake.py'
+      - 'src/sagallm/java_model_freeze.py'
+      - 'tests/test_java_model_freeze.py'
       - 'src/sagallm/java_exposure_shards.py'
       - 'scripts/java_exposure_shards.py'
       - 'tests/test_java_exposure_shards.py'
@@ -40,4 +44,4 @@ jobs:
         with:
           python-version: '3.11'
       - run: python -m pip install 'pytest>=8,<10'
-      - run: python -m pytest -q tests/test_java_private_intake.py tests/test_java_overlap_screen.py tests/test_java_exposure_shards.py
+      - run: python -m pytest -q tests/test_java_private_intake.py tests/test_java_overlap_screen.py tests/test_java_exposure_shards.py tests/test_java_model_freeze.py

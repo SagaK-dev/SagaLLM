@@ -218,6 +218,37 @@ def _private_intake_gate(suite_path, fingerprint, *, provenance_path,
     return "PREFLIGHT_ONLY", report
 
 
+def _model_freeze_gate(suite_path, fingerprint, *, freeze_path,
+                       expected_freeze_sha256, provenance_path,
+                       expected_provenance_sha256, inventory_path,
+                       expected_inventory_sha256, shard_root, artifact_root, image):
+    from .java_model_freeze import verify_model_freeze
+    if any(value is None for value in (
+            freeze_path, expected_freeze_sha256, provenance_path,
+            expected_provenance_sha256, inventory_path, expected_inventory_sha256,
+            shard_root, artifact_root)):
+        return "PINNED_MODEL_FREEZE_REQUIRED", None
+    try:
+        report = verify_model_freeze(
+            suite_path, fingerprint, freeze_path=freeze_path,
+            expected_freeze_sha256=expected_freeze_sha256,
+            provenance_path=provenance_path,
+            expected_provenance_sha256=expected_provenance_sha256,
+            inventory_path=inventory_path,
+            expected_inventory_sha256=expected_inventory_sha256,
+            shard_root=shard_root, artifact_root=artifact_root, image=image)
+    except (OSError, ValueError, TypeError, RecursionError):
+        return "MODEL_FREEZE_INVALID", None
+    if report["machine_status"] != "PREFLIGHT_ONLY" or report["blockers"]:
+        return "MODEL_FREEZE_BLOCKED", report
+    return "PREFLIGHT_ONLY", report
+
+
+def _pinned_candidates(path, digest, freeze_sha, task_ids, candidate_dir):
+    from .java_model_freeze import read_candidate_freeze
+    return read_candidate_freeze(path, digest, freeze_sha, task_ids, candidate_dir)
+
+
 def evaluate_suite(suite_path: Path, candidate_dir: Path, *,
                    allow_execution: bool = False, expected_suite_sha256: str | None = None,
                    disposable_vm_acknowledged: bool = False,
@@ -228,7 +259,13 @@ def evaluate_suite(suite_path: Path, candidate_dir: Path, *,
                    expected_provenance_sha256: str | None = None,
                    inventory_path: Path | None = None,
                    expected_inventory_sha256: str | None = None,
-                   exposure_root: Path | None = None) -> dict:
+                   exposure_root: Path | None = None,
+                   freeze_path: Path | None = None,
+                   expected_freeze_sha256: str | None = None,
+                   shard_root: Path | None = None,
+                   artifact_root: Path | None = None,
+                   candidate_freeze_path: Path | None = None,
+                   expected_candidate_freeze_sha256: str | None = None) -> dict:
     suite, fingerprint, protocol = read_suite(suite_path)
     result = {
         "protocol": SCHEMA,
@@ -269,25 +306,38 @@ def evaluate_suite(suite_path: Path, candidate_dir: Path, *,
         return result
     result["vm_review_sha256"] = vm_sha
     result["oci_image"] = image
-    intake_status, intake_report = _private_intake_gate(
-        suite_path, fingerprint, provenance_path=provenance_path,
+    freeze_status, freeze_report = _model_freeze_gate(
+        suite_path, fingerprint, freeze_path=freeze_path,
+        expected_freeze_sha256=expected_freeze_sha256,
+        provenance_path=provenance_path,
         expected_provenance_sha256=expected_provenance_sha256,
         inventory_path=inventory_path,
         expected_inventory_sha256=expected_inventory_sha256,
-        exposure_root=exposure_root)
-    result["private_intake_gate"] = intake_status
-    if intake_report is not None:
-        result["private_intake"] = intake_report
-        result["private_intake_report_canonical_sha256"] = hashlib.sha256(
-            json.dumps(intake_report, sort_keys=True, ensure_ascii=False,
+        shard_root=shard_root, artifact_root=artifact_root, image=image)
+    result["model_freeze_gate"] = freeze_status
+    if freeze_report is not None:
+        result["model_freeze"] = freeze_report
+        result["model_freeze_report_canonical_sha256"] = hashlib.sha256(
+            json.dumps(freeze_report, sort_keys=True, ensure_ascii=False,
                        separators=(",", ":")).encode("utf-8")).hexdigest()
-    if intake_status != "PREFLIGHT_ONLY":
-        result["reason"] = intake_status
+    if freeze_status != "PREFLIGHT_ONLY":
+        result["reason"] = freeze_status
         return result
     if (not candidate_dir.is_dir() or candidate_dir.is_symlink()
             or not candidate_dir.resolve().is_dir()):
         result["reason"] = "CANDIDATE_DIRECTORY_MISSING"
         return result
+    if candidate_freeze_path is None or expected_candidate_freeze_sha256 is None:
+        result["reason"] = "PINNED_CANDIDATE_FREEZE_REQUIRED"
+        return result
+    try:
+        pinned_codes = _pinned_candidates(
+            candidate_freeze_path, expected_candidate_freeze_sha256,
+            expected_freeze_sha256, [t["id"] for t in suite["tasks"]], candidate_dir)
+    except (OSError, ValueError, TypeError, RecursionError):
+        result["reason"] = "CANDIDATE_FREEZE_INVALID"
+        return result
+    result["candidate_freeze_sha256"] = expected_candidate_freeze_sha256
     if not local_docker_context():
         result["reason"] = "LOCAL_DOCKER_CONTEXT_REQUIRED"
         return result
@@ -302,7 +352,7 @@ def evaluate_suite(suite_path: Path, candidate_dir: Path, *,
     attempted = False
     for task in suite["tasks"]:
         task_id = task["id"]
-        code = _candidate(candidate_dir / (task_id + ".java"))
+        code = pinned_codes[task_id]
         if code is None:
             any_unavailable = True
             results.append({"id": task_id, "status": "CANDIDATE_MISSING",

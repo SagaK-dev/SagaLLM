@@ -26,7 +26,13 @@ def main() -> None:
     parser.add_argument("--expected-provenance-sha256")
     parser.add_argument("--inventory", type=Path)
     parser.add_argument("--expected-inventory-sha256")
-    parser.add_argument("--exposure-root", type=Path)
+    parser.add_argument("--exposure-root", type=Path, help="Legacy; not sufficient for execution")
+    parser.add_argument("--model-freeze", type=Path)
+    parser.add_argument("--expected-model-freeze-sha256")
+    parser.add_argument("--shard-root", type=Path)
+    parser.add_argument("--artifact-root", type=Path)
+    parser.add_argument("--candidate-freeze", type=Path)
+    parser.add_argument("--expected-candidate-freeze-sha256")
     parser.add_argument("--vm-review", type=Path)
     parser.add_argument("--expected-vm-review-sha256")
     parser.add_argument("--backend", choices=["docker", "podman"], default="docker")
@@ -45,6 +51,11 @@ def main() -> None:
         inventory_path=args.inventory,
         expected_inventory_sha256=args.expected_inventory_sha256,
         exposure_root=args.exposure_root,
+        freeze_path=args.model_freeze,
+        expected_freeze_sha256=args.expected_model_freeze_sha256,
+        shard_root=args.shard_root, artifact_root=args.artifact_root,
+        candidate_freeze_path=args.candidate_freeze,
+        expected_candidate_freeze_sha256=args.expected_candidate_freeze_sha256,
         vm_review_path=args.vm_review,
         expected_vm_review_sha256=args.expected_vm_review_sha256,
     )

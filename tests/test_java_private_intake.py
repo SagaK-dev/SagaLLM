@@ -270,16 +270,20 @@ def test_actual_intake_gate_precedes_engine_and_candidates(tmp_path, monkeypatch
         args.pop("inventory_path")
     if mode == "tampered":
         args["expected_inventory_sha256"] = "0" * 64
-    report = bench.evaluate_suite(
-        s, tmp_path / "missing-candidates", allow_execution=True,
-        disposable_vm_acknowledged=True, expected_suite_sha256=sha(s), **args)
-    assert report["reason"] == reason
-    assert report["behavioral_status"] == "NOT_RUN"
-    assert report["java_executed"] is False
+    status, report = bench._private_intake_gate(s, sha(s),
+        provenance_path=args.get("provenance_path"),
+        expected_provenance_sha256=args.get("expected_provenance_sha256"),
+        inventory_path=args.get("inventory_path"),
+        expected_inventory_sha256=args.get("expected_inventory_sha256"),
+        exposure_root=args.get("exposure_root"))
+    assert status == ("PREFLIGHT_ONLY" if mode == "clean" else reason)
     if mode == "clean":
-        assert report["private_intake_gate"] == "PREFLIGHT_ONLY"
-        assert len(report["private_intake_report_canonical_sha256"]) == 64
-        assert report["private_intake"]["independence_proven"] is False
+        assert report["independence_proven"] is False
+    # The legacy raw gate is no longer sufficient for evaluation.
+    result = bench.evaluate_suite(s, tmp_path, allow_execution=True,
+        disposable_vm_acknowledged=True, expected_suite_sha256=sha(s), **args)
+    assert result["reason"] == "PINNED_MODEL_FREEZE_REQUIRED"
+    assert result["behavioral_status"] == "NOT_RUN"
 
 
 def test_similarity_lead_blocks_actual_evaluator_without_engine(tmp_path, monkeypatch):
@@ -309,6 +313,6 @@ def test_similarity_lead_blocks_actual_evaluator_without_engine(tmp_path, monkey
         expected_suite_sha256=sha(s), provenance_path=p,
         expected_provenance_sha256=sha(p), inventory_path=inv,
         expected_inventory_sha256=sha(inv), exposure_root=root)
-    assert result["reason"] == "PRIVATE_INTAKE_BLOCKED"
+    assert result["reason"] == "PINNED_MODEL_FREEZE_REQUIRED"
     assert result["behavioral_status"] == "NOT_RUN"
     assert result["java_executed"] is False

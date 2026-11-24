@@ -74,7 +74,9 @@ python scripts/evaluate_java_independent_io.py \
   --expected-suite-sha256 <exact-64-character-sha256> \
   --provenance /private/provenance.json --expected-provenance-sha256 PROVENANCE_SHA \
   --inventory /private/inventory.json --expected-inventory-sha256 INVENTORY_SHA \
-  --exposure-root /private/exposure \
+  --model-freeze /private/model-freeze.json --expected-model-freeze-sha256 MODEL_FREEZE_SHA \
+  --shard-root /private/shards --artifact-root /private/artifacts \
+  --candidate-freeze /private/candidate-freeze.json --expected-candidate-freeze-sha256 CANDIDATE_FREEZE_SHA \
   --vm-review /private/review.json \
   --expected-vm-review-sha256 <exact-review-file-sha256> \
   --backend docker --image <repository@sha256:reviewed-digest>
@@ -103,3 +105,7 @@ OCI image-declared volumes are rejected for independent evaluation. The shared r
 ## Mandatory M2 preflight
 
 See [JAVA_PRIVATE_INTAKE.md](JAVA_PRIVATE_INTAKE.md). Explicit evaluation now re-runs the pinned local intake before candidate access or Docker engine probes. Missing metadata, hash mismatches or overlap leads prevent execution. Only `PREFLIGHT_ONLY` with no blockers passes the machine gate; this is not independent review or proof. Report includes the canonical intake report hash and per-candidate source hashes without raw code. Do not copy sensitive exposure material into the VM; if safe complete inputs cannot be made available, keep evaluation NOT_RUN.
+
+## Model-specific mandatory shard gate
+
+See [JAVA_MODEL_FREEZE.md](JAVA_MODEL_FREEZE.md). The old raw intake path is now offline-only. The evaluator requires the model-specific freeze, exact shard scan and candidate manifest before engine access. All supplied history and generation settings remain declarations, not verified training or inference evidence.
