@@ -1,0 +1,23 @@
+{
+  "status": "PARAMETER_CE_AUDIT_AND_PROMPT_SIGNAL_DIAGNOSTIC_COMPLETE",
+  "run_id": 45378356573,
+  "job_id": 138390543325,
+  "run_sha": "3b8dd807c39b83f0115cb0c2fc60c98467e20074",
+  "artifact_id": 14911808494,
+  "zip_sha256": "46b2df5cdb251e7abb3c11796c9cc0bc92402133474e1d56e9f0c0ee4253075f",
+  "report_sha256": "535d10f4c9873f945040ddadfbadcd5041024878d59db6fda5203cda9038ab6e",
+  "downloaded_hashes_verified": true,
+  "cpu_ci_run": 45378356405,
+  "tests_passed": 6,
+  "generation_replay_matches": 126,
+  "models": 7,
+  "pairs_per_model": 20,
+  "equal_length_pairs_per_model": 19,
+  "all_model_pairs": 140,
+  "rms_lower_at_end_pairs": 134,
+  "js_lower_at_end_pairs": 0,
+  "decision": "NO_CONSISTENT_PARAMETER_SIGNAL",
+  "root_cause": "NOT_ESTABLISHED",
+  "behavior": "NOT_RUN",
+  "production_promotion": false
+}
