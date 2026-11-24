@@ -185,7 +185,8 @@ def _texts(row: dict, kind: str) -> list[str]:
     return values
 
 
-def _scan(root: Path, entries: list[dict], tasks: list[dict]) -> tuple[list[dict], list[dict]]:
+def _scan(root: Path, entries: list[dict], tasks: list[dict], *,
+          source_digest=None) -> tuple[list[dict], list[dict]]:
     normalized = [_normalize(t["prompt"]) for t in tasks]
     shapes = [_shape(t) for t in normalized]
     families = known_families()
@@ -231,6 +232,8 @@ def _scan(root: Path, entries: list[dict], tasks: list[dict]) -> tuple[list[dict
                         or total_bytes > MAX_TOTAL or total_rows > MAX_ROWS):
                     raise ValueError("Exposure scan limit exceeded")
                 digest.update(raw)
+                if source_digest is not None:
+                    source_digest.update(raw)
                 row = json.loads(raw, object_pairs_hook=_unique_object)
                 group = entry["group"]
                 for value in _texts(row, entry["format"]):
