@@ -1,0 +1,26 @@
+{
+  "status": "PARAMETER_CE_CPU_TRAINING_AND_INFERENCE_COMPLETE",
+  "run_id": 45377422360,
+  "run_sha": "fdf53625d8e64596748113b53fd6f4c63e2a1c74",
+  "job_id": 138387289566,
+  "artifact_id": 14912381648,
+  "archive_sha256": "068d733b1a1059a1e904ed8931467a85aaf9f5a16968a6837ce2fb4b604bb447",
+  "report_sha256": "26f143575842073c9b4119ecefcb3b50935891bba6c4c9fc60b0b0c8353a89b7",
+  "downloaded_hashes_verified": true,
+  "checkpoint_sha256": {
+    "4201-control": "8793e467968be8b65766744fcc4e68c2d055c13820985ff0a8138e05bceb6464",
+    "4201-parameter_ce": "6000ffedc3dbc6373c7602091a15dae532fda80b93fbb9f8a01b357573cf7957",
+    "4202-control": "1c03cf5f31c6ce2572040035a24462e385bf452ca5d71071f6d36bb05933aeec",
+    "4202-parameter_ce": "af98af991c7fbfc7fca057b7a274edd55ce5a512d328a6c2c931461e70dfa680",
+    "4203-control": "44e26c576e25a082f65e5dd3b680ff8bb5101c6602e39736f192ffbe7f02130e",
+    "4203-parameter_ce": "5ea1780bda83dae67a73721a8946d8ee6da0d4a4180ef36fa2ac1b036f0d21be"
+  },
+  "steps": 960,
+  "eos": 126,
+  "passing_seeds": 0,
+  "decision": "NO_CONSISTENT_PARAMETER_SIGNAL",
+  "compile": "NOT_RUN",
+  "behavior": "NOT_RUN",
+  "independent_benchmark": "NOT_ESTABLISHED",
+  "production_promotion": false
+}
