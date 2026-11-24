@@ -51,6 +51,5 @@ No silent sampling. Optional measurement reports elapsed time, bytes/s
 and peak traced Python allocations (not total process RSS); tracing changes
 runtime. Tests use small synthetic fixtures only, not real large corpora.
 
-This is an offline engineering preflight, **not** a mandatory runtime
-gate yet. No training-lineage verification, human rights approval, semantic
+The independent evaluator now requires this shard audit through the model freeze gate; see JAVA_MODEL_FREEZE.md. No training-lineage verification, human rights approval, semantic
 independence or model capability is established. Review remains required.
