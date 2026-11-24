@@ -72,6 +72,9 @@ python scripts/evaluate_java_independent_io.py \
   --output independently-reviewed-results.json \
   --allow-execution --acknowledge-disposable-vm \
   --expected-suite-sha256 <exact-64-character-sha256> \
+  --provenance /private/provenance.json --expected-provenance-sha256 PROVENANCE_SHA \
+  --inventory /private/inventory.json --expected-inventory-sha256 INVENTORY_SHA \
+  --exposure-root /private/exposure \
   --vm-review /private/review.json \
   --expected-vm-review-sha256 <exact-review-file-sha256> \
   --backend docker --image <repository@sha256:reviewed-digest>
@@ -96,3 +99,7 @@ executed against SagaLLM, and no Java quality improvement is established.
 See [JAVA_M4_VM_REVIEW.md](JAVA_M4_VM_REVIEW.md). The independent evaluator rejects common CI environments, non-Linux hosts, mutable image tags, non-default or remote Docker contexts, and missing or mismatched review evidence. These are defense-in-depth checks, not proof of VM isolation. Podman is deferred for this independent evaluation path.
 
 OCI image-declared volumes are rejected for independent evaluation. The shared runner disables Docker/Podman logging and overrides the image entrypoint with the fixed shell; actual engine behavior still requires VM review. Duplicate JSON keys and duplicate stdin cases are rejected.
+
+## Mandatory M2 preflight
+
+See [JAVA_PRIVATE_INTAKE.md](JAVA_PRIVATE_INTAKE.md). Explicit evaluation now re-runs the pinned local intake before candidate access or Docker engine probes. Missing metadata, hash mismatches or overlap leads prevent execution. Only `PREFLIGHT_ONLY` with no blockers passes the machine gate; this is not independent review or proof. Report includes the canonical intake report hash and per-candidate source hashes without raw code. Do not copy sensitive exposure material into the VM; if safe complete inputs cannot be made available, keep evaluation NOT_RUN.

@@ -60,8 +60,15 @@ inventory may omit exposures; the tool cannot know its completeness.
 Lexical comparisons miss paraphrases, translations, structural/semantic
 similarity and memorized code. Numeric matches may be false positives.
 Use a real independent human review of the exact source, I/O, rights and
-complete exposure history before freezing the suite. This preflight is a
-separate preparation step, not yet a mandatory runtime gate.
+complete exposure history before freezing the suite. The independent evaluator now requires the same pinned local inputs and
+re-runs this screen before candidate access or engine probes. Missing inputs,
+invalid hashes, unresolved leads and other blockers prevent evaluation.
+Only a blocker-free PREFLIGHT_ONLY passes the machine gate. This does not
+authenticate reviewers or prove completeness. Author/reviewer identity
+collisions and reviews predating authorship are blocked; numeric-template
+substrings are also screened. Use only approved, non-sensitive exposure
+inputs in the disposable VM; no corpus is mounted into generated Java.
+If unavailable, do not execute.
 
 Limits: 64 input files, 100 MB/file, 512 MB total, 500,000 JSONL rows,
 256 KiB/line; no silent truncation. Larger corpora require a separately

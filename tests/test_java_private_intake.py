@@ -187,3 +187,96 @@ def test_symlink_and_malformed_jsonl(tmp_path):
     change_exposure(paths, "train", {"messages": [{"role": "unknown", "content": "a"}]}, "chat-jsonl")
     with pytest.raises(ValueError, match="Malformed"):
         run(paths)
+
+
+def approved_mock(tmp_path):
+    paths = fixture(tmp_path)
+    s, p, _, _ = paths
+    suite = json.loads(s.read_text())
+    suite.update(origin="EXTERNALLY_SOURCED_HUMAN_TASKS",
+                 review_status="APPROVED_FOR_INDEPENDENT_EVALUATION",
+                 license_id="CC0-1.0", provenance_url="https://example.invalid/mock",
+                 train_overlap_review="ATTESTED_NO_KNOWN_OVERLAP",
+                 reviewers=[{"reviewer_id": "mock-review-" + i, "date": "2020-02-01",
+                             "review_url": "https://example.invalid/" + i,
+                             "task_ids": [t["id"] for t in suite["tasks"]]}
+                            for i in ("a", "b")])
+    save(s, suite)
+    meta = json.loads(p.read_text())
+    meta["suite_sha256"] = sha(s)
+    for row in meta["tasks"]:
+        row.update(license_id="CC0-1.0", allowed_uses=["evaluate", "redistribute"],
+                   held_back=True, rights_review="ATTESTED", io_review="ATTESTED",
+                   overlap_review="ATTESTED")
+    save(p, meta)
+    return paths
+
+
+def test_mock_clean_preflight_is_never_independence_proof(tmp_path):
+    result = run(approved_mock(tmp_path))
+    assert result["machine_status"] == "PREFLIGHT_ONLY"
+    assert result["review_gate"] == "REVIEW_REQUIRED"
+    assert result["independence_proven"] is False
+
+
+def test_author_review_and_date_conflicts(tmp_path):
+    paths = approved_mock(tmp_path)
+    p = paths[1]
+    meta = json.loads(p.read_text())
+    meta["tasks"][0]["author_id"] = " MOCK-REVIEW-A "
+    meta["tasks"][1]["authored_on"] = "2020-03-01"
+    save(p, meta)
+    blockers = run(paths)["blockers"]
+    assert "AUTHOR_CANNOT_REVIEW_OWN_TASK" in blockers
+    assert "REVIEW_PREDATES_AUTHORSHIP" in blockers
+
+
+def test_numeric_template_embedded_in_exposure(tmp_path):
+    paths = approved_mock(tmp_path)
+    s, p, _, _ = paths
+    suite = json.loads(s.read_text())
+    suite["tasks"][0]["prompt"] = "A mock example uses the numeric parameter 123 for its output."
+    save(s, suite)
+    meta = json.loads(p.read_text())
+    meta["suite_sha256"] = sha(s)
+    meta["tasks"][0]["task_sha256"] = task_sha256(suite["tasks"][0])
+    save(p, meta)
+    change_exposure(paths, "train", {"text": "wrapper A mock example uses the numeric parameter 999 for its output. end"})
+    assert {"task_index": 0, "group": "train", "kind": "NUMERIC_TEMPLATE_SUBSTRING_MATCH"} in run(paths)["overlap_leads"]
+
+
+@pytest.mark.parametrize("mode,reason", [
+    ("missing", "PINNED_PRIVATE_INTAKE_REQUIRED"),
+    ("tampered", "PRIVATE_INTAKE_INVALID"),
+    ("overlap", "PRIVATE_INTAKE_BLOCKED"),
+    ("clean", "CANDIDATE_DIRECTORY_MISSING"),
+])
+def test_actual_intake_gate_precedes_engine_and_candidates(tmp_path, monkeypatch, mode, reason):
+    from sagallm import java_independent_benchmark as bench
+    paths = approved_mock(tmp_path)
+    s, p, inv, root = paths
+    if mode == "overlap":
+        prompt = json.loads(s.read_text())["tasks"][0]["prompt"]
+        change_exposure(paths, "development", {"text": prompt})
+    monkeypatch.setattr(bench, "review_gate", lambda *a, **k: ("ELIGIBLE_SELF_ATTESTED", "a" * 64))
+    def forbidden(*a, **k):
+        raise AssertionError("No engine or candidate source allowed")
+    for name in ("local_docker_context", "oci_image_ready", "_candidate", "run_java_in_oci"):
+        monkeypatch.setattr(bench, name, forbidden)
+    args = dict(provenance_path=p, expected_provenance_sha256=sha(p),
+                inventory_path=inv, expected_inventory_sha256=sha(inv),
+                exposure_root=root)
+    if mode == "missing":
+        args.pop("inventory_path")
+    if mode == "tampered":
+        args["expected_inventory_sha256"] = "0" * 64
+    report = bench.evaluate_suite(
+        s, tmp_path / "missing-candidates", allow_execution=True,
+        disposable_vm_acknowledged=True, expected_suite_sha256=sha(s), **args)
+    assert report["reason"] == reason
+    assert report["behavioral_status"] == "NOT_RUN"
+    assert report["java_executed"] is False
+    if mode == "clean":
+        assert report["private_intake_gate"] == "PREFLIGHT_ONLY"
+        assert len(report["private_intake_report_canonical_sha256"]) == 64
+        assert report["private_intake"]["independence_proven"] is False

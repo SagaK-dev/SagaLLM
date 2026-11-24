@@ -80,6 +80,8 @@ def test_no_opt_in_means_no_oci_or_candidate_access(tmp_path, monkeypatch):
 def _mock_vm_review(monkeypatch):
     # Existing runtime tests are mocked; the actual gate is tested separately.
     monkeypatch.setattr(bench, "review_gate", lambda *a, **k: ("ELIGIBLE_SELF_ATTESTED", "a" * 64))
+    monkeypatch.setattr(bench, "_private_intake_gate",
+                        lambda *a, **k: ("PREFLIGHT_ONLY", None))
     monkeypatch.setattr(bench, "local_docker_context", lambda: True)
     monkeypatch.setattr(bench, "local_image_has_no_volumes", lambda image: True)
 
@@ -142,6 +144,7 @@ def test_mocked_oci_receives_each_stdin_and_exact_expected_stdout(tmp_path, monk
     assert calls[0] == ("10 90 60 120\n", "30\n")
     assert report["behavioral_status"] == "EVALUATED"
     assert report["behavior_passed_tasks"] == 5
+    assert all(len(x["candidate_sha256"]) == 64 for x in report["results"])
     assert report["java_executed"] == "POSSIBLE_IN_OCI_ONLY"
     assert report["model_selection"] == "NOT_PERMITTED_NO_INDEPENDENCE_PROOF"
     assert report["review_metadata_verified_externally"] is False
@@ -169,6 +172,8 @@ def test_missing_and_symlinked_candidates_do_not_run(tmp_path, monkeypatch):
     assert report["behavioral_status"] == "PARTIAL_OR_UNAVAILABLE"
     assert report["behavior_passed_tasks"] is None
     assert all(x["status"] == "CANDIDATE_MISSING" for x in report["results"])
+    assert report["oci_execution_attempted"] is False
+    assert report["java_executed"] is False
 
 
 def test_schema_rejects_duplicate_ids_and_oversize_and_bad_provenance():

@@ -14,7 +14,7 @@ import unicodedata
 from . import java_coding_eval, java_generated_data, java_large_corpus
 from . import java_diverse_corpus, java_stdio_curriculum
 from .java_independent_benchmark import (
-    ID_PATTERN, SHA_PATTERN, _https, _text, _unique_object,
+    SHA_PATTERN, _https, _text, _unique_object,
     _valid_review_date, read_suite,
 )
 
@@ -112,6 +112,17 @@ def _provenance(suite: dict, suite_sha: str, meta: dict) -> list[str]:
                 raise ValueError("Missing task provenance value")
         if not _valid_review_date(row["authored_on"]):
             raise ValueError("Invalid task authorship date")
+        for reviewer in suite["reviewers"] if isinstance(suite["reviewers"], list) else []:
+            if not isinstance(reviewer, dict):
+                continue
+            reviewer_id = reviewer.get("reviewer_id")
+            if isinstance(reviewer_id, str) and reviewer_id.strip().casefold() == row["author_id"].strip().casefold():
+                blockers.add("AUTHOR_CANNOT_REVIEW_OWN_TASK")
+            day = reviewer.get("date")
+            if _valid_review_date(day) and day < row["authored_on"]:
+                blockers.add("REVIEW_PREDATES_AUTHORSHIP")
+        if row["license_id"].strip().casefold() in {"pending", "not_reviewed", "unverified", "unknown"}:
+            blockers.add("TASK_LICENSE_UNREVIEWED")
         if not _https(row["source_url"]) or not _https(row["permission_url"]):
             raise ValueError("Missing traceable source or permission URL")
         uses = row["allowed_uses"]
@@ -225,6 +236,8 @@ def _scan(root: Path, entries: list[dict], tasks: list[dict]) -> tuple[list[dict
                             hits.add((i, group, "NUMERIC_TEMPLATE_MATCH"))
                         elif len(normalized[i]) >= 40 and normalized[i] in text:
                             hits.add((i, group, "PROMPT_SUBSTRING_MATCH"))
+                        elif len(shapes[i]) >= 40 and shapes[i] in shape:
+                            hits.add((i, group, "NUMERIC_TEMPLATE_SUBSTRING_MATCH"))
                         if row.get("family") == task["family"] or row.get("id") == task["id"]:
                             hits.add((i, group, "EXPOSURE_FAMILY_OR_ID"))
         if not count or digest.hexdigest() != entry["sha256"]:
