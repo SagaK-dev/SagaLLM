@@ -18,7 +18,7 @@ Primary hypothesis: prompt-conditioning collapse (different instructions yield i
 
 | Priority / provisional window | Work and deliverable | Acceptance gate | Status |
 | --- | --- | --- | --- |
-| M0 / 11-24 to 11-27 | Reproducible evidence audit, pinned report-byte hash, integrity/tamper unit tests, run provenance ledger | Six matched prompt IDs, 18 cases/model, correct collision recount, SHA pin and non-promotion, fail closed on errors | IMPLEMENTING; actual report ZIP download and byte checks pending |
+| M0 / 11-24 to 11-27 | Reproducible evidence audit, pinned report-byte hash, integrity/tamper unit tests, run provenance ledger | Six matched prompt IDs, 18 cases/model, correct collision recount, SHA pin and non-promotion, fail closed on errors | IMPLEMENTED / LOCAL_AUDIT_PASS; GitHub CI and review pending |
 | M1 / 11-27 to 12-04 | Root-cause diagnostic matrix for generated-code format, tokenization, compile errors, source-hash collisions and prompt encoding | Same fixed seed, inputs and candidates; a falsifiable single-variable hypothesis pre-registered | NOT_RUN |
 | M2 / 12-01 to 12-15 | Collect 5–12 truly independent human-authored Java 17 I/O tasks; rights/license provenance and two distinct real reviews per task | Frozen task and I/O suite SHA, reviewer links/dates and family-overlap clearance before inference | BLOCKED_ON_HUMAN_REVIEW (#36) |
 | M3 / 12-05 to 12-22 | One-variable-at-a-time interventions: instruction representation, generation termination, task conditioning and modest capacity/data changes | Equal exposure and compute, no test leakage; full exact-stdout, distinct source-hash and unavailable-case analysis | NOT_RUN |
@@ -41,9 +41,9 @@ Windows are planning targets, not promises of external reviews, GPU allocation o
 
 - [x] Read Issue #22, v0.18 results and PR #44 implementation/workflow, inspect run 45167198398 log.
 - [x] Specify an offline report consistency auditor and adversarial tests; no Java execution.
-- [ ] Retrieve artifact 14815096856, compute exact ab-report.json SHA-256, compare canonical IDs/metrics and validate all report invariants.
-- [ ] Record the exact manifest SHA, optional candidate checkpoint SHA, artifacts and environment versions if present.
-- [ ] Run the auditor with the exact report SHA. It must say NOT_VERIFIED_OFFLINE for unauthenticated operator-supplied run/archive metadata.
+- [x] Retrieve artifact 14815096856; extracted ab-report.json SHA-256 = 1f59f98acafc5b2939f5dc043717beb3b76dd5ff923506064377ca8a7221c468; independently recount totals and collisions.
+- [x] Verify extracted curriculum manifest SHA-256 = 0cea8ded8a5c03d15b2b516a86665901266b0b375095579daa8d712661316a13; candidate checkpoint SHA-256 = 379d57d6d8668995dc34fb310e0c5140041c5fd3e78b77932712785e96b01eae; both agree with the downloaded report. No unsupported environment versions inferred.
+- [x] Run offline auditor against extracted report and exact SHA: OFFLINE_REPORT_INVARIANTS_PASS / NO_VALIDATED_CONTRASTIVE_GAIN. It still says NOT_VERIFIED_OFFLINE for operator-supplied run/archive metadata; GitHub run and artifact were inspected separately.
 - [ ] Review CI and PR; update README/STATUS/changelog and close Issue #22 only after every independent acceptance item is traceable and actually satisfied.
 
 Example (replace the report SHA placeholder only with actual extracted-file checksum):
@@ -55,7 +55,7 @@ Example (replace the report SHA placeholder only with actual extracted-file chec
       --artifact-digest sha256:f1716f3111bd8df1bf63282f1970b9b9aadf340aeb18f5133e66a5ea9d55955e \
       --output /path/to/new-audit.json
 
-The auditor checks local report bytes and internal structure; it does not authenticate GitHub on the network. Until report-file bytes are verified, the report-level evidence gate remains PENDING. If artifacts expire or evidence is missing, record BLOCKED_EVIDENCE_UNAVAILABLE instead of estimating or fabricating metrics.
+The auditor checks local report bytes and internal structure; it does not authenticate GitHub on the network. Report-file and downloaded archive SHA-256 have now been verified and the local invariant gate passed; see experiments/java_contrastive_v018_ab_evidence.json. This does not amount to independent training reproducibility. If artifacts expire or evidence is missing, record BLOCKED_EVIDENCE_UNAVAILABLE instead of estimating or fabricating metrics.
 
 ## External technology references (evaluation candidates, NOT integrated)
 
