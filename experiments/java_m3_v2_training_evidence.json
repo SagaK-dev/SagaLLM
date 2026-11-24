@@ -1,0 +1,31 @@
+{
+  "status": "MATCHED_CPU_TRAINING_AND_INFERENCE_COMPLETE",
+  "run_id": 45373241422,
+  "run_sha": "babcbe130905d4acc7e4617497f0ebcea68569a9",
+  "job_id": 138372591811,
+  "artifact_id": 14909169047,
+  "archive_sha256": "2d4d6bf653c394ddf75016b26099efcf2fc5eb09ec1edd1086d7baedbedcc97f",
+  "report_sha256": "90c8b9bb12e381c415e798d88875fc401143a0c703a3b0424cfab6c2283932cd",
+  "downloaded_hashes_verified": true,
+  "checkpoint_sha256": {
+    "4201-control": "1ea3d9ce570308afbfca07dcac258a83b91ad483b900f47dd84c38003f51c04b",
+    "4201-ranking": "5b16fec6648ee2665f72deb15b1af9b0b751bbe54948afde70b5ff2889c5a695",
+    "4202-control": "57a310426270f0a17114891b9d80b9070407ac9b1c320c6991d9ab619b844a73",
+    "4202-ranking": "d5a2e5d59a35b3048f0807cde998c215f562bb745a203cd2d119ae2fa50cc4ba",
+    "4203-control": "e3c6ff78cb777ab03b4459141f5df7ed0708d165f268d8cb774980b662039ca0",
+    "4203-ranking": "8515eed991721ed364b82a778e68ca515cbef12f7f343733e460aa6498902341"
+  },
+  "unit_tests_passed": 11,
+  "optimizer_steps": 960,
+  "admitted_rows": 320,
+  "operation_token_positions": 3767,
+  "all_eos": 84,
+  "regression_diversity_gain_seeds": 1,
+  "fresh_diversity_gain_seeds": 1,
+  "margin_gain_seeds": 3,
+  "validation_nll_worse_seeds": 3,
+  "compile": "NOT_RUN",
+  "behavior": "NOT_RUN",
+  "independent_benchmark": "NOT_ESTABLISHED",
+  "production_promotion": false
+}
