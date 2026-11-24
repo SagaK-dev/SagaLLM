@@ -1,0 +1,20 @@
+{
+  "status": "ACTIVATION_SWAP_DIAGNOSTIC_COMPLETE",
+  "run_id": 45386333879,
+  "job_id": 138418094830,
+  "run_sha": "0f15a7116315ea74089f2f1a29dd1e9899e89acc",
+  "artifact_id": 14915953140,
+  "zip_sha256": "e428e95300195cfcde474592f721b9be45995789bbe51b31549cc780bd1c878d",
+  "report_sha256": "3d8436e4cfee22aee4918a8718a5eb270d94f7a3af832adb724ff4691e47742c",
+  "downloaded_hashes_verified": true,
+  "cpu_ci_run": 45386333730,
+  "tests_passed": 6,
+  "matched_model_pairs": 133,
+  "site_region_conditions": 5852,
+  "control_checks": 3192,
+  "layer1_attention_mean_donor_shift_positive_models": 7,
+  "layer2_attention_mean_donor_shift_negative_models": 7,
+  "root_cause": "NOT_ESTABLISHED",
+  "behavior": "NOT_RUN",
+  "production_promotion": false
+}

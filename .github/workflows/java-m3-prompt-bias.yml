@@ -1,0 +1,56 @@
+name: SagaLLM M3 first-layer prompt-bias CPU pilot (NO JAVA EXECUTION)
+on:
+  pull_request:
+    paths:
+      - 'scripts/experiment_java_m3_prompt_bias.py'
+      - 'tests/test_java_m3_prompt_bias.py'
+      - '.github/workflows/java-m3-prompt-bias.yml'
+permissions:
+  contents: read
+  actions: read
+jobs:
+  pilot:
+    if: >-
+      github.event.pull_request.head.repo.full_name == github.repository &&
+      github.head_ref == 'experiment/java-m3-first-layer-prompt-bias-2026-11-24' &&
+      github.actor == 'SagaK-dev'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    env:
+      OMP_NUM_THREADS: '2'
+      MKL_NUM_THREADS: '2'
+      CUDA_VISIBLE_DEVICES: ''
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+      - run: |
+          python -m pip install 'torch>=2.3' --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install -e '.[test,fast-tokenizer]'
+          python -m pytest -q tests/test_java_m3_prompt_bias.py
+      - uses: actions/download-artifact@v4
+        with:
+          name: sagallm-v018-java-context-sft-cpu
+          run-id: 44994208434
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: v018
+      - name: Audit and run fixed-weight matched bias pilot
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh api repos/SagaK-dev/SagaLLM/actions/artifacts/14912381648/zip > ce.zip
+          gh api repos/SagaK-dev/SagaLLM/actions/artifacts/14915953140/zip > swap.zip
+          python -m scripts.experiment_java_m3_prompt_bias --archive ce.zip --swap swap.zip \
+            --base v018/java-context-model/java-sft-best.pt \
+            --tokenizer v018/java-context-model/tokenizer.json \
+            --previous-holdback examples/java_m3_development_holdback.json --output prompt-bias.json
+          sha256sum prompt-bias.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: sagallm-m3-first-layer-prompt-bias
+          path: prompt-bias.json
+          if-no-files-found: error
+          retention-days: 30
