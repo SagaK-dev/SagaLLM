@@ -186,7 +186,8 @@ def _texts(row: dict, kind: str) -> list[str]:
 
 
 def _scan(root: Path, entries: list[dict], tasks: list[dict], *,
-          source_digest=None) -> tuple[list[dict], list[dict]]:
+          source_digest=None, expected_bytes=None, expected_rows=None,
+          require_final_lf=False) -> tuple[list[dict], list[dict]]:
     normalized = [_normalize(t["prompt"]) for t in tasks]
     shapes = [_shape(t) for t in normalized]
     families = known_families()
@@ -219,6 +220,7 @@ def _scan(root: Path, entries: list[dict], tasks: list[dict], *,
             raise ValueError("Exposure file missing or symlinked")
         digest = hashlib.sha256()
         size = count = 0
+        final_lf = False
         with target.open("rb") as handle:
             while True:
                 raw = handle.readline(MAX_LINE + 1)
@@ -231,6 +233,10 @@ def _scan(root: Path, entries: list[dict], tasks: list[dict], *,
                 if (len(raw) > MAX_LINE or size > MAX_FILE
                         or total_bytes > MAX_TOTAL or total_rows > MAX_ROWS):
                     raise ValueError("Exposure scan limit exceeded")
+                if ((expected_bytes is not None and size > expected_bytes)
+                        or (expected_rows is not None and count > expected_rows)):
+                    raise ValueError("Shard exceeds declared size or rows")
+                final_lf = raw.endswith(b"\n")
                 digest.update(raw)
                 if source_digest is not None:
                     source_digest.update(raw)
@@ -252,6 +258,8 @@ def _scan(root: Path, entries: list[dict], tasks: list[dict], *,
                             hits.add((i, group, "NUMERIC_TEMPLATE_SUBSTRING_MATCH"))
                         if row.get("family") == task["family"] or row.get("id") == task["id"]:
                             hits.add((i, group, "EXPOSURE_FAMILY_OR_ID"))
+        if require_final_lf and not final_lf:
+            raise ValueError("Nonfinal shard must end at a newline")
         if not count or digest.hexdigest() != entry["sha256"]:
             raise ValueError("Empty exposure file or SHA mismatch")
         summaries.append({"group": entry["group"], "sha256": entry["sha256"],

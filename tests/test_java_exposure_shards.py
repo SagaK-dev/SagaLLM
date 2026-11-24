@@ -141,3 +141,44 @@ def test_prepare_failure_cleans_stage(tmp_path, monkeypatch):
             training_code_sha="b"*40)
     assert not output.exists()
     assert not list(tmp_path.glob(".exposure-*"))
+
+
+def test_nonfinal_shard_requires_newline(tmp_path, monkeypatch):
+    state = prepared(tmp_path, monkeypatch)
+    (_, _, inv, _), output, _, _, _ = state
+    path = output / "manifest.json"
+    meta = json.loads(path.read_text())
+    first = meta["sources"][0]
+    shard = first["shards"][0]
+    target = output / shard["path"]
+    target.write_bytes(target.read_bytes().rstrip(b"\n"))
+    shard["sha256"] = sha(target)
+    shard["bytes"] -= 1
+    first["bytes"] -= 1
+    import hashlib
+    first["source_sha256"] = hashlib.sha256(
+        b"".join((output / x["path"]).read_bytes() for x in first["shards"])
+    ).hexdigest()
+    inventory = json.loads(inv.read_text())
+    inventory["files"][0]["sha256"] = first["source_sha256"]
+    save(inv, inventory)
+    meta["inventory_sha256"] = sha(inv)
+    save(path, meta)
+    with pytest.raises(ValueError, match="newline"):
+        audit(state, expected_manifest_sha256=sha(path))
+
+
+def test_optional_measurement(tmp_path, monkeypatch):
+    state = prepared(tmp_path, monkeypatch)
+    (s, p, inv, _), output, checkpoint, tokenizer, result = state
+    report, metrics = shards.measure_audit(
+        s, sha(s), provenance_path=p, expected_provenance_sha256=sha(p),
+        inventory_path=inv, expected_inventory_sha256=sha(inv),
+        shard_root=output, expected_manifest_sha256=result["manifest_sha256"],
+        checkpoint_path=checkpoint, expected_checkpoint_sha256=sha(checkpoint),
+        tokenizer_path=tokenizer, expected_tokenizer_sha256=sha(tokenizer))
+    assert report["scanned_records"] == 7
+    assert metrics["elapsed_seconds"] > 0
+    assert metrics["peak_python_bytes"] > 0
+    assert metrics["bytes_per_second"] > 0
+    assert metrics["measurement_scope"] == "TRACEMALLOC_NOT_PROCESS_RSS"

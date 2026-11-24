@@ -240,13 +240,15 @@ def audit_exposure_shards(suite_path: Path, expected_suite_sha256: str, *,
     for source in manifest["sources"]:
         digest = hashlib.sha256()
         count = size = 0
-        for shard in source["shards"]:
+        for ordinal, shard in enumerate(source["shards"]):
             # One bounded shard at a time. Hash exactly the bytes consumed by
             # the existing scanner, including source reconstruction in order.
             files, hits = _scan(shard_root, [{"group": source["group"],
                             "format": source["format"], "path": shard["path"],
                             "sha256": shard["sha256"]}], suite["tasks"],
-                            source_digest=digest)
+                            source_digest=digest, expected_bytes=shard["bytes"],
+                            expected_rows=shard["rows"],
+                            require_final_lf=ordinal < len(source["shards"]) - 1)
             actual = files[0]
             if actual["bytes"] != shard["bytes"] or actual["records"] != shard["rows"]:
                 raise ValueError("Shard byte or record count mismatch")
