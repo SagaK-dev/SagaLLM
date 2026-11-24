@@ -159,14 +159,19 @@ def pairs(rows,eos):
                 table[x["id"]]=v
                 if v is not None:
                     counts[pair_name]+=1
-    if set(table)!=set(lookup) or sum(counts.values())<MIN_ADMITTED_ROWS or len(counts)!=5:
-        raise ValueError("BLOCKED_ALIGNMENT_ADMISSION")
+    if set(table)!=set(lookup):
+        raise ValueError("Pair coverage mismatch")
     # Commit to the exact training-only position masks before model loading.
     mask_manifest={k:list(v[1]) if v is not None else [] for k,v in sorted(table.items())}
-    return table,ordered,{"admitted_rows":sum(counts.values()),"excluded_rows":320-sum(counts.values()),
-                          "rows_per_pair_type":dict(counts),
-                          "aligned_token_positions":sum(len(v[1]) for v in table.values() if v),
-                          "mask_sha256":sha(canonical(mask_manifest))}
+    coverage={left+"__"+right:counts[left+"__"+right] for left,right in FAMILY_PAIRS}
+    admission={"admitted_rows":sum(counts.values()),"excluded_rows":320-sum(counts.values()),
+               "rows_per_pair_type":coverage,
+               "aligned_token_positions":sum(len(v[1]) for v in table.values() if v),
+               "mask_sha256":sha(canonical(mask_manifest)),
+               "minimum_admitted_rows":MIN_ADMITTED_ROWS,
+               "all_five_pair_types_represented":all(v>0 for v in coverage.values())}
+    admission["passed"]=admission["admitted_rows"]>=MIN_ADMITTED_ROWS and admission["all_five_pair_types_represented"]
+    return table,ordered,admission
 
 
 def broad_rows():
@@ -376,6 +381,20 @@ def run(args):
     if {r["task"] for r in broad+stdio+valid}&{r["task"] for r in fresh}:
         raise ValueError("Exact task text overlap")
     aux,ordered,admission=pairs(stdio,eos)
+    if not admission["passed"]:
+        # Keep the preregistered gate unchanged. A blocked run publishes
+        # bounded counts, not learned weights or an invented model score.
+        args.output.mkdir(parents=True)
+        report={"status":"BLOCKED_ALIGNMENT_ADMISSION","alignment":admission,
+                "base_sha256":PINNED_V018,"tokenizer_sha256":V016_TOKENIZER_SHA256,
+                "broad_train_sha256":TRAIN_SHA,"stdio_manifest_sha256":STDIO_SHA,
+                "holdback_sha256":SUITE_SHA,"optimizer_steps_completed":0,
+                "new_inference":"NOT_RUN","new_java_compile":"NOT_RUN",
+                "new_java_behavior":"NOT_RUN","production_promotion":False,
+                "independent_benchmark":"NOT_ESTABLISHED"}
+        (args.output/"ranking-report.json").write_bytes(canonical(report))
+        print(json.dumps(report,sort_keys=True),flush=True)
+        return
     schedules={s:schedule_for(broad,ordered,s) for s in SEEDS}
     schedule_hashes={str(s):sha(canonical([[ [broad[i]["id"] for i in b],list(ids)] for b,ids in v]))
                      for s,v in schedules.items()}
