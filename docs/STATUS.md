@@ -3,11 +3,22 @@
 - IMPLEMENTED / LOCAL_CPU_TESTED: optional SHA-pinned v0.17 SFT model RoPE
   context limit expansion 192→384. Strict tensor loading, parameter-count and
   original-context logit-parity assertions, full-example admission accounting.
-- HOSTED_TRAINING_PENDING: GitHub workflow for actual 384-position SFT using
-  the known v0.17 best checkpoint. No success or metric claimed before the
-  workflow's result is verified.
-- NOT_ESTABLISHED: Java instruction compliance, real-world editing, long-range
-  generalization, model-generated Java behavioral correctness, GPU/large models.
+- HOSTED_TRAINED_CPU / ARTIFACT_SHA_VERIFIED (2026-11-24): run
+  44994208434 completed 400 optimizer steps, saw 1,600 distinct TRAIN
+  examples, and selected the step-50 checkpoint (200 examples). Archived
+  v0.17 input best checkpoint and tokenizer SHA-256 were directly verified
+  against run 44982940959; archived v0.18 best, last, tokenizer, manifest and
+  train-report hashes were directly verified against run 44994208434.
+  See experiments/java_context_v018_artifact_audit.json.
+- SYNTHETIC_OCI_BEHAVIOR_VERIFIED: later matched A/B run 45167198398
+  passed its workflow but scored 0/18 exact I/O for base, interleaved and
+  contrastive models; unique generated sources were 3/6, 2/6 and 1/6.
+  Downloaded artifact and report SHA-256 verified; offline invariant
+  audit PASS. See experiments/java_contrastive_v018_ab_evidence.json.
+  Outcome: NO_VALIDATED_CONTRASTIVE_GAIN; no weight promotion.
+- NOT_ESTABLISHED: independent Java coding ability, real-world editing,
+  long-context generalization or behavior on human-reviewed tasks; GPU/1B/3B
+  NOT_RUN. Synthetic OCI failures do not establish general competence.
 
 ## v0.16 development — real open-source Java code learning
 
