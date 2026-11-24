@@ -74,3 +74,21 @@ Limits: 64 input files, 100 MB/file, 512 MB total, 500,000 JSONL rows,
 256 KiB/line; no silent truncation. Larger corpora require a separately
 reviewed scalable screening method; never substitute a sample and claim
 full coverage. CI uses only artificial fixtures; do not upload private data.
+
+## M2.3 bounded near-duplicate and concept screen
+
+`java-overlap-heuristic-v1` adds Unicode-normalized five-character shingles
+(minimum 45 distinct candidate shingles, at least 82% containment) and eight
+explicit Japanese/English algorithm concept conjunctions. Punctuation and
+spacing are removed for shingles; generic input/output words alone are not
+concept hits. Long records are scanned through the end, within a cumulative
+128 million normalized character budget (including suite comparisons).
+Budget excess rejects the scan; no truncation or sampling is called complete.
+Only candidate-sized gram sets are retained. Hits, including within-suite
+hits, block execution and are reported by index/group/category only. Fixed
+synthetic positive and negative controls check rule behavior, not real-world
+precision or recall. No translation model, embedding, AST parser or full
+semantic equivalence check is implemented. Shared algorithm concepts may be
+legitimate; the current conservative gate requires a fresh disjoint suite
+rather than silently overriding an unresolved lead. Inventory completeness
+and independence remain unverified; actual human review is mandatory.
