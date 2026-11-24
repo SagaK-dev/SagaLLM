@@ -1,0 +1,2930 @@
+{
+  "archive_sha256": "2d4d6bf653c394ddf75016b26099efcf2fc5eb09ec1edd1086d7baedbedcc97f",
+  "base_sha256": "9802e848f0abea9979623f461b5e63cd7aed838acd087d06b20d747db1e2a0fc",
+  "behavior": "NOT_RUN",
+  "compile": "NOT_RUN",
+  "independent_benchmark": "NOT_ESTABLISHED",
+  "models": {
+    "4201-control": {
+      "prior_generation_collisions": {
+        "fresh_development": 2,
+        "regression": 2
+      },
+      "train": {
+        "both_choices_correct": 0,
+        "correct_choices": 20,
+        "mean_interaction": 0.0006495594978332519,
+        "pairs": 20,
+        "positive_interactions": 7,
+        "rows": [
+          {
+            "both_choices_correct": false,
+            "common_reference_tokens": 73,
+            "correct_choices": 1,
+            "family": "stdin_add_offset",
+            "ids": [
+              "train-stdin_add_offset-000",
+              "train-stdin_add_offset-001"
+            ],
+            "interaction": -0.0017156600952148438,
+            "left_correct_minus_other": 1.2085185050964355,
+            "prompt_token_counts": [
+              55,
+              55
+            ],
+            "right_correct_minus_other": -1.2102341651916504
+          },
+          {
+            "both_choices_correct": false,
+            "common_reference_tokens": 74,
+            "correct_choices": 1,
+            "family": "stdin_add_offset",
+            "ids": [
+              "train-stdin_add_offset-014",
+              "train-stdin_add_offset-015"
+            ],
+            "interaction": -0.0006771087646484375,
+            "left_correct_minus_other": 0.05583000183105469,
+            "prompt_token_counts": [
+              56,
+              56
+            ],
+            "right_correct_minus_other": -0.056507110595703125
+          },
+          {
+            "both_choices_correct": false,
+            "common_reference_tokens": 73,
+            "correct_choices": 1,
+            "family": "stdin_multiply_offset",
+            "ids": [
+              "train-stdin_multiply_offset-000",
+              "train-stdin_multiply_offset-001"
+            ],
+            "interaction": -0.0026683807373046875,
+            "left_correct_minus_other": 0.9913330078125,
+            "prompt_token_counts": [
+              56,
+              56
+            ],
+            "right_correct_minus_other": -0.9940013885498047
+          },
+          {
+            "both_choices_correct": false,
+            "common_reference_tokens": 74,
+            "correct_choices": 1,
+            "family": "stdin_multiply_offset",
+            "ids": [
+              "train-stdin_multiply_offset-014",
+              "train-stdin_multiply_offset-015"
+            ],
+            "interaction": 0.0003409385681152344,
+            "left_correct_minus_other": 0.09335088729858398,
+            "prompt_token_counts": [
+              57,
+              57
+            ],
+            "right_correct_minus_other": -0.09300994873046875
+          },
+          {
+            "both_choices_correct": false,
+            "common_reference_tokens": 79,
+            "correct_choices": 1,
+            "family": "stdin_max_offset",
+            "ids": [
+              "train-stdin_max_offset-000",
+              "train-stdin_max_offset-001"
+            ],
+            "interaction": 0.006206989288330078,
+            "left_correct_minus_other": 0.6828827857971191,
+            "prompt_token_counts": [
+              58,
+              58
+            ],
+            "right_correct_minus_other": -0.6766757965087891
+          },
+          {
+            "both_choices_correct": false,
+            "common_reference_tokens": 80,
+            "correct_choices": 1,
+            "family": "stdin_max_offset",
+            "ids": [
+              "train-stdin_max_offset-014",
+              "train-stdin_max_offset-015"
+            ],
+            "interaction": -0.002562999725341797,
+            "left_correct_minus_other": -0.08437633514404297,
+            "prompt_token_counts": [
+              59,
+              59
+            ],
+            "right_correct_minus_other": 0.08181333541870117
+          },
+          {
+            "both_choices_correct": false,
+            "common_reference_tokens": 80,
+            "correct_choices": 1,
+            "family": "stdin_absolute_gap_offset",
+            "ids": [
+              "train-stdin_absolute_gap_offset-000",
+              "train-stdin_absolute_gap_offset-001"
+            ],
+            "interaction": 0.009962081909179688,
+            "left_correct_minus_other": 0.7342104911804199,
+            "prompt_token_counts": [
+              61,
+              61
+            ],
+            "right_correct_minus_other": -0.7242484092712402
+          },
+          {
+            "both_choices_correct": false,
+            "common_reference_tokens": 81,
+            "correct_choices": 1,
+            "family": "stdin_absolute_gap_offset",
+            "ids": [
+              "train-stdin_absolute_gap_offset-014",
+              "train-stdin_absolute_gap_offset-015"
+            ],
+            "interaction": -0.0014319419860839844,
+            "left_correct_minus_other": -0.13158512115478516,
+            "prompt_token_counts": [
+              62,
+              62
+            ],
+            "right_correct_minus_other": 0.13015317916870117
+          },
+          {
+            "both_choices_correct": false,
+            "common_reference_tokens": 88,
+            "correct_choices": 1,
+            "family": "stdin_count_greater",
+            "ids": [
+              "train-stdin_count_greater-000",
+              "train-stdin_count_greater-001"
+            ],
+            "interaction": 0.011010885238647461,
+            "left_correct_minus_other": 1.0234038829803467,
+            "prompt_token_counts": [
+              66,
+              66
+            ],
+            "right_correct_minus_other": -1.0123929977416992
+          },
+          {
+            "both_choices_correct": false,
+            "common_reference_tokens": 86,
+            "correct_choices": 1,
+            "family": "stdin_count_greater",
+            "ids": [
+              "train-stdin_count_greater-014",
+              "train-stdin_count_greater-015"
+            ],
+            "interaction": 0.000415802001953125,
+            "left_correct_minus_other": 0.30336523056030273,
+            "prompt_token_counts": [
+              64,
+              64
+            ],
+            "right_correct_minus_other": -0.3029494285583496
+          },
+          {
+            "both_choices_correct": false,
+            "common_reference_tokens": 112,
+            "correct_choices": 1,
+            "family": "stdin_even_sum_offset",
+            "ids": [
+              "train-stdin_even_sum_offset-000",
+              "train-stdin_even_sum_offset-001"
+            ],
+            "interaction": 0.007733821868896484,
+            "left_correct_minus_other": 1.2295804023742676,
+            "prompt_token_counts": [
+              62,
+              62
+            ],
+            "right_correct_minus_other": -1.221846580505371
+          },
+          {
+            "both_choices_correct": false,
+            "common_reference_tokens": 113,
+            "correct_choices": 1,
+            "family": "stdin_even_sum_offset",
+            "ids": [
+              "train-stdin_even_sum_offset-014",
+              "train-stdin_even_sum_offset-015"
+            ],
+            "interaction": -0.0026569366455078125,
+            "left_correct_minus_other": 0.24727487564086914,
+            "prompt_token_counts": [
+              63,
+              63
+            ],
+            "right_correct_minus_other": -0.24993181228637695
+          },
+          {
+            "both_choices_correct": false,
+            "common_reference_tokens": 99,
+            "correct_choices": 1,
+            "family": "stdin_digit_sum_offset",
+            "ids": [
+              "train-stdin_digit_sum_offset-000",
+              "train-stdin_digit_sum_offset-001"
+            ],
+            "interaction": -0.0022864341735839844,
+            "left_correct_minus_other": 1.3829689025878906,
+            "prompt_token_counts": [
+              60,
+              60
+            ],
+            "right_correct_minus_other": -1.3852553367614746
+          },
+          {
+            "both_choices_correct": false,
+            "common_reference_tokens": 100,
+            "correct_choices": 1,
+            "family": "stdin_digit_sum_offset",
+            "ids": [
+              "train-stdin_digit_sum_offset-014",
+              "train-stdin_digit_sum_offset-015"
+            ],
+            "interaction": -0.0004305839538574219,
+            "left_correct_minus_other": 0.19347143173217773,
+            "prompt_token_counts": [
+              61,
+              61
+            ],
+            "right_correct_minus_other": -0.19390201568603516
+          },
+          {
+            "both_choices_correct": false,
+            "common_reference_tokens": 89,
+            "correct_choices": 1,
+            "family": "stdin_ascii_upper_suffix",
+            "ids": [
+              "train-stdin_ascii_upper_suffix-000",
+              "train-stdin_ascii_upper_suffix-001"
+            ],
+            "interaction": -0.014459609985351562,
+            "left_correct_minus_other": -0.733555793762207,
+            "prompt_token_counts": [
+              69,
+              69
+            ],
+            "right_correct_minus_other": 0.7190961837768555
+          },
+          {
+            "both_choices_correct": false,
+            "common_reference_tokens": 90,
+            "correct_choices": 1,
+            "family": "stdin_ascii_upper_suffix",
+            "ids": [
+              "train-stdin_ascii_upper_suffix-014",
+              "train-stdin_ascii_upper_suffix-015"
+            ],
+            "interaction": -0.0007143020629882812,
+            "left_correct_minus_other": 0.48128414154052734,
+            "prompt_token_counts": [
+              70,
+              70
+            ],
+            "right_correct_minus_other": -0.4819984436035156
+          },
+          {
+            "both_choices_correct": false,
+            "common_reference_tokens": 78,
+            "correct_choices": 1,
+            "family": "stdin_ascii_reverse_suffix",
+            "ids": [
+              "train-stdin_ascii_reverse_suffix-000",
+              "train-stdin_ascii_reverse_suffix-001"
+            ],
+            "interaction": -0.005503654479980469,
+            "left_correct_minus_other": -0.5040240287780762,
+            "prompt_token_counts": [
+              68,
+              68
+            ],
+            "right_correct_minus_other": 0.4985203742980957
+          },
+          {
+            "both_choices_correct": false,
+            "common_reference_tokens": 79,
+            "correct_choices": 1,
+            "family": "stdin_ascii_reverse_suffix",
+            "ids": [
+              "train-stdin_ascii_reverse_suffix-014",
+              "train-stdin_ascii_reverse_suffix-015"
+            ],
+            "interaction": -0.0007486343383789062,
+            "left_correct_minus_other": 0.6811413764953613,
+            "prompt_token_counts": [
+              69,
+              69
+            ],
+            "right_correct_minus_other": -0.6818900108337402
+          },
+          {
+            "both_choices_correct": false,
+            "common_reference_tokens": 69,
+            "correct_choices": 1,
+            "family": "stdin_clamp",
+            "ids": [
+              "train-stdin_clamp-000",
+              "train-stdin_clamp-001"
+            ],
+            "interaction": 0.014174938201904297,
+            "left_correct_minus_other": -0.06069660186767578,
+            "prompt_token_counts": [
+              66,
+              66
+            ],
+            "right_correct_minus_other": 0.07487154006958008
+          },
+          {
+            "both_choices_correct": false,
+            "common_reference_tokens": 68,
+            "correct_choices": 1,
+            "family": "stdin_clamp",
+            "ids": [
+              "train-stdin_clamp-014",
+              "train-stdin_clamp-015"
+            ],
+            "interaction": -0.0009980201721191406,
+            "left_correct_minus_other": -0.4907722473144531,
+            "prompt_token_counts": [
+              65,
+              64
+            ],
+            "right_correct_minus_other": 0.489774227142334
+          }
+        ]
+      },
+      "validation": {
+        "both_choices_correct": 0,
+        "correct_choices": 3,
+        "mean_interaction": 0.005787054697672526,
+        "pairs": 3,
+        "positive_interactions": 2,
+        "rows": [
+          {
+            "both_choices_correct": false,
+            "common_reference_tokens": 79,
+            "correct_choices": 1,
+            "family": "stdin_min_offset",
+            "ids": [
+              "validation-stdin_min_offset-002",
+              "validation-stdin_min_offset-003"
+            ],
+            "interaction": 0.005877971649169922,
+            "left_correct_minus_other": 0.8706808090209961,
+            "prompt_token_counts": [
+              58,
+              58
+            ],
+            "right_correct_minus_other": -0.8648028373718262
+          },
+          {
+            "both_choices_correct": false,
+            "common_reference_tokens": 109,
+            "correct_choices": 1,
+            "family": "stdin_count_odd_offset",
+            "ids": [
+              "validation-stdin_count_odd_offset-002",
+              "validation-stdin_count_odd_offset-003"
+            ],
+            "interaction": -0.0003333091735839844,
+            "left_correct_minus_other": 1.2054376602172852,
+            "prompt_token_counts": [
+              62,
+              62
+            ],
+            "right_correct_minus_other": -1.2057709693908691
+          },
+          {
+            "both_choices_correct": false,
+            "common_reference_tokens": 89,
+            "correct_choices": 1,
+            "family": "stdin_ascii_lower_suffix",
+            "ids": [
+              "validation-stdin_ascii_lower_suffix-002",
+              "validation-stdin_ascii_lower_suffix-003"
+            ],
+            "interaction": 0.01181650161743164,
+            "left_correct_minus_other": 0.3555459976196289,
+            "prompt_token_counts": [
+              69,
+              69
+            ],
+            "right_correct_minus_other": -0.34372949600219727
+          }
+        ]
+      }
+    },
+    "4201-ranking": {
+      "prior_generation_collisions": {
+        "fresh_development": 3,
+        "regression": 3
+      },
+      "train": {
+        "both_choices_correct": 0,
+        "correct_choices": 20,
+        "mean_interaction": 0.0006152749061584473,
+        "pairs": 20,
+        "positive_interactions": 7,
+        "rows": [
+          {
+            "both_choices_correct": false,
+            "common_reference_tokens": 73,
+            "correct_choices": 1,
+            "family": "stdin_add_offset",
+            "ids": [
+              "train-stdin_add_offset-000",
+              "train-stdin_add_offset-001"
+            ],
+            "interaction": -0.0025281906127929688,
+            "left_correct_minus_other": 1.2837724685668945,
+            "prompt_token_counts": [
+              55,
+              55
+            ],
+            "right_correct_minus_other": -1.2863006591796875
+          },
+          {
+            "both_choices_correct": false,
+            "common_reference_tokens": 74,
+            "correct_choices": 1,
+            "family": "stdin_add_offset",
+            "ids": [
+              "train-stdin_add_offset-014",
+              "train-stdin_add_offset-015"
+            ],
+            "interaction": -0.0009350776672363281,
+            "left_correct_minus_other": 0.07108831405639648,
+            "prompt_token_counts": [
+              56,
+              56
+            ],
+            "right_correct_minus_other": -0.07202339172363281
+          },
+          {
+            "both_choices_correct": false,
+            "common_reference_tokens": 73,
+            "correct_choices": 1,
+            "family": "stdin_multiply_offset",
+            "ids": [
+              "train-stdin_multiply_offset-000",
+              "train-stdin_multiply_offset-001"
+            ],
+            "interaction": -0.002571582794189453,
+            "left_correct_minus_other": 1.1281495094299316,
+            "prompt_token_counts": [
+              56,
+              56
+            ],
+            "right_correct_minus_other": -1.130721092224121
+          },
+          {
+            "both_choices_correct": false,
+            "common_reference_tokens": 74,
+            "correct_choices": 1,
+            "family": "stdin_multiply_offset",
+            "ids": [
+              "train-stdin_multiply_offset-014",
+              "train-stdin_multiply_offset-015"
+            ],
+            "interaction": 0.0004382133483886719,
+            "left_correct_minus_other": 0.11012887954711914,
+            "prompt_token_counts": [
+              57,
+              57
+            ],
+            "right_correct_minus_other": -0.10969066619873047
+          },
+          {
+            "both_choices_correct": false,
+            "common_reference_tokens": 79,
+            "correct_choices": 1,
+            "family": "stdin_max_offset",
+            "ids": [
+              "train-stdin_max_offset-000",
+              "train-stdin_max_offset-001"
+            ],
+            "interaction": 0.004422187805175781,
+            "left_correct_minus_other": 0.781557559967041,
+            "prompt_token_counts": [
+              58,
+              58
+            ],
+            "right_correct_minus_other": -0.7771353721618652
+          },
+          {
+            "both_choices_correct": false,
+            "common_reference_tokens": 80,
+            "correct_choices": 1,
+            "family": "stdin_max_offset",
+            "ids": [
+              "train-stdin_max_offset-014",
+              "train-stdin_max_offset-015"
+            ],
+            "interaction": -0.0016608238220214844,
+            "left_correct_minus_other": -0.06370115280151367,
+            "prompt_token_counts": [
+              59,
+              59
+            ],
+            "right_correct_minus_other": 0.06204032897949219
+          },
+          {
+            "both_choices_correct": false,
+            "common_reference_tokens": 80,
+            "correct_choices": 1,
+            "family": "stdin_absolute_gap_offset",
+            "ids": [
+              "train-stdin_absolute_gap_offset-000",
+              "train-stdin_absolute_gap_offset-001"
+            ],
+            "interaction": 0.006287574768066406,
+            "left_correct_minus_other": 0.9199028015136719,
+            "prompt_token_counts": [
+              61,
+              61
+            ],
+            "right_correct_minus_other": -0.9136152267456055
+          },
+          {
+            "both_choices_correct": false,
+            "common_reference_tokens": 81,
+            "correct_choices": 1,
+            "family": "stdin_absolute_gap_offset",
+            "ids": [
+              "train-stdin_absolute_gap_offset-014",
+              "train-stdin_absolute_gap_offset-015"
+            ],
+            "interaction": -0.0012087821960449219,
+            "left_correct_minus_other": -0.12420988082885742,
+            "prompt_token_counts": [
+              62,
+              62
+            ],
+            "right_correct_minus_other": 0.1230010986328125
+          },
+          {
+            "both_choices_correct": false,
+            "common_reference_tokens": 88,
+            "correct_choices": 1,
+            "family": "stdin_count_greater",
+            "ids": [
+              "train-stdin_count_greater-000",
+              "train-stdin_count_greater-001"
+            ],
+            "interaction": 0.011787652969360352,
+            "left_correct_minus_other": 1.0422017574310303,
+            "prompt_token_counts": [
+              66,
+              66
+            ],
+            "right_correct_minus_other": -1.03041410446167
+          },
+          {
+            "both_choices_correct": false,
+            "common_reference_tokens": 86,
+            "correct_choices": 1,
+            "family": "stdin_count_greater",
+            "ids": [
+              "train-stdin_count_greater-014",
+              "train-stdin_count_greater-015"
+            ],
+            "interaction": -0.00048542022705078125,
+            "left_correct_minus_other": -0.07868194580078125,
+            "prompt_token_counts": [
+              64,
+              64
+            ],
+            "right_correct_minus_other": 0.07819652557373047
+          },
+          {
+            "both_choices_correct": false,
+            "common_reference_tokens": 112,
+            "correct_choices": 1,
+            "family": "stdin_even_sum_offset",
+            "ids": [
+              "train-stdin_even_sum_offset-000",
+              "train-stdin_even_sum_offset-001"
+            ],
+            "interaction": 0.00795745849609375,
+            "left_correct_minus_other": 1.344935417175293,
+            "prompt_token_counts": [
+              62,
+              62
+            ],
+            "right_correct_minus_other": -1.3369779586791992
+          },
+          {
+            "both_choices_correct": false,
+            "common_reference_tokens": 113,
+            "correct_choices": 1,
+            "family": "stdin_even_sum_offset",
+            "ids": [
+              "train-stdin_even_sum_offset-014",
+              "train-stdin_even_sum_offset-015"
+            ],
+            "interaction": -0.002685546875,
+            "left_correct_minus_other": 0.2974238395690918,
+            "prompt_token_counts": [
+              63,
+              63
+            ],
+            "right_correct_minus_other": -0.3001093864440918
+          },
+          {
+            "both_choices_correct": false,
+            "common_reference_tokens": 99,
+            "correct_choices": 1,
+            "family": "stdin_digit_sum_offset",
+            "ids": [
+              "train-stdin_digit_sum_offset-000",
+              "train-stdin_digit_sum_offset-001"
+            ],
+            "interaction": -0.0025773048400878906,
+            "left_correct_minus_other": 1.485926628112793,
+            "prompt_token_counts": [
+              60,
+              60
+            ],
+            "right_correct_minus_other": -1.4885039329528809
+          },
+          {
+            "both_choices_correct": false,
+            "common_reference_tokens": 100,
+            "correct_choices": 1,
+            "family": "stdin_digit_sum_offset",
+            "ids": [
+              "train-stdin_digit_sum_offset-014",
+              "train-stdin_digit_sum_offset-015"
+            ],
+            "interaction": -6.67572021484375e-06,
+            "left_correct_minus_other": 0.23305654525756836,
+            "prompt_token_counts": [
+              61,
+              61
+            ],
+            "right_correct_minus_other": -0.2330632209777832
+          },
+          {
+            "both_choices_correct": false,
+            "common_reference_tokens": 89,
+            "correct_choices": 1,
+            "family": "stdin_ascii_upper_suffix",
+            "ids": [
+              "train-stdin_ascii_upper_suffix-000",
+              "train-stdin_ascii_upper_suffix-001"
+            ],
+            "interaction": -0.013706207275390625,
+            "left_correct_minus_other": -0.6791448593139648,
+            "prompt_token_counts": [
+              69,
+              69
+            ],
+            "right_correct_minus_other": 0.6654386520385742
+          },
+          {
+            "both_choices_correct": false,
+            "common_reference_tokens": 90,
+            "correct_choices": 1,
+            "family": "stdin_ascii_upper_suffix",
+            "ids": [
+              "train-stdin_ascii_upper_suffix-014",
+              "train-stdin_ascii_upper_suffix-015"
+            ],
+            "interaction": -0.0005736351013183594,
+            "left_correct_minus_other": 0.48107433319091797,
+            "prompt_token_counts": [
+              70,
+              70
+            ],
+            "right_correct_minus_other": -0.48164796829223633
+          },
+          {
+            "both_choices_correct": false,
+            "common_reference_tokens": 78,
+            "correct_choices": 1,
+            "family": "stdin_ascii_reverse_suffix",
+            "ids": [
+              "train-stdin_ascii_reverse_suffix-000",
+              "train-stdin_ascii_reverse_suffix-001"
+            ],
+            "interaction": -0.005598545074462891,
+            "left_correct_minus_other": -0.4458303451538086,
+            "prompt_token_counts": [
+              68,
+              68
+            ],
+            "right_correct_minus_other": 0.4402318000793457
+          },
+          {
+            "both_choices_correct": false,
+            "common_reference_tokens": 79,
+            "correct_choices": 1,
+            "family": "stdin_ascii_reverse_suffix",
+            "ids": [
+              "train-stdin_ascii_reverse_suffix-014",
+              "train-stdin_ascii_reverse_suffix-015"
+            ],
+            "interaction": -0.0009012222290039062,
+            "left_correct_minus_other": 0.7064347267150879,
+            "prompt_token_counts": [
+              69,
+              69
+            ],
+            "right_correct_minus_other": -0.7073359489440918
+          },
+          {
+            "both_choices_correct": false,
+            "common_reference_tokens": 69,
+            "correct_choices": 1,
+            "family": "stdin_clamp",
+            "ids": [
+              "train-stdin_clamp-000",
+              "train-stdin_clamp-001"
+            ],
+            "interaction": 0.013485431671142578,
+            "left_correct_minus_other": -0.06022453308105469,
+            "prompt_token_counts": [
+              66,
+              66
+            ],
+            "right_correct_minus_other": 0.07370996475219727
+          },
+          {
+            "both_choices_correct": false,
+            "common_reference_tokens": 68,
+            "correct_choices": 1,
+            "family": "stdin_clamp",
+            "ids": [
+              "train-stdin_clamp-014",
+              "train-stdin_clamp-015"
+            ],
+            "interaction": 0.0033659934997558594,
+            "left_correct_minus_other": -0.5397830009460449,
+            "prompt_token_counts": [
+              65,
+              64
+            ],
+            "right_correct_minus_other": 0.5431489944458008
+          }
+        ]
+      },
+      "validation": {
+        "both_choices_correct": 0,
+        "correct_choices": 3,
+        "mean_interaction": 0.006228446960449219,
+        "pairs": 3,
+        "positive_interactions": 3,
+        "rows": [
+          {
+            "both_choices_correct": false,
+            "common_reference_tokens": 79,
+            "correct_choices": 1,
+            "family": "stdin_min_offset",
+            "ids": [
+              "validation-stdin_min_offset-002",
+              "validation-stdin_min_offset-003"
+            ],
+            "interaction": 0.005340576171875,
+            "left_correct_minus_other": 0.7449002265930176,
+            "prompt_token_counts": [
+              58,
+              58
+            ],
+            "right_correct_minus_other": -0.7395596504211426
+          },
+          {
+            "both_choices_correct": false,
+            "common_reference_tokens": 109,
+            "correct_choices": 1,
+            "family": "stdin_count_odd_offset",
+            "ids": [
+              "validation-stdin_count_odd_offset-002",
+              "validation-stdin_count_odd_offset-003"
+            ],
+            "interaction": 0.00019025802612304688,
+            "left_correct_minus_other": 1.1618013381958008,
+            "prompt_token_counts": [
+              62,
+              62
+            ],
+            "right_correct_minus_other": -1.1616110801696777
+          },
+          {
+            "both_choices_correct": false,
+            "common_reference_tokens": 89,
+            "correct_choices": 1,
+            "family": "stdin_ascii_lower_suffix",
+            "ids": [
+              "validation-stdin_ascii_lower_suffix-002",
+              "validation-stdin_ascii_lower_suffix-003"
+            ],
+            "interaction": 0.01315450668334961,
+            "left_correct_minus_other": 0.25338172912597656,
+            "prompt_token_counts": [
+              69,
+              69
+            ],
+            "right_correct_minus_other": -0.24022722244262695
+          }
+        ]
+      }
+    },
+    "4202-control": {
+      "prior_generation_collisions": {
+        "fresh_development": 2,
+        "regression": 3
+      },
+      "train": {
+        "both_choices_correct": 0,
+        "correct_choices": 20,
+        "mean_interaction": 0.000217437744140625,
+        "pairs": 20,
+        "positive_interactions": 6,
+        "rows": [
+          {
+            "both_choices_correct": false,
+            "common_reference_tokens": 73,
+            "correct_choices": 1,
+            "family": "stdin_add_offset",
+            "ids": [
+              "train-stdin_add_offset-000",
+              "train-stdin_add_offset-001"
+            ],
+            "interaction": -0.0025839805603027344,
+            "left_correct_minus_other": 1.175717830657959,
+            "prompt_token_counts": [
+              55,
+              55
+            ],
+            "right_correct_minus_other": -1.1783018112182617
+          },
+          {
+            "both_choices_correct": false,
+            "common_reference_tokens": 74,
+            "correct_choices": 1,
+            "family": "stdin_add_offset",
+            "ids": [
+              "train-stdin_add_offset-014",
+              "train-stdin_add_offset-015"
+            ],
+            "interaction": -0.0008172988891601562,
+            "left_correct_minus_other": -0.0008854866027832031,
+            "prompt_token_counts": [
+              56,
+              56
+            ],
+            "right_correct_minus_other": 6.818771362304688e-05
+          },
+          {
+            "both_choices_correct": false,
+            "common_reference_tokens": 73,
+            "correct_choices": 1,
+            "family": "stdin_multiply_offset",
+            "ids": [
+              "train-stdin_multiply_offset-000",
+              "train-stdin_multiply_offset-001"
+            ],
+            "interaction": -0.0035614967346191406,
+            "left_correct_minus_other": 0.9930377006530762,
+            "prompt_token_counts": [
+              56,
+              56
+            ],
+            "right_correct_minus_other": -0.9965991973876953
+          },
+          {
+            "both_choices_correct": false,
+            "common_reference_tokens": 74,
+            "correct_choices": 1,
+            "family": "stdin_multiply_offset",
+            "ids": [
+              "train-stdin_multiply_offset-014",
+              "train-stdin_multiply_offset-015"
+            ],
+            "interaction": -0.00012445449829101562,
+            "left_correct_minus_other": 0.027608394622802734,
+            "prompt_token_counts": [
+              57,
+              57
+            ],
+            "right_correct_minus_other": -0.02773284912109375
+          },
+          {
+            "both_choices_correct": false,
+            "common_reference_tokens": 79,
+            "correct_choices": 1,
+            "family": "stdin_max_offset",
+            "ids": [
+              "train-stdin_max_offset-000",
+              "train-stdin_max_offset-001"
+            ],
+            "interaction": 0.004275798797607422,
+            "left_correct_minus_other": 0.6413960456848145,
+            "prompt_token_counts": [
+              58,
+              58
+            ],
+            "right_correct_minus_other": -0.637120246887207
+          },
+          {
+            "both_choices_correct": false,
+            "common_reference_tokens": 80,
+            "correct_choices": 1,
+            "family": "stdin_max_offset",
+            "ids": [
+              "train-stdin_max_offset-014",
+              "train-stdin_max_offset-015"
+            ],
+            "interaction": -0.0022954940795898438,
+            "left_correct_minus_other": -0.12394905090332031,
+            "prompt_token_counts": [
+              59,
+              59
+            ],
+            "right_correct_minus_other": 0.12165355682373047
+          },
+          {
+            "both_choices_correct": false,
+            "common_reference_tokens": 80,
+            "correct_choices": 1,
+            "family": "stdin_absolute_gap_offset",
+            "ids": [
+              "train-stdin_absolute_gap_offset-000",
+              "train-stdin_absolute_gap_offset-001"
+            ],
+            "interaction": 0.007634639739990234,
+            "left_correct_minus_other": 0.6761269569396973,
+            "prompt_token_counts": [
+              61,
+              61
+            ],
+            "right_correct_minus_other": -0.668492317199707
+          },
+          {
+            "both_choices_correct": false,
+            "common_reference_tokens": 81,
+            "correct_choices": 1,
+            "family": "stdin_absolute_gap_offset",
+            "ids": [
+              "train-stdin_absolute_gap_offset-014",
+              "train-stdin_absolute_gap_offset-015"
+            ],
+            "interaction": -0.0013871192932128906,
+            "left_correct_minus_other": -0.19349241256713867,
+            "prompt_token_counts": [
+              62,
+              62
+            ],
+            "right_correct_minus_other": 0.19210529327392578
+          },
+          {
+            "both_choices_correct": false,
+            "common_reference_tokens": 88,
+            "correct_choices": 1,
+            "family": "stdin_count_greater",
+            "ids": [
+              "train-stdin_count_greater-000",
+              "train-stdin_count_greater-001"
+            ],
+            "interaction": 0.009130239486694336,
+            "left_correct_minus_other": 1.1446094512939453,
+            "prompt_token_counts": [
+              66,
+              66
+            ],
+            "right_correct_minus_other": -1.135479211807251
+          },
+          {
+            "both_choices_correct": false,
+            "common_reference_tokens": 86,
+            "correct_choices": 1,
+            "family": "stdin_count_greater",
+            "ids": [
+              "train-stdin_count_greater-014",
+              "train-stdin_count_greater-015"
+            ],
+            "interaction": 0.0038099288940429688,
+            "left_correct_minus_other": 0.15416479110717773,
+            "prompt_token_counts": [
+              64,
+              64
+            ],
+            "right_correct_minus_other": -0.15035486221313477
+          },
+          {
+            "both_choices_correct": false,
+            "common_reference_tokens": 112,
+            "correct_choices": 1,
+            "family": "stdin_even_sum_offset",
+            "ids": [
+              "train-stdin_even_sum_offset-000",
+              "train-stdin_even_sum_offset-001"
+            ],
+            "interaction": 0.0063610076904296875,
+            "left_correct_minus_other": 1.2425150871276855,
+            "prompt_token_counts": [
+              62,
+              62
+            ],
+            "right_correct_minus_other": -1.2361540794372559
+          },
+          {
+            "both_choices_correct": false,
+            "common_reference_tokens": 113,
+            "correct_choices": 1,
+            "family": "stdin_even_sum_offset",
+            "ids": [
+              "train-stdin_even_sum_offset-014",
+              "train-stdin_even_sum_offset-015"
+            ],
+            "interaction": -0.0032639503479003906,
+            "left_correct_minus_other": 0.18488216400146484,
+            "prompt_token_counts": [
+              63,
+              63
+            ],
+            "right_correct_minus_other": -0.18814611434936523
+          },
+          {
+            "both_choices_correct": false,
+            "common_reference_tokens": 99,
+            "correct_choices": 1,
+            "family": "stdin_digit_sum_offset",
+            "ids": [
+              "train-stdin_digit_sum_offset-000",
+              "train-stdin_digit_sum_offset-001"
+            ],
+            "interaction": -0.003942012786865234,
+            "left_correct_minus_other": 1.4437799453735352,
+            "prompt_token_counts": [
+              60,
+              60
+            ],
+            "right_correct_minus_other": -1.4477219581604004
+          },
+          {
+            "both_choices_correct": false,
+            "common_reference_tokens": 100,
+            "correct_choices": 1,
+            "family": "stdin_digit_sum_offset",
+            "ids": [
+              "train-stdin_digit_sum_offset-014",
+              "train-stdin_digit_sum_offset-015"
+            ],
+            "interaction": -0.0006327629089355469,
+            "left_correct_minus_other": 0.13250112533569336,
+            "prompt_token_counts": [
+              61,
+              61
+            ],
+            "right_correct_minus_other": -0.1331338882446289
+          },
+          {
+            "both_choices_correct": false,
+            "common_reference_tokens": 89,
+            "correct_choices": 1,
+            "family": "stdin_ascii_upper_suffix",
+            "ids": [
+              "train-stdin_ascii_upper_suffix-000",
+              "train-stdin_ascii_upper_suffix-001"
+            ],
+            "interaction": -0.012964725494384766,
+            "left_correct_minus_other": -0.6209330558776855,
+            "prompt_token_counts": [
+              69,
+              69
+            ],
+            "right_correct_minus_other": 0.6079683303833008
+          },
+          {
+            "both_choices_correct": false,
+            "common_reference_tokens": 90,
+            "correct_choices": 1,
+            "family": "stdin_ascii_upper_suffix",
+            "ids": [
+              "train-stdin_ascii_upper_suffix-014",
+              "train-stdin_ascii_upper_suffix-015"
+            ],
+            "interaction": -0.0017547607421875,
+            "left_correct_minus_other": 0.2214040756225586,
+            "prompt_token_counts": [
+              70,
+              70
+            ],
+            "right_correct_minus_other": -0.2231588363647461
+          },
+          {
+            "both_choices_correct": false,
+            "common_reference_tokens": 78,
+            "correct_choices": 1,
+            "family": "stdin_ascii_reverse_suffix",
+            "ids": [
+              "train-stdin_ascii_reverse_suffix-000",
+              "train-stdin_ascii_reverse_suffix-001"
+            ],
+            "interaction": -0.004775524139404297,
+            "left_correct_minus_other": -0.431915283203125,
+            "prompt_token_counts": [
+              68,
+              68
+            ],
+            "right_correct_minus_other": 0.4271397590637207
+          },
+          {
+            "both_choices_correct": false,
+            "common_reference_tokens": 79,
+            "correct_choices": 1,
+            "family": "stdin_ascii_reverse_suffix",
+            "ids": [
+              "train-stdin_ascii_reverse_suffix-014",
+              "train-stdin_ascii_reverse_suffix-015"
+            ],
+            "interaction": -0.0022335052490234375,
+            "left_correct_minus_other": 0.377072811126709,
+            "prompt_token_counts": [
+              69,
+              69
+            ],
+            "right_correct_minus_other": -0.3793063163757324
+          },
+          {
+            "both_choices_correct": false,
+            "common_reference_tokens": 69,
+            "correct_choices": 1,
+            "family": "stdin_clamp",
+            "ids": [
+              "train-stdin_clamp-000",
+              "train-stdin_clamp-001"
+            ],
+            "interaction": 0.01353597640991211,
+            "left_correct_minus_other": -0.28130483627319336,
+            "prompt_token_counts": [
+              66,
+              66
+            ],
+            "right_correct_minus_other": 0.29484081268310547
+          },
+          {
+            "both_choices_correct": false,
+            "common_reference_tokens": 68,
+            "correct_choices": 1,
+            "family": "stdin_clamp",
+            "ids": [
+              "train-stdin_clamp-014",
+              "train-stdin_clamp-015"
+            ],
+            "interaction": -6.175041198730469e-05,
+            "left_correct_minus_other": -0.7221353054046631,
+            "prompt_token_counts": [
+              65,
+              64
+            ],
+            "right_correct_minus_other": 0.7220735549926758
+          }
+        ]
+      },
+      "validation": {
+        "both_choices_correct": 0,
+        "correct_choices": 3,
+        "mean_interaction": 0.005783875783284505,
+        "pairs": 3,
+        "positive_interactions": 3,
+        "rows": [
+          {
+            "both_choices_correct": false,
+            "common_reference_tokens": 79,
+            "correct_choices": 1,
+            "family": "stdin_min_offset",
+            "ids": [
+              "validation-stdin_min_offset-002",
+              "validation-stdin_min_offset-003"
+            ],
+            "interaction": 0.00597381591796875,
+            "left_correct_minus_other": 0.6240715980529785,
+            "prompt_token_counts": [
+              58,
+              58
+            ],
+            "right_correct_minus_other": -0.6180977821350098
+          },
+          {
+            "both_choices_correct": false,
+            "common_reference_tokens": 109,
+            "correct_choices": 1,
+            "family": "stdin_count_odd_offset",
+            "ids": [
+              "validation-stdin_count_odd_offset-002",
+              "validation-stdin_count_odd_offset-003"
+            ],
+            "interaction": 3.1948089599609375e-05,
+            "left_correct_minus_other": 1.072455883026123,
+            "prompt_token_counts": [
+              62,
+              62
+            ],
+            "right_correct_minus_other": -1.0724239349365234
+          },
+          {
+            "both_choices_correct": false,
+            "common_reference_tokens": 89,
+            "correct_choices": 1,
+            "family": "stdin_ascii_lower_suffix",
+            "ids": [
+              "validation-stdin_ascii_lower_suffix-002",
+              "validation-stdin_ascii_lower_suffix-003"
+            ],
+            "interaction": 0.011345863342285156,
+            "left_correct_minus_other": 0.49521398544311523,
+            "prompt_token_counts": [
+              69,
+              69
+            ],
+            "right_correct_minus_other": -0.4838681221008301
+          }
+        ]
+      }
+    },
+    "4202-ranking": {
+      "prior_generation_collisions": {
+        "fresh_development": 3,
+        "regression": 3
+      },
+      "train": {
+        "both_choices_correct": 0,
+        "correct_choices": 19,
+        "mean_interaction": 0.0005328178405761719,
+        "pairs": 20,
+        "positive_interactions": 7,
+        "rows": [
+          {
+            "both_choices_correct": false,
+            "common_reference_tokens": 73,
+            "correct_choices": 1,
+            "family": "stdin_add_offset",
+            "ids": [
+              "train-stdin_add_offset-000",
+              "train-stdin_add_offset-001"
+            ],
+            "interaction": -0.0033240318298339844,
+            "left_correct_minus_other": 1.224228858947754,
+            "prompt_token_counts": [
+              55,
+              55
+            ],
+            "right_correct_minus_other": -1.227552890777588
+          },
+          {
+            "both_choices_correct": false,
+            "common_reference_tokens": 74,
+            "correct_choices": 0,
+            "family": "stdin_add_offset",
+            "ids": [
+              "train-stdin_add_offset-014",
+              "train-stdin_add_offset-015"
+            ],
+            "interaction": -0.0012726783752441406,
+            "left_correct_minus_other": -0.0007576942443847656,
+            "prompt_token_counts": [
+              56,
+              56
+            ],
+            "right_correct_minus_other": -0.000514984130859375
+          },
+          {
+            "both_choices_correct": false,
+            "common_reference_tokens": 73,
+            "correct_choices": 1,
+            "family": "stdin_multiply_offset",
+            "ids": [
+              "train-stdin_multiply_offset-000",
+              "train-stdin_multiply_offset-001"
+            ],
+            "interaction": -0.0039038658142089844,
+            "left_correct_minus_other": 1.0736417770385742,
+            "prompt_token_counts": [
+              56,
+              56
+            ],
+            "right_correct_minus_other": -1.0775456428527832
+          },
+          {
+            "both_choices_correct": false,
+            "common_reference_tokens": 74,
+            "correct_choices": 1,
+            "family": "stdin_multiply_offset",
+            "ids": [
+              "train-stdin_multiply_offset-014",
+              "train-stdin_multiply_offset-015"
+            ],
+            "interaction": -0.00010156631469726562,
+            "left_correct_minus_other": 0.042928218841552734,
+            "prompt_token_counts": [
+              57,
+              57
+            ],
+            "right_correct_minus_other": -0.04302978515625
+          },
+          {
+            "both_choices_correct": false,
+            "common_reference_tokens": 79,
+            "correct_choices": 1,
+            "family": "stdin_max_offset",
+            "ids": [
+              "train-stdin_max_offset-000",
+              "train-stdin_max_offset-001"
+            ],
+            "interaction": 0.003394603729248047,
+            "left_correct_minus_other": 0.7334203720092773,
+            "prompt_token_counts": [
+              58,
+              58
+            ],
+            "right_correct_minus_other": -0.7300257682800293
+          },
+          {
+            "both_choices_correct": false,
+            "common_reference_tokens": 80,
+            "correct_choices": 1,
+            "family": "stdin_max_offset",
+            "ids": [
+              "train-stdin_max_offset-014",
+              "train-stdin_max_offset-015"
+            ],
+            "interaction": -0.0012521743774414062,
+            "left_correct_minus_other": -0.0745539665222168,
+            "prompt_token_counts": [
+              59,
+              59
+            ],
+            "right_correct_minus_other": 0.07330179214477539
+          },
+          {
+            "both_choices_correct": false,
+            "common_reference_tokens": 80,
+            "correct_choices": 1,
+            "family": "stdin_absolute_gap_offset",
+            "ids": [
+              "train-stdin_absolute_gap_offset-000",
+              "train-stdin_absolute_gap_offset-001"
+            ],
+            "interaction": 0.004849433898925781,
+            "left_correct_minus_other": 0.8665823936462402,
+            "prompt_token_counts": [
+              61,
+              61
+            ],
+            "right_correct_minus_other": -0.8617329597473145
+          },
+          {
+            "both_choices_correct": false,
+            "common_reference_tokens": 81,
+            "correct_choices": 1,
+            "family": "stdin_absolute_gap_offset",
+            "ids": [
+              "train-stdin_absolute_gap_offset-014",
+              "train-stdin_absolute_gap_offset-015"
+            ],
+            "interaction": -0.0010790824890136719,
+            "left_correct_minus_other": -0.16109418869018555,
+            "prompt_token_counts": [
+              62,
+              62
+            ],
+            "right_correct_minus_other": 0.16001510620117188
+          },
+          {
+            "both_choices_correct": false,
+            "common_reference_tokens": 88,
+            "correct_choices": 1,
+            "family": "stdin_count_greater",
+            "ids": [
+              "train-stdin_count_greater-000",
+              "train-stdin_count_greater-001"
+            ],
+            "interaction": 0.010651588439941406,
+            "left_correct_minus_other": 1.1979882717132568,
+            "prompt_token_counts": [
+              66,
+              66
+            ],
+            "right_correct_minus_other": -1.1873366832733154
+          },
+          {
+            "both_choices_correct": false,
+            "common_reference_tokens": 86,
+            "correct_choices": 1,
+            "family": "stdin_count_greater",
+            "ids": [
+              "train-stdin_count_greater-014",
+              "train-stdin_count_greater-015"
+            ],
+            "interaction": 0.006506919860839844,
+            "left_correct_minus_other": -0.2479543685913086,
+            "prompt_token_counts": [
+              64,
+              64
+            ],
+            "right_correct_minus_other": 0.25446128845214844
+          },
+          {
+            "both_choices_correct": false,
+            "common_reference_tokens": 112,
+            "correct_choices": 1,
+            "family": "stdin_even_sum_offset",
+            "ids": [
+              "train-stdin_even_sum_offset-000",
+              "train-stdin_even_sum_offset-001"
+            ],
+            "interaction": 0.006754398345947266,
+            "left_correct_minus_other": 1.3282122611999512,
+            "prompt_token_counts": [
+              62,
+              62
+            ],
+            "right_correct_minus_other": -1.321457862854004
+          },
+          {
+            "both_choices_correct": false,
+            "common_reference_tokens": 113,
+            "correct_choices": 1,
+            "family": "stdin_even_sum_offset",
+            "ids": [
+              "train-stdin_even_sum_offset-014",
+              "train-stdin_even_sum_offset-015"
+            ],
+            "interaction": -0.003231048583984375,
+            "left_correct_minus_other": 0.23249053955078125,
+            "prompt_token_counts": [
+              63,
+              63
+            ],
+            "right_correct_minus_other": -0.23572158813476562
+          },
+          {
+            "both_choices_correct": false,
+            "common_reference_tokens": 99,
+            "correct_choices": 1,
+            "family": "stdin_digit_sum_offset",
+            "ids": [
+              "train-stdin_digit_sum_offset-000",
+              "train-stdin_digit_sum_offset-001"
+            ],
+            "interaction": -0.003917694091796875,
+            "left_correct_minus_other": 1.5044751167297363,
+            "prompt_token_counts": [
+              60,
+              60
+            ],
+            "right_correct_minus_other": -1.5083928108215332
+          },
+          {
+            "both_choices_correct": false,
+            "common_reference_tokens": 100,
+            "correct_choices": 1,
+            "family": "stdin_digit_sum_offset",
+            "ids": [
+              "train-stdin_digit_sum_offset-014",
+              "train-stdin_digit_sum_offset-015"
+            ],
+            "interaction": -0.00024175643920898438,
+            "left_correct_minus_other": 0.15307235717773438,
+            "prompt_token_counts": [
+              61,
+              61
+            ],
+            "right_correct_minus_other": -0.15331411361694336
+          },
+          {
+            "both_choices_correct": false,
+            "common_reference_tokens": 89,
+            "correct_choices": 1,
+            "family": "stdin_ascii_upper_suffix",
+            "ids": [
+              "train-stdin_ascii_upper_suffix-000",
+              "train-stdin_ascii_upper_suffix-001"
+            ],
+            "interaction": -0.012718677520751953,
+            "left_correct_minus_other": -0.5280952453613281,
+            "prompt_token_counts": [
+              69,
+              69
+            ],
+            "right_correct_minus_other": 0.5153765678405762
+          },
+          {
+            "both_choices_correct": false,
+            "common_reference_tokens": 90,
+            "correct_choices": 1,
+            "family": "stdin_ascii_upper_suffix",
+            "ids": [
+              "train-stdin_ascii_upper_suffix-014",
+              "train-stdin_ascii_upper_suffix-015"
+            ],
+            "interaction": -0.0013628005981445312,
+            "left_correct_minus_other": 0.23906517028808594,
+            "prompt_token_counts": [
+              70,
+              70
+            ],
+            "right_correct_minus_other": -0.24042797088623047
+          },
+          {
+            "both_choices_correct": false,
+            "common_reference_tokens": 78,
+            "correct_choices": 1,
+            "family": "stdin_ascii_reverse_suffix",
+            "ids": [
+              "train-stdin_ascii_reverse_suffix-000",
+              "train-stdin_ascii_reverse_suffix-001"
+            ],
+            "interaction": -0.005015373229980469,
+            "left_correct_minus_other": -0.31043338775634766,
+            "prompt_token_counts": [
+              68,
+              68
+            ],
+            "right_correct_minus_other": 0.3054180145263672
+          },
+          {
+            "both_choices_correct": false,
+            "common_reference_tokens": 79,
+            "correct_choices": 1,
+            "family": "stdin_ascii_reverse_suffix",
+            "ids": [
+              "train-stdin_ascii_reverse_suffix-014",
+              "train-stdin_ascii_reverse_suffix-015"
+            ],
+            "interaction": -0.0021457672119140625,
+            "left_correct_minus_other": 0.4286818504333496,
+            "prompt_token_counts": [
+              69,
+              69
+            ],
+            "right_correct_minus_other": -0.43082761764526367
+          },
+          {
+            "both_choices_correct": false,
+            "common_reference_tokens": 69,
+            "correct_choices": 1,
+            "family": "stdin_clamp",
+            "ids": [
+              "train-stdin_clamp-000",
+              "train-stdin_clamp-001"
+            ],
+            "interaction": 0.013669490814208984,
+            "left_correct_minus_other": -0.24035263061523438,
+            "prompt_token_counts": [
+              66,
+              66
+            ],
+            "right_correct_minus_other": 0.25402212142944336
+          },
+          {
+            "both_choices_correct": false,
+            "common_reference_tokens": 68,
+            "correct_choices": 1,
+            "family": "stdin_clamp",
+            "ids": [
+              "train-stdin_clamp-014",
+              "train-stdin_clamp-015"
+            ],
+            "interaction": 0.0043964385986328125,
+            "left_correct_minus_other": -0.7365624904632568,
+            "prompt_token_counts": [
+              65,
+              64
+            ],
+            "right_correct_minus_other": 0.7409589290618896
+          }
+        ]
+      },
+      "validation": {
+        "both_choices_correct": 0,
+        "correct_choices": 3,
+        "mean_interaction": 0.0061651865641276045,
+        "pairs": 3,
+        "positive_interactions": 3,
+        "rows": [
+          {
+            "both_choices_correct": false,
+            "common_reference_tokens": 79,
+            "correct_choices": 1,
+            "family": "stdin_min_offset",
+            "ids": [
+              "validation-stdin_min_offset-002",
+              "validation-stdin_min_offset-003"
+            ],
+            "interaction": 0.005572795867919922,
+            "left_correct_minus_other": 0.5952157974243164,
+            "prompt_token_counts": [
+              58,
+              58
+            ],
+            "right_correct_minus_other": -0.5896430015563965
+          },
+          {
+            "both_choices_correct": false,
+            "common_reference_tokens": 109,
+            "correct_choices": 1,
+            "family": "stdin_count_odd_offset",
+            "ids": [
+              "validation-stdin_count_odd_offset-002",
+              "validation-stdin_count_odd_offset-003"
+            ],
+            "interaction": 0.0007462501525878906,
+            "left_correct_minus_other": 1.0563020706176758,
+            "prompt_token_counts": [
+              62,
+              62
+            ],
+            "right_correct_minus_other": -1.055555820465088
+          },
+          {
+            "both_choices_correct": false,
+            "common_reference_tokens": 89,
+            "correct_choices": 1,
+            "family": "stdin_ascii_lower_suffix",
+            "ids": [
+              "validation-stdin_ascii_lower_suffix-002",
+              "validation-stdin_ascii_lower_suffix-003"
+            ],
+            "interaction": 0.012176513671875,
+            "left_correct_minus_other": 0.4075736999511719,
+            "prompt_token_counts": [
+              69,
+              69
+            ],
+            "right_correct_minus_other": -0.3953971862792969
+          }
+        ]
+      }
+    },
+    "4203-control": {
+      "prior_generation_collisions": {
+        "fresh_development": 2,
+        "regression": 3
+      },
+      "train": {
+        "both_choices_correct": 0,
+        "correct_choices": 20,
+        "mean_interaction": 0.0006167292594909668,
+        "pairs": 20,
+        "positive_interactions": 6,
+        "rows": [
+          {
+            "both_choices_correct": false,
+            "common_reference_tokens": 73,
+            "correct_choices": 1,
+            "family": "stdin_add_offset",
+            "ids": [
+              "train-stdin_add_offset-000",
+              "train-stdin_add_offset-001"
+            ],
+            "interaction": -0.0018205642700195312,
+            "left_correct_minus_other": 1.073927402496338,
+            "prompt_token_counts": [
+              55,
+              55
+            ],
+            "right_correct_minus_other": -1.0757479667663574
+          },
+          {
+            "both_choices_correct": false,
+            "common_reference_tokens": 74,
+            "correct_choices": 1,
+            "family": "stdin_add_offset",
+            "ids": [
+              "train-stdin_add_offset-014",
+              "train-stdin_add_offset-015"
+            ],
+            "interaction": -0.0002346038818359375,
+            "left_correct_minus_other": 0.17040300369262695,
+            "prompt_token_counts": [
+              56,
+              56
+            ],
+            "right_correct_minus_other": -0.1706376075744629
+          },
+          {
+            "both_choices_correct": false,
+            "common_reference_tokens": 73,
+            "correct_choices": 1,
+            "family": "stdin_multiply_offset",
+            "ids": [
+              "train-stdin_multiply_offset-000",
+              "train-stdin_multiply_offset-001"
+            ],
+            "interaction": -0.0025763511657714844,
+            "left_correct_minus_other": 0.8399090766906738,
+            "prompt_token_counts": [
+              56,
+              56
+            ],
+            "right_correct_minus_other": -0.8424854278564453
+          },
+          {
+            "both_choices_correct": false,
+            "common_reference_tokens": 74,
+            "correct_choices": 1,
+            "family": "stdin_multiply_offset",
+            "ids": [
+              "train-stdin_multiply_offset-014",
+              "train-stdin_multiply_offset-015"
+            ],
+            "interaction": 0.0007905960083007812,
+            "left_correct_minus_other": 0.21723222732543945,
+            "prompt_token_counts": [
+              57,
+              57
+            ],
+            "right_correct_minus_other": -0.21644163131713867
+          },
+          {
+            "both_choices_correct": false,
+            "common_reference_tokens": 79,
+            "correct_choices": 1,
+            "family": "stdin_max_offset",
+            "ids": [
+              "train-stdin_max_offset-000",
+              "train-stdin_max_offset-001"
+            ],
+            "interaction": 0.006003856658935547,
+            "left_correct_minus_other": 0.5846953392028809,
+            "prompt_token_counts": [
+              58,
+              58
+            ],
+            "right_correct_minus_other": -0.5786914825439453
+          },
+          {
+            "both_choices_correct": false,
+            "common_reference_tokens": 80,
+            "correct_choices": 1,
+            "family": "stdin_max_offset",
+            "ids": [
+              "train-stdin_max_offset-014",
+              "train-stdin_max_offset-015"
+            ],
+            "interaction": -0.0012545585632324219,
+            "left_correct_minus_other": 0.021891117095947266,
+            "prompt_token_counts": [
+              59,
+              59
+            ],
+            "right_correct_minus_other": -0.023145675659179688
+          },
+          {
+            "both_choices_correct": false,
+            "common_reference_tokens": 80,
+            "correct_choices": 1,
+            "family": "stdin_absolute_gap_offset",
+            "ids": [
+              "train-stdin_absolute_gap_offset-000",
+              "train-stdin_absolute_gap_offset-001"
+            ],
+            "interaction": 0.00999307632446289,
+            "left_correct_minus_other": 0.5964269638061523,
+            "prompt_token_counts": [
+              61,
+              61
+            ],
+            "right_correct_minus_other": -0.5864338874816895
+          },
+          {
+            "both_choices_correct": false,
+            "common_reference_tokens": 81,
+            "correct_choices": 1,
+            "family": "stdin_absolute_gap_offset",
+            "ids": [
+              "train-stdin_absolute_gap_offset-014",
+              "train-stdin_absolute_gap_offset-015"
+            ],
+            "interaction": -0.0004668235778808594,
+            "left_correct_minus_other": -0.030915260314941406,
+            "prompt_token_counts": [
+              62,
+              62
+            ],
+            "right_correct_minus_other": 0.030448436737060547
+          },
+          {
+            "both_choices_correct": false,
+            "common_reference_tokens": 88,
+            "correct_choices": 1,
+            "family": "stdin_count_greater",
+            "ids": [
+              "train-stdin_count_greater-000",
+              "train-stdin_count_greater-001"
+            ],
+            "interaction": 0.008632183074951172,
+            "left_correct_minus_other": 1.029430866241455,
+            "prompt_token_counts": [
+              66,
+              66
+            ],
+            "right_correct_minus_other": -1.020798683166504
+          },
+          {
+            "both_choices_correct": false,
+            "common_reference_tokens": 86,
+            "correct_choices": 1,
+            "family": "stdin_count_greater",
+            "ids": [
+              "train-stdin_count_greater-014",
+              "train-stdin_count_greater-015"
+            ],
+            "interaction": -3.528594970703125e-05,
+            "left_correct_minus_other": 1.114293098449707,
+            "prompt_token_counts": [
+              64,
+              64
+            ],
+            "right_correct_minus_other": -1.114328384399414
+          },
+          {
+            "both_choices_correct": false,
+            "common_reference_tokens": 112,
+            "correct_choices": 1,
+            "family": "stdin_even_sum_offset",
+            "ids": [
+              "train-stdin_even_sum_offset-000",
+              "train-stdin_even_sum_offset-001"
+            ],
+            "interaction": 0.007668972015380859,
+            "left_correct_minus_other": 1.0827059745788574,
+            "prompt_token_counts": [
+              62,
+              62
+            ],
+            "right_correct_minus_other": -1.0750370025634766
+          },
+          {
+            "both_choices_correct": false,
+            "common_reference_tokens": 113,
+            "correct_choices": 1,
+            "family": "stdin_even_sum_offset",
+            "ids": [
+              "train-stdin_even_sum_offset-014",
+              "train-stdin_even_sum_offset-015"
+            ],
+            "interaction": -0.0026345252990722656,
+            "left_correct_minus_other": 0.335235595703125,
+            "prompt_token_counts": [
+              63,
+              63
+            ],
+            "right_correct_minus_other": -0.33787012100219727
+          },
+          {
+            "both_choices_correct": false,
+            "common_reference_tokens": 99,
+            "correct_choices": 1,
+            "family": "stdin_digit_sum_offset",
+            "ids": [
+              "train-stdin_digit_sum_offset-000",
+              "train-stdin_digit_sum_offset-001"
+            ],
+            "interaction": -0.003318309783935547,
+            "left_correct_minus_other": 1.299116611480713,
+            "prompt_token_counts": [
+              60,
+              60
+            ],
+            "right_correct_minus_other": -1.3024349212646484
+          },
+          {
+            "both_choices_correct": false,
+            "common_reference_tokens": 100,
+            "correct_choices": 1,
+            "family": "stdin_digit_sum_offset",
+            "ids": [
+              "train-stdin_digit_sum_offset-014",
+              "train-stdin_digit_sum_offset-015"
+            ],
+            "interaction": -0.00010824203491210938,
+            "left_correct_minus_other": 0.27388763427734375,
+            "prompt_token_counts": [
+              61,
+              61
+            ],
+            "right_correct_minus_other": -0.27399587631225586
+          },
+          {
+            "both_choices_correct": false,
+            "common_reference_tokens": 89,
+            "correct_choices": 1,
+            "family": "stdin_ascii_upper_suffix",
+            "ids": [
+              "train-stdin_ascii_upper_suffix-000",
+              "train-stdin_ascii_upper_suffix-001"
+            ],
+            "interaction": -0.013134479522705078,
+            "left_correct_minus_other": -0.5096988677978516,
+            "prompt_token_counts": [
+              69,
+              69
+            ],
+            "right_correct_minus_other": 0.4965643882751465
+          },
+          {
+            "both_choices_correct": false,
+            "common_reference_tokens": 90,
+            "correct_choices": 1,
+            "family": "stdin_ascii_upper_suffix",
+            "ids": [
+              "train-stdin_ascii_upper_suffix-014",
+              "train-stdin_ascii_upper_suffix-015"
+            ],
+            "interaction": -0.0013523101806640625,
+            "left_correct_minus_other": 0.3560514450073242,
+            "prompt_token_counts": [
+              70,
+              70
+            ],
+            "right_correct_minus_other": -0.3574037551879883
+          },
+          {
+            "both_choices_correct": false,
+            "common_reference_tokens": 78,
+            "correct_choices": 1,
+            "family": "stdin_ascii_reverse_suffix",
+            "ids": [
+              "train-stdin_ascii_reverse_suffix-000",
+              "train-stdin_ascii_reverse_suffix-001"
+            ],
+            "interaction": -0.004604816436767578,
+            "left_correct_minus_other": -0.28561925888061523,
+            "prompt_token_counts": [
+              68,
+              68
+            ],
+            "right_correct_minus_other": 0.28101444244384766
+          },
+          {
+            "both_choices_correct": false,
+            "common_reference_tokens": 79,
+            "correct_choices": 1,
+            "family": "stdin_ascii_reverse_suffix",
+            "ids": [
+              "train-stdin_ascii_reverse_suffix-014",
+              "train-stdin_ascii_reverse_suffix-015"
+            ],
+            "interaction": -0.0017848014831542969,
+            "left_correct_minus_other": 0.49517297744750977,
+            "prompt_token_counts": [
+              69,
+              69
+            ],
+            "right_correct_minus_other": -0.49695777893066406
+          },
+          {
+            "both_choices_correct": false,
+            "common_reference_tokens": 69,
+            "correct_choices": 1,
+            "family": "stdin_clamp",
+            "ids": [
+              "train-stdin_clamp-000",
+              "train-stdin_clamp-001"
+            ],
+            "interaction": 0.013097763061523438,
+            "left_correct_minus_other": -0.17776060104370117,
+            "prompt_token_counts": [
+              66,
+              66
+            ],
+            "right_correct_minus_other": 0.1908583641052246
+          },
+          {
+            "both_choices_correct": false,
+            "common_reference_tokens": 68,
+            "correct_choices": 1,
+            "family": "stdin_clamp",
+            "ids": [
+              "train-stdin_clamp-014",
+              "train-stdin_clamp-015"
+            ],
+            "interaction": -0.0005261898040771484,
+            "left_correct_minus_other": -0.5683212280273438,
+            "prompt_token_counts": [
+              65,
+              64
+            ],
+            "right_correct_minus_other": 0.5677950382232666
+          }
+        ]
+      },
+      "validation": {
+        "both_choices_correct": 0,
+        "correct_choices": 3,
+        "mean_interaction": 0.005436897277832031,
+        "pairs": 3,
+        "positive_interactions": 2,
+        "rows": [
+          {
+            "both_choices_correct": false,
+            "common_reference_tokens": 79,
+            "correct_choices": 1,
+            "family": "stdin_min_offset",
+            "ids": [
+              "validation-stdin_min_offset-002",
+              "validation-stdin_min_offset-003"
+            ],
+            "interaction": 0.004421234130859375,
+            "left_correct_minus_other": 0.7671947479248047,
+            "prompt_token_counts": [
+              58,
+              58
+            ],
+            "right_correct_minus_other": -0.7627735137939453
+          },
+          {
+            "both_choices_correct": false,
+            "common_reference_tokens": 109,
+            "correct_choices": 1,
+            "family": "stdin_count_odd_offset",
+            "ids": [
+              "validation-stdin_count_odd_offset-002",
+              "validation-stdin_count_odd_offset-003"
+            ],
+            "interaction": -0.00031757354736328125,
+            "left_correct_minus_other": 1.29404878616333,
+            "prompt_token_counts": [
+              62,
+              62
+            ],
+            "right_correct_minus_other": -1.2943663597106934
+          },
+          {
+            "both_choices_correct": false,
+            "common_reference_tokens": 89,
+            "correct_choices": 1,
+            "family": "stdin_ascii_lower_suffix",
+            "ids": [
+              "validation-stdin_ascii_lower_suffix-002",
+              "validation-stdin_ascii_lower_suffix-003"
+            ],
+            "interaction": 0.01220703125,
+            "left_correct_minus_other": 0.6157598495483398,
+            "prompt_token_counts": [
+              69,
+              69
+            ],
+            "right_correct_minus_other": -0.6035528182983398
+          }
+        ]
+      }
+    },
+    "4203-ranking": {
+      "prior_generation_collisions": {
+        "fresh_development": 0,
+        "regression": 3
+      },
+      "train": {
+        "both_choices_correct": 0,
+        "correct_choices": 20,
+        "mean_interaction": 0.0010914921760559082,
+        "pairs": 20,
+        "positive_interactions": 11,
+        "rows": [
+          {
+            "both_choices_correct": false,
+            "common_reference_tokens": 73,
+            "correct_choices": 1,
+            "family": "stdin_add_offset",
+            "ids": [
+              "train-stdin_add_offset-000",
+              "train-stdin_add_offset-001"
+            ],
+            "interaction": -0.0020422935485839844,
+            "left_correct_minus_other": 1.282060146331787,
+            "prompt_token_counts": [
+              55,
+              55
+            ],
+            "right_correct_minus_other": -1.284102439880371
+          },
+          {
+            "both_choices_correct": false,
+            "common_reference_tokens": 74,
+            "correct_choices": 1,
+            "family": "stdin_add_offset",
+            "ids": [
+              "train-stdin_add_offset-014",
+              "train-stdin_add_offset-015"
+            ],
+            "interaction": 0.00015163421630859375,
+            "left_correct_minus_other": 0.13280773162841797,
+            "prompt_token_counts": [
+              56,
+              56
+            ],
+            "right_correct_minus_other": -0.13265609741210938
+          },
+          {
+            "both_choices_correct": false,
+            "common_reference_tokens": 73,
+            "correct_choices": 1,
+            "family": "stdin_multiply_offset",
+            "ids": [
+              "train-stdin_multiply_offset-000",
+              "train-stdin_multiply_offset-001"
+            ],
+            "interaction": -0.0023679733276367188,
+            "left_correct_minus_other": 1.1230359077453613,
+            "prompt_token_counts": [
+              56,
+              56
+            ],
+            "right_correct_minus_other": -1.125403881072998
+          },
+          {
+            "both_choices_correct": false,
+            "common_reference_tokens": 74,
+            "correct_choices": 1,
+            "family": "stdin_multiply_offset",
+            "ids": [
+              "train-stdin_multiply_offset-014",
+              "train-stdin_multiply_offset-015"
+            ],
+            "interaction": 0.00154876708984375,
+            "left_correct_minus_other": 0.18557071685791016,
+            "prompt_token_counts": [
+              57,
+              57
+            ],
+            "right_correct_minus_other": -0.1840219497680664
+          },
+          {
+            "both_choices_correct": false,
+            "common_reference_tokens": 79,
+            "correct_choices": 1,
+            "family": "stdin_max_offset",
+            "ids": [
+              "train-stdin_max_offset-000",
+              "train-stdin_max_offset-001"
+            ],
+            "interaction": 0.005961418151855469,
+            "left_correct_minus_other": 0.759519100189209,
+            "prompt_token_counts": [
+              58,
+              58
+            ],
+            "right_correct_minus_other": -0.7535576820373535
+          },
+          {
+            "both_choices_correct": false,
+            "common_reference_tokens": 80,
+            "correct_choices": 1,
+            "family": "stdin_max_offset",
+            "ids": [
+              "train-stdin_max_offset-014",
+              "train-stdin_max_offset-015"
+            ],
+            "interaction": -0.00011682510375976562,
+            "left_correct_minus_other": 0.0399937629699707,
+            "prompt_token_counts": [
+              59,
+              59
+            ],
+            "right_correct_minus_other": -0.04011058807373047
+          },
+          {
+            "both_choices_correct": false,
+            "common_reference_tokens": 80,
+            "correct_choices": 1,
+            "family": "stdin_absolute_gap_offset",
+            "ids": [
+              "train-stdin_absolute_gap_offset-000",
+              "train-stdin_absolute_gap_offset-001"
+            ],
+            "interaction": 0.00798797607421875,
+            "left_correct_minus_other": 0.8900933265686035,
+            "prompt_token_counts": [
+              61,
+              61
+            ],
+            "right_correct_minus_other": -0.8821053504943848
+          },
+          {
+            "both_choices_correct": false,
+            "common_reference_tokens": 81,
+            "correct_choices": 1,
+            "family": "stdin_absolute_gap_offset",
+            "ids": [
+              "train-stdin_absolute_gap_offset-014",
+              "train-stdin_absolute_gap_offset-015"
+            ],
+            "interaction": 1.33514404296875e-05,
+            "left_correct_minus_other": -0.03905200958251953,
+            "prompt_token_counts": [
+              62,
+              62
+            ],
+            "right_correct_minus_other": 0.03906536102294922
+          },
+          {
+            "both_choices_correct": false,
+            "common_reference_tokens": 88,
+            "correct_choices": 1,
+            "family": "stdin_count_greater",
+            "ids": [
+              "train-stdin_count_greater-000",
+              "train-stdin_count_greater-001"
+            ],
+            "interaction": 0.009052276611328125,
+            "left_correct_minus_other": 0.9642102718353271,
+            "prompt_token_counts": [
+              66,
+              66
+            ],
+            "right_correct_minus_other": -0.955157995223999
+          },
+          {
+            "both_choices_correct": false,
+            "common_reference_tokens": 86,
+            "correct_choices": 1,
+            "family": "stdin_count_greater",
+            "ids": [
+              "train-stdin_count_greater-014",
+              "train-stdin_count_greater-015"
+            ],
+            "interaction": 0.0018229484558105469,
+            "left_correct_minus_other": 0.8704953193664551,
+            "prompt_token_counts": [
+              64,
+              64
+            ],
+            "right_correct_minus_other": -0.8686723709106445
+          },
+          {
+            "both_choices_correct": false,
+            "common_reference_tokens": 112,
+            "correct_choices": 1,
+            "family": "stdin_even_sum_offset",
+            "ids": [
+              "train-stdin_even_sum_offset-000",
+              "train-stdin_even_sum_offset-001"
+            ],
+            "interaction": 0.008461952209472656,
+            "left_correct_minus_other": 1.2847661972045898,
+            "prompt_token_counts": [
+              62,
+              62
+            ],
+            "right_correct_minus_other": -1.2763042449951172
+          },
+          {
+            "both_choices_correct": false,
+            "common_reference_tokens": 113,
+            "correct_choices": 1,
+            "family": "stdin_even_sum_offset",
+            "ids": [
+              "train-stdin_even_sum_offset-014",
+              "train-stdin_even_sum_offset-015"
+            ],
+            "interaction": -0.0025653839111328125,
+            "left_correct_minus_other": 0.3270854949951172,
+            "prompt_token_counts": [
+              63,
+              63
+            ],
+            "right_correct_minus_other": -0.32965087890625
+          },
+          {
+            "both_choices_correct": false,
+            "common_reference_tokens": 99,
+            "correct_choices": 1,
+            "family": "stdin_digit_sum_offset",
+            "ids": [
+              "train-stdin_digit_sum_offset-000",
+              "train-stdin_digit_sum_offset-001"
+            ],
+            "interaction": -0.00232696533203125,
+            "left_correct_minus_other": 1.4811148643493652,
+            "prompt_token_counts": [
+              60,
+              60
+            ],
+            "right_correct_minus_other": -1.4834418296813965
+          },
+          {
+            "both_choices_correct": false,
+            "common_reference_tokens": 100,
+            "correct_choices": 1,
+            "family": "stdin_digit_sum_offset",
+            "ids": [
+              "train-stdin_digit_sum_offset-014",
+              "train-stdin_digit_sum_offset-015"
+            ],
+            "interaction": 0.0003876686096191406,
+            "left_correct_minus_other": 0.22867345809936523,
+            "prompt_token_counts": [
+              61,
+              61
+            ],
+            "right_correct_minus_other": -0.2282857894897461
+          },
+          {
+            "both_choices_correct": false,
+            "common_reference_tokens": 89,
+            "correct_choices": 1,
+            "family": "stdin_ascii_upper_suffix",
+            "ids": [
+              "train-stdin_ascii_upper_suffix-000",
+              "train-stdin_ascii_upper_suffix-001"
+            ],
+            "interaction": -0.012824058532714844,
+            "left_correct_minus_other": -0.5174193382263184,
+            "prompt_token_counts": [
+              69,
+              69
+            ],
+            "right_correct_minus_other": 0.5045952796936035
+          },
+          {
+            "both_choices_correct": false,
+            "common_reference_tokens": 90,
+            "correct_choices": 1,
+            "family": "stdin_ascii_upper_suffix",
+            "ids": [
+              "train-stdin_ascii_upper_suffix-014",
+              "train-stdin_ascii_upper_suffix-015"
+            ],
+            "interaction": -0.0014424324035644531,
+            "left_correct_minus_other": 0.3527359962463379,
+            "prompt_token_counts": [
+              70,
+              70
+            ],
+            "right_correct_minus_other": -0.35417842864990234
+          },
+          {
+            "both_choices_correct": false,
+            "common_reference_tokens": 78,
+            "correct_choices": 1,
+            "family": "stdin_ascii_reverse_suffix",
+            "ids": [
+              "train-stdin_ascii_reverse_suffix-000",
+              "train-stdin_ascii_reverse_suffix-001"
+            ],
+            "interaction": -0.004908084869384766,
+            "left_correct_minus_other": -0.25804758071899414,
+            "prompt_token_counts": [
+              68,
+              68
+            ],
+            "right_correct_minus_other": 0.2531394958496094
+          },
+          {
+            "both_choices_correct": false,
+            "common_reference_tokens": 79,
+            "correct_choices": 1,
+            "family": "stdin_ascii_reverse_suffix",
+            "ids": [
+              "train-stdin_ascii_reverse_suffix-014",
+              "train-stdin_ascii_reverse_suffix-015"
+            ],
+            "interaction": -0.0020656585693359375,
+            "left_correct_minus_other": 0.5112605094909668,
+            "prompt_token_counts": [
+              69,
+              69
+            ],
+            "right_correct_minus_other": -0.5133261680603027
+          },
+          {
+            "both_choices_correct": false,
+            "common_reference_tokens": 69,
+            "correct_choices": 1,
+            "family": "stdin_clamp",
+            "ids": [
+              "train-stdin_clamp-000",
+              "train-stdin_clamp-001"
+            ],
+            "interaction": 0.012269020080566406,
+            "left_correct_minus_other": -0.21351289749145508,
+            "prompt_token_counts": [
+              66,
+              66
+            ],
+            "right_correct_minus_other": 0.22578191757202148
+          },
+          {
+            "both_choices_correct": false,
+            "common_reference_tokens": 68,
+            "correct_choices": 1,
+            "family": "stdin_clamp",
+            "ids": [
+              "train-stdin_clamp-014",
+              "train-stdin_clamp-015"
+            ],
+            "interaction": 0.00483250617980957,
+            "left_correct_minus_other": -0.5714917182922363,
+            "prompt_token_counts": [
+              65,
+              64
+            ],
+            "right_correct_minus_other": 0.5763242244720459
+          }
+        ]
+      },
+      "validation": {
+        "both_choices_correct": 0,
+        "correct_choices": 3,
+        "mean_interaction": 0.00627597173055013,
+        "pairs": 3,
+        "positive_interactions": 3,
+        "rows": [
+          {
+            "both_choices_correct": false,
+            "common_reference_tokens": 79,
+            "correct_choices": 1,
+            "family": "stdin_min_offset",
+            "ids": [
+              "validation-stdin_min_offset-002",
+              "validation-stdin_min_offset-003"
+            ],
+            "interaction": 0.005261421203613281,
+            "left_correct_minus_other": 0.690342903137207,
+            "prompt_token_counts": [
+              58,
+              58
+            ],
+            "right_correct_minus_other": -0.6850814819335938
+          },
+          {
+            "both_choices_correct": false,
+            "common_reference_tokens": 109,
+            "correct_choices": 1,
+            "family": "stdin_count_odd_offset",
+            "ids": [
+              "validation-stdin_count_odd_offset-002",
+              "validation-stdin_count_odd_offset-003"
+            ],
+            "interaction": 0.0003523826599121094,
+            "left_correct_minus_other": 1.202099323272705,
+            "prompt_token_counts": [
+              62,
+              62
+            ],
+            "right_correct_minus_other": -1.201746940612793
+          },
+          {
+            "both_choices_correct": false,
+            "common_reference_tokens": 89,
+            "correct_choices": 1,
+            "family": "stdin_ascii_lower_suffix",
+            "ids": [
+              "validation-stdin_ascii_lower_suffix-002",
+              "validation-stdin_ascii_lower_suffix-003"
+            ],
+            "interaction": 0.013214111328125,
+            "left_correct_minus_other": 0.5260214805603027,
+            "prompt_token_counts": [
+              69,
+              69
+            ],
+            "right_correct_minus_other": -0.5128073692321777
+          }
+        ]
+      }
+    },
+    "base": {
+      "prior_generation_collisions": {
+        "fresh_development": 2,
+        "regression": 2
+      },
+      "train": {
+        "both_choices_correct": 0,
+        "correct_choices": 20,
+        "mean_interaction": 0.002353048324584961,
+        "pairs": 20,
+        "positive_interactions": 12,
+        "rows": [
+          {
+            "both_choices_correct": false,
+            "common_reference_tokens": 73,
+            "correct_choices": 1,
+            "family": "stdin_add_offset",
+            "ids": [
+              "train-stdin_add_offset-000",
+              "train-stdin_add_offset-001"
+            ],
+            "interaction": 0.007323265075683594,
+            "left_correct_minus_other": 2.209198474884033,
+            "prompt_token_counts": [
+              55,
+              55
+            ],
+            "right_correct_minus_other": -2.2018752098083496
+          },
+          {
+            "both_choices_correct": false,
+            "common_reference_tokens": 74,
+            "correct_choices": 1,
+            "family": "stdin_add_offset",
+            "ids": [
+              "train-stdin_add_offset-014",
+              "train-stdin_add_offset-015"
+            ],
+            "interaction": 0.0011191368103027344,
+            "left_correct_minus_other": 0.307797908782959,
+            "prompt_token_counts": [
+              56,
+              56
+            ],
+            "right_correct_minus_other": -0.30667877197265625
+          },
+          {
+            "both_choices_correct": false,
+            "common_reference_tokens": 73,
+            "correct_choices": 1,
+            "family": "stdin_multiply_offset",
+            "ids": [
+              "train-stdin_multiply_offset-000",
+              "train-stdin_multiply_offset-001"
+            ],
+            "interaction": 0.00465083122253418,
+            "left_correct_minus_other": 2.196850299835205,
+            "prompt_token_counts": [
+              56,
+              56
+            ],
+            "right_correct_minus_other": -2.192199468612671
+          },
+          {
+            "both_choices_correct": false,
+            "common_reference_tokens": 74,
+            "correct_choices": 1,
+            "family": "stdin_multiply_offset",
+            "ids": [
+              "train-stdin_multiply_offset-014",
+              "train-stdin_multiply_offset-015"
+            ],
+            "interaction": 0.0023887157440185547,
+            "left_correct_minus_other": 0.2819855213165283,
+            "prompt_token_counts": [
+              57,
+              57
+            ],
+            "right_correct_minus_other": -0.27959680557250977
+          },
+          {
+            "both_choices_correct": false,
+            "common_reference_tokens": 79,
+            "correct_choices": 1,
+            "family": "stdin_max_offset",
+            "ids": [
+              "train-stdin_max_offset-000",
+              "train-stdin_max_offset-001"
+            ],
+            "interaction": 0.011111021041870117,
+            "left_correct_minus_other": 1.9445528984069824,
+            "prompt_token_counts": [
+              58,
+              58
+            ],
+            "right_correct_minus_other": -1.9334418773651123
+          },
+          {
+            "both_choices_correct": false,
+            "common_reference_tokens": 80,
+            "correct_choices": 1,
+            "family": "stdin_max_offset",
+            "ids": [
+              "train-stdin_max_offset-014",
+              "train-stdin_max_offset-015"
+            ],
+            "interaction": 0.0004534721374511719,
+            "left_correct_minus_other": 0.364321231842041,
+            "prompt_token_counts": [
+              59,
+              59
+            ],
+            "right_correct_minus_other": -0.36386775970458984
+          },
+          {
+            "both_choices_correct": false,
+            "common_reference_tokens": 80,
+            "correct_choices": 1,
+            "family": "stdin_absolute_gap_offset",
+            "ids": [
+              "train-stdin_absolute_gap_offset-000",
+              "train-stdin_absolute_gap_offset-001"
+            ],
+            "interaction": 0.010579109191894531,
+            "left_correct_minus_other": 2.0212087631225586,
+            "prompt_token_counts": [
+              61,
+              61
+            ],
+            "right_correct_minus_other": -2.010629653930664
+          },
+          {
+            "both_choices_correct": false,
+            "common_reference_tokens": 81,
+            "correct_choices": 1,
+            "family": "stdin_absolute_gap_offset",
+            "ids": [
+              "train-stdin_absolute_gap_offset-014",
+              "train-stdin_absolute_gap_offset-015"
+            ],
+            "interaction": -0.00021958351135253906,
+            "left_correct_minus_other": 0.3249979019165039,
+            "prompt_token_counts": [
+              62,
+              62
+            ],
+            "right_correct_minus_other": -0.32521748542785645
+          },
+          {
+            "both_choices_correct": false,
+            "common_reference_tokens": 88,
+            "correct_choices": 1,
+            "family": "stdin_count_greater",
+            "ids": [
+              "train-stdin_count_greater-000",
+              "train-stdin_count_greater-001"
+            ],
+            "interaction": 0.009092569351196289,
+            "left_correct_minus_other": 1.9507689476013184,
+            "prompt_token_counts": [
+              66,
+              66
+            ],
+            "right_correct_minus_other": -1.941676378250122
+          },
+          {
+            "both_choices_correct": false,
+            "common_reference_tokens": 86,
+            "correct_choices": 1,
+            "family": "stdin_count_greater",
+            "ids": [
+              "train-stdin_count_greater-014",
+              "train-stdin_count_greater-015"
+            ],
+            "interaction": -0.00406956672668457,
+            "left_correct_minus_other": -0.13506555557250977,
+            "prompt_token_counts": [
+              64,
+              64
+            ],
+            "right_correct_minus_other": 0.1309959888458252
+          },
+          {
+            "both_choices_correct": false,
+            "common_reference_tokens": 112,
+            "correct_choices": 1,
+            "family": "stdin_even_sum_offset",
+            "ids": [
+              "train-stdin_even_sum_offset-000",
+              "train-stdin_even_sum_offset-001"
+            ],
+            "interaction": 0.0072934627532958984,
+            "left_correct_minus_other": 2.3177196979522705,
+            "prompt_token_counts": [
+              62,
+              62
+            ],
+            "right_correct_minus_other": -2.3104262351989746
+          },
+          {
+            "both_choices_correct": false,
+            "common_reference_tokens": 113,
+            "correct_choices": 1,
+            "family": "stdin_even_sum_offset",
+            "ids": [
+              "train-stdin_even_sum_offset-014",
+              "train-stdin_even_sum_offset-015"
+            ],
+            "interaction": -0.00023031234741210938,
+            "left_correct_minus_other": 0.39029645919799805,
+            "prompt_token_counts": [
+              63,
+              63
+            ],
+            "right_correct_minus_other": -0.39052677154541016
+          },
+          {
+            "both_choices_correct": false,
+            "common_reference_tokens": 99,
+            "correct_choices": 1,
+            "family": "stdin_digit_sum_offset",
+            "ids": [
+              "train-stdin_digit_sum_offset-000",
+              "train-stdin_digit_sum_offset-001"
+            ],
+            "interaction": -0.0007879734039306641,
+            "left_correct_minus_other": 2.401881694793701,
+            "prompt_token_counts": [
+              60,
+              60
+            ],
+            "right_correct_minus_other": -2.402669668197632
+          },
+          {
+            "both_choices_correct": false,
+            "common_reference_tokens": 100,
+            "correct_choices": 1,
+            "family": "stdin_digit_sum_offset",
+            "ids": [
+              "train-stdin_digit_sum_offset-014",
+              "train-stdin_digit_sum_offset-015"
+            ],
+            "interaction": 0.001491546630859375,
+            "left_correct_minus_other": 0.37304091453552246,
+            "prompt_token_counts": [
+              61,
+              61
+            ],
+            "right_correct_minus_other": -0.3715493679046631
+          },
+          {
+            "both_choices_correct": false,
+            "common_reference_tokens": 89,
+            "correct_choices": 1,
+            "family": "stdin_ascii_upper_suffix",
+            "ids": [
+              "train-stdin_ascii_upper_suffix-000",
+              "train-stdin_ascii_upper_suffix-001"
+            ],
+            "interaction": -0.010768413543701172,
+            "left_correct_minus_other": 0.35260915756225586,
+            "prompt_token_counts": [
+              69,
+              69
+            ],
+            "right_correct_minus_other": -0.36337757110595703
+          },
+          {
+            "both_choices_correct": false,
+            "common_reference_tokens": 90,
+            "correct_choices": 1,
+            "family": "stdin_ascii_upper_suffix",
+            "ids": [
+              "train-stdin_ascii_upper_suffix-014",
+              "train-stdin_ascii_upper_suffix-015"
+            ],
+            "interaction": -0.0037398338317871094,
+            "left_correct_minus_other": 0.2081623077392578,
+            "prompt_token_counts": [
+              70,
+              70
+            ],
+            "right_correct_minus_other": -0.21190214157104492
+          },
+          {
+            "both_choices_correct": false,
+            "common_reference_tokens": 78,
+            "correct_choices": 1,
+            "family": "stdin_ascii_reverse_suffix",
+            "ids": [
+              "train-stdin_ascii_reverse_suffix-000",
+              "train-stdin_ascii_reverse_suffix-001"
+            ],
+            "interaction": -0.004709720611572266,
+            "left_correct_minus_other": 0.5976395606994629,
+            "prompt_token_counts": [
+              68,
+              68
+            ],
+            "right_correct_minus_other": -0.6023492813110352
+          },
+          {
+            "both_choices_correct": false,
+            "common_reference_tokens": 79,
+            "correct_choices": 1,
+            "family": "stdin_ascii_reverse_suffix",
+            "ids": [
+              "train-stdin_ascii_reverse_suffix-014",
+              "train-stdin_ascii_reverse_suffix-015"
+            ],
+            "interaction": -0.0032930374145507812,
+            "left_correct_minus_other": 0.22118568420410156,
+            "prompt_token_counts": [
+              69,
+              69
+            ],
+            "right_correct_minus_other": -0.22447872161865234
+          },
+          {
+            "both_choices_correct": false,
+            "common_reference_tokens": 69,
+            "correct_choices": 1,
+            "family": "stdin_clamp",
+            "ids": [
+              "train-stdin_clamp-000",
+              "train-stdin_clamp-001"
+            ],
+            "interaction": 0.012093067169189453,
+            "left_correct_minus_other": -0.1269664764404297,
+            "prompt_token_counts": [
+              66,
+              66
+            ],
+            "right_correct_minus_other": 0.13905954360961914
+          },
+          {
+            "both_choices_correct": false,
+            "common_reference_tokens": 68,
+            "correct_choices": 1,
+            "family": "stdin_clamp",
+            "ids": [
+              "train-stdin_clamp-014",
+              "train-stdin_clamp-015"
+            ],
+            "interaction": 0.007283210754394531,
+            "left_correct_minus_other": -0.3005647659301758,
+            "prompt_token_counts": [
+              65,
+              64
+            ],
+            "right_correct_minus_other": 0.3078479766845703
+          }
+        ]
+      },
+      "validation": {
+        "both_choices_correct": 0,
+        "correct_choices": 3,
+        "mean_interaction": 0.005352417627970378,
+        "pairs": 3,
+        "positive_interactions": 3,
+        "rows": [
+          {
+            "both_choices_correct": false,
+            "common_reference_tokens": 79,
+            "correct_choices": 1,
+            "family": "stdin_min_offset",
+            "ids": [
+              "validation-stdin_min_offset-002",
+              "validation-stdin_min_offset-003"
+            ],
+            "interaction": 0.003616809844970703,
+            "left_correct_minus_other": -1.060067057609558,
+            "prompt_token_counts": [
+              58,
+              58
+            ],
+            "right_correct_minus_other": 1.0636838674545288
+          },
+          {
+            "both_choices_correct": false,
+            "common_reference_tokens": 109,
+            "correct_choices": 1,
+            "family": "stdin_count_odd_offset",
+            "ids": [
+              "validation-stdin_count_odd_offset-002",
+              "validation-stdin_count_odd_offset-003"
+            ],
+            "interaction": 0.001940011978149414,
+            "left_correct_minus_other": -0.6732511520385742,
+            "prompt_token_counts": [
+              62,
+              62
+            ],
+            "right_correct_minus_other": 0.6751911640167236
+          },
+          {
+            "both_choices_correct": false,
+            "common_reference_tokens": 89,
+            "correct_choices": 1,
+            "family": "stdin_ascii_lower_suffix",
+            "ids": [
+              "validation-stdin_ascii_lower_suffix-002",
+              "validation-stdin_ascii_lower_suffix-003"
+            ],
+            "interaction": 0.010500431060791016,
+            "left_correct_minus_other": -1.4502394199371338,
+            "prompt_token_counts": [
+              69,
+              69
+            ],
+            "right_correct_minus_other": 1.4607398509979248
+          }
+        ]
+      }
+    }
+  },
+  "prior_report_sha256": "90c8b9bb12e381c415e798d88875fc401143a0c703a3b0424cfab6c2283932cd",
+  "production_promotion": false,
+  "protocol": "JAVA_M3_PARAMETER_BINDING_V1",
+  "root_cause": "NOT_ESTABLISHED",
+  "source_hash_replay_matches": 84,
+  "status": "PARAMETER_BINDING_DIAGNOSTIC_COMPLETE",
+  "tokenizer_sha256": "186566808cb03e328cac9a6b7b384a8d0aefc54ccb83fbe97782a751726682fe",
+  "torch_version": "2.15.0+cpu",
+  "train_pair_preflight": {
+    "directional_rows": 320,
+    "families": 10,
+    "manifest_sha256": "4d9b2d6eb7ff216b653953eda1f355c4cae6def22d8a9af31016e51c7daa7d0b",
+    "optimizer_steps": 0,
+    "pairs": 160
+  },
+  "training": "NOT_RUN"
+}

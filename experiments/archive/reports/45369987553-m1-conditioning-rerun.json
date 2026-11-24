@@ -1,0 +1,491 @@
+{
+  "control_checkpoint": "NOT_AVAILABLE_IN_PRIOR_ARTIFACT",
+  "fixed_task_ids": [
+    "validation-stdin_min_offset-002",
+    "validation-stdin_min_offset-003",
+    "validation-stdin_count_odd_offset-002",
+    "validation-stdin_count_odd_offset-003",
+    "validation-stdin_ascii_lower_suffix-002",
+    "validation-stdin_ascii_lower_suffix-003"
+  ],
+  "generation_cap": 170,
+  "historical_behavior_only": {
+    "base_v018": {
+      "case_categories": {
+        "NONZERO_EXIT_OR_JAVAC_ERROR": 18
+      },
+      "cases_passed": 0,
+      "oci_invocations": 18
+    },
+    "contrastive_same_variant": {
+      "case_categories": {
+        "NONZERO_EXIT_OR_JAVAC_ERROR": 8,
+        "OUTPUT_MISMATCH_ZERO_EXIT": 10
+      },
+      "cases_passed": 0,
+      "oci_invocations": 18
+    },
+    "control_interleaved": {
+      "case_categories": {
+        "NONZERO_EXIT_OR_JAVAC_ERROR": 8,
+        "OUTPUT_MISMATCH_ZERO_EXIT": 10
+      },
+      "cases_passed": 0,
+      "oci_invocations": 18
+    }
+  },
+  "historical_report_sha256": "1f59f98acafc5b2939f5dc043717beb3b76dd5ff923506064377ca8a7221c468",
+  "historical_run_id": 45167198398,
+  "independent_benchmark": "NOT_ESTABLISHED",
+  "model_training": "NOT_RUN",
+  "models": {
+    "base_v018": {
+      "checkpoint_sha256": "9802e848f0abea9979623f461b5e63cd7aed838acd087d06b20d747db1e2a0fc",
+      "cross_family_prefix_comparisons": [
+        {
+          "a": "validation-stdin_min_offset-002",
+          "b": "validation-stdin_count_odd_offset-002",
+          "common_generated_prefix_tokens": 24
+        },
+        {
+          "a": "validation-stdin_min_offset-002",
+          "b": "validation-stdin_count_odd_offset-003",
+          "common_generated_prefix_tokens": 24
+        },
+        {
+          "a": "validation-stdin_min_offset-002",
+          "b": "validation-stdin_ascii_lower_suffix-002",
+          "common_generated_prefix_tokens": 28
+        },
+        {
+          "a": "validation-stdin_min_offset-002",
+          "b": "validation-stdin_ascii_lower_suffix-003",
+          "common_generated_prefix_tokens": 79
+        },
+        {
+          "a": "validation-stdin_min_offset-003",
+          "b": "validation-stdin_count_odd_offset-002",
+          "common_generated_prefix_tokens": 24
+        },
+        {
+          "a": "validation-stdin_min_offset-003",
+          "b": "validation-stdin_count_odd_offset-003",
+          "common_generated_prefix_tokens": 24
+        },
+        {
+          "a": "validation-stdin_min_offset-003",
+          "b": "validation-stdin_ascii_lower_suffix-002",
+          "common_generated_prefix_tokens": 28
+        },
+        {
+          "a": "validation-stdin_min_offset-003",
+          "b": "validation-stdin_ascii_lower_suffix-003",
+          "common_generated_prefix_tokens": 79
+        },
+        {
+          "a": "validation-stdin_count_odd_offset-002",
+          "b": "validation-stdin_ascii_lower_suffix-002",
+          "common_generated_prefix_tokens": 24
+        },
+        {
+          "a": "validation-stdin_count_odd_offset-002",
+          "b": "validation-stdin_ascii_lower_suffix-003",
+          "common_generated_prefix_tokens": 24
+        },
+        {
+          "a": "validation-stdin_count_odd_offset-003",
+          "b": "validation-stdin_ascii_lower_suffix-002",
+          "common_generated_prefix_tokens": 24
+        },
+        {
+          "a": "validation-stdin_count_odd_offset-003",
+          "b": "validation-stdin_ascii_lower_suffix-003",
+          "common_generated_prefix_tokens": 24
+        }
+      ],
+      "historical_hash_matches": 6,
+      "observations": [
+        {
+          "generated_tokens": 79,
+          "generation_budget": 170,
+          "historical_source_sha_matches": true,
+          "id": "validation-stdin_min_offset-002",
+          "own_reference_nll": 2.37656689,
+          "shape_markers_not_parser": {
+            "main_class_marker": true,
+            "markdown_fence_present": false,
+            "nul_present": false,
+            "raw_brace_counts_equal": true,
+            "replacement_character_present": false,
+            "source_bytes": 154,
+            "stdin_marker": false,
+            "stdout_marker": true
+          },
+          "source_sha256": "e42ec479ec0d3d1d766ca6146915ac40479d1d05d211a3f858734e680800f532",
+          "stop": "EOS",
+          "swapped_minus_own_nll": 0.01359224,
+          "swapped_prompt_id": "validation-stdin_count_odd_offset-002",
+          "swapped_prompt_same_reference_nll": 2.39015913
+        },
+        {
+          "generated_tokens": 79,
+          "generation_budget": 170,
+          "historical_source_sha_matches": true,
+          "id": "validation-stdin_min_offset-003",
+          "own_reference_nll": 2.36230373,
+          "shape_markers_not_parser": {
+            "main_class_marker": true,
+            "markdown_fence_present": false,
+            "nul_present": false,
+            "raw_brace_counts_equal": true,
+            "replacement_character_present": false,
+            "source_bytes": 154,
+            "stdin_marker": false,
+            "stdout_marker": true
+          },
+          "source_sha256": "e42ec479ec0d3d1d766ca6146915ac40479d1d05d211a3f858734e680800f532",
+          "stop": "EOS",
+          "swapped_minus_own_nll": 0.01347756,
+          "swapped_prompt_id": "validation-stdin_count_odd_offset-003",
+          "swapped_prompt_same_reference_nll": 2.3757813
+        },
+        {
+          "generated_tokens": 79,
+          "generation_budget": 170,
+          "historical_source_sha_matches": true,
+          "id": "validation-stdin_count_odd_offset-002",
+          "own_reference_nll": 2.207412,
+          "shape_markers_not_parser": {
+            "main_class_marker": true,
+            "markdown_fence_present": false,
+            "nul_present": false,
+            "raw_brace_counts_equal": true,
+            "replacement_character_present": false,
+            "source_bytes": 154,
+            "stdin_marker": false,
+            "stdout_marker": true
+          },
+          "source_sha256": "e2f21accfae277ba5371de6771093cbc7f3d4cb560b696a5c6ff0067c254d78c",
+          "stop": "EOS",
+          "swapped_minus_own_nll": -0.02471256,
+          "swapped_prompt_id": "validation-stdin_ascii_lower_suffix-002",
+          "swapped_prompt_same_reference_nll": 2.18269944
+        },
+        {
+          "generated_tokens": 79,
+          "generation_budget": 170,
+          "historical_source_sha_matches": true,
+          "id": "validation-stdin_count_odd_offset-003",
+          "own_reference_nll": 2.20250535,
+          "shape_markers_not_parser": {
+            "main_class_marker": true,
+            "markdown_fence_present": false,
+            "nul_present": false,
+            "raw_brace_counts_equal": true,
+            "replacement_character_present": false,
+            "source_bytes": 154,
+            "stdin_marker": false,
+            "stdout_marker": true
+          },
+          "source_sha256": "e2f21accfae277ba5371de6771093cbc7f3d4cb560b696a5c6ff0067c254d78c",
+          "stop": "EOS",
+          "swapped_minus_own_nll": -0.02289033,
+          "swapped_prompt_id": "validation-stdin_ascii_lower_suffix-003",
+          "swapped_prompt_same_reference_nll": 2.17961502
+        },
+        {
+          "generated_tokens": 78,
+          "generation_budget": 170,
+          "historical_source_sha_matches": true,
+          "id": "validation-stdin_ascii_lower_suffix-002",
+          "own_reference_nll": 2.23224235,
+          "shape_markers_not_parser": {
+            "main_class_marker": true,
+            "markdown_fence_present": false,
+            "nul_present": false,
+            "raw_brace_counts_equal": true,
+            "replacement_character_present": false,
+            "source_bytes": 153,
+            "stdin_marker": false,
+            "stdout_marker": true
+          },
+          "source_sha256": "c6bfec110a6fb2d89311aab24192952215ed7d537ed0cbe10df485432e00b4ff",
+          "stop": "EOS",
+          "swapped_minus_own_nll": 0.02936697,
+          "swapped_prompt_id": "validation-stdin_min_offset-002",
+          "swapped_prompt_same_reference_nll": 2.26160932
+        },
+        {
+          "generated_tokens": 79,
+          "generation_budget": 170,
+          "historical_source_sha_matches": true,
+          "id": "validation-stdin_ascii_lower_suffix-003",
+          "own_reference_nll": 2.22615361,
+          "shape_markers_not_parser": {
+            "main_class_marker": true,
+            "markdown_fence_present": false,
+            "nul_present": false,
+            "raw_brace_counts_equal": true,
+            "replacement_character_present": false,
+            "source_bytes": 154,
+            "stdin_marker": false,
+            "stdout_marker": true
+          },
+          "source_sha256": "e42ec479ec0d3d1d766ca6146915ac40479d1d05d211a3f858734e680800f532",
+          "stop": "EOS",
+          "swapped_minus_own_nll": 0.02825928,
+          "swapped_prompt_id": "validation-stdin_min_offset-003",
+          "swapped_prompt_same_reference_nll": 2.25441289
+        }
+      ],
+      "unique_source_hashes": 3
+    },
+    "contrastive_same_variant": {
+      "checkpoint_sha256": "379d57d6d8668995dc34fb310e0c5140041c5fd3e78b77932712785e96b01eae",
+      "cross_family_prefix_comparisons": [
+        {
+          "a": "validation-stdin_min_offset-002",
+          "b": "validation-stdin_count_odd_offset-002",
+          "common_generated_prefix_tokens": 80
+        },
+        {
+          "a": "validation-stdin_min_offset-002",
+          "b": "validation-stdin_count_odd_offset-003",
+          "common_generated_prefix_tokens": 80
+        },
+        {
+          "a": "validation-stdin_min_offset-002",
+          "b": "validation-stdin_ascii_lower_suffix-002",
+          "common_generated_prefix_tokens": 80
+        },
+        {
+          "a": "validation-stdin_min_offset-002",
+          "b": "validation-stdin_ascii_lower_suffix-003",
+          "common_generated_prefix_tokens": 80
+        },
+        {
+          "a": "validation-stdin_min_offset-003",
+          "b": "validation-stdin_count_odd_offset-002",
+          "common_generated_prefix_tokens": 80
+        },
+        {
+          "a": "validation-stdin_min_offset-003",
+          "b": "validation-stdin_count_odd_offset-003",
+          "common_generated_prefix_tokens": 80
+        },
+        {
+          "a": "validation-stdin_min_offset-003",
+          "b": "validation-stdin_ascii_lower_suffix-002",
+          "common_generated_prefix_tokens": 80
+        },
+        {
+          "a": "validation-stdin_min_offset-003",
+          "b": "validation-stdin_ascii_lower_suffix-003",
+          "common_generated_prefix_tokens": 80
+        },
+        {
+          "a": "validation-stdin_count_odd_offset-002",
+          "b": "validation-stdin_ascii_lower_suffix-002",
+          "common_generated_prefix_tokens": 80
+        },
+        {
+          "a": "validation-stdin_count_odd_offset-002",
+          "b": "validation-stdin_ascii_lower_suffix-003",
+          "common_generated_prefix_tokens": 80
+        },
+        {
+          "a": "validation-stdin_count_odd_offset-003",
+          "b": "validation-stdin_ascii_lower_suffix-002",
+          "common_generated_prefix_tokens": 80
+        },
+        {
+          "a": "validation-stdin_count_odd_offset-003",
+          "b": "validation-stdin_ascii_lower_suffix-003",
+          "common_generated_prefix_tokens": 80
+        }
+      ],
+      "historical_hash_matches": 6,
+      "observations": [
+        {
+          "generated_tokens": 80,
+          "generation_budget": 170,
+          "historical_source_sha_matches": true,
+          "id": "validation-stdin_min_offset-002",
+          "own_reference_nll": 0.24926594,
+          "shape_markers_not_parser": {
+            "main_class_marker": true,
+            "markdown_fence_present": false,
+            "nul_present": false,
+            "raw_brace_counts_equal": true,
+            "replacement_character_present": false,
+            "source_bytes": 192,
+            "stdin_marker": true,
+            "stdout_marker": true
+          },
+          "source_sha256": "a0d2ee38b3dc87906e34ba7e40ff49d1d847c9894572dca9a5663b99bea0aba0",
+          "stop": "EOS",
+          "swapped_minus_own_nll": 0.00145692,
+          "swapped_prompt_id": "validation-stdin_count_odd_offset-002",
+          "swapped_prompt_same_reference_nll": 0.25072286
+        },
+        {
+          "generated_tokens": 80,
+          "generation_budget": 170,
+          "historical_source_sha_matches": true,
+          "id": "validation-stdin_min_offset-003",
+          "own_reference_nll": 0.25395831,
+          "shape_markers_not_parser": {
+            "main_class_marker": true,
+            "markdown_fence_present": false,
+            "nul_present": false,
+            "raw_brace_counts_equal": true,
+            "replacement_character_present": false,
+            "source_bytes": 192,
+            "stdin_marker": true,
+            "stdout_marker": true
+          },
+          "source_sha256": "a0d2ee38b3dc87906e34ba7e40ff49d1d847c9894572dca9a5663b99bea0aba0",
+          "stop": "EOS",
+          "swapped_minus_own_nll": 0.00315261,
+          "swapped_prompt_id": "validation-stdin_count_odd_offset-003",
+          "swapped_prompt_same_reference_nll": 0.25711092
+        },
+        {
+          "generated_tokens": 80,
+          "generation_budget": 170,
+          "historical_source_sha_matches": true,
+          "id": "validation-stdin_count_odd_offset-002",
+          "own_reference_nll": 0.41931558,
+          "shape_markers_not_parser": {
+            "main_class_marker": true,
+            "markdown_fence_present": false,
+            "nul_present": false,
+            "raw_brace_counts_equal": true,
+            "replacement_character_present": false,
+            "source_bytes": 192,
+            "stdin_marker": true,
+            "stdout_marker": true
+          },
+          "source_sha256": "a0d2ee38b3dc87906e34ba7e40ff49d1d847c9894572dca9a5663b99bea0aba0",
+          "stop": "EOS",
+          "swapped_minus_own_nll": 0.00241205,
+          "swapped_prompt_id": "validation-stdin_ascii_lower_suffix-002",
+          "swapped_prompt_same_reference_nll": 0.42172763
+        },
+        {
+          "generated_tokens": 80,
+          "generation_budget": 170,
+          "historical_source_sha_matches": true,
+          "id": "validation-stdin_count_odd_offset-003",
+          "own_reference_nll": 0.42977378,
+          "shape_markers_not_parser": {
+            "main_class_marker": true,
+            "markdown_fence_present": false,
+            "nul_present": false,
+            "raw_brace_counts_equal": true,
+            "replacement_character_present": false,
+            "source_bytes": 192,
+            "stdin_marker": true,
+            "stdout_marker": true
+          },
+          "source_sha256": "a0d2ee38b3dc87906e34ba7e40ff49d1d847c9894572dca9a5663b99bea0aba0",
+          "stop": "EOS",
+          "swapped_minus_own_nll": 0.00288793,
+          "swapped_prompt_id": "validation-stdin_ascii_lower_suffix-003",
+          "swapped_prompt_same_reference_nll": 0.43266171
+        },
+        {
+          "generated_tokens": 80,
+          "generation_budget": 170,
+          "historical_source_sha_matches": true,
+          "id": "validation-stdin_ascii_lower_suffix-002",
+          "own_reference_nll": 0.46295154,
+          "shape_markers_not_parser": {
+            "main_class_marker": true,
+            "markdown_fence_present": false,
+            "nul_present": false,
+            "raw_brace_counts_equal": true,
+            "replacement_character_present": false,
+            "source_bytes": 192,
+            "stdin_marker": true,
+            "stdout_marker": true
+          },
+          "source_sha256": "a0d2ee38b3dc87906e34ba7e40ff49d1d847c9894572dca9a5663b99bea0aba0",
+          "stop": "EOS",
+          "swapped_minus_own_nll": 0.02027249,
+          "swapped_prompt_id": "validation-stdin_min_offset-002",
+          "swapped_prompt_same_reference_nll": 0.48322403
+        },
+        {
+          "generated_tokens": 80,
+          "generation_budget": 170,
+          "historical_source_sha_matches": true,
+          "id": "validation-stdin_ascii_lower_suffix-003",
+          "own_reference_nll": 0.47042894,
+          "shape_markers_not_parser": {
+            "main_class_marker": true,
+            "markdown_fence_present": false,
+            "nul_present": false,
+            "raw_brace_counts_equal": true,
+            "replacement_character_present": false,
+            "source_bytes": 192,
+            "stdin_marker": true,
+            "stdout_marker": true
+          },
+          "source_sha256": "a0d2ee38b3dc87906e34ba7e40ff49d1d847c9894572dca9a5663b99bea0aba0",
+          "stop": "EOS",
+          "swapped_minus_own_nll": 0.0210402,
+          "swapped_prompt_id": "validation-stdin_min_offset-003",
+          "swapped_prompt_same_reference_nll": 0.49146914
+        }
+      ],
+      "unique_source_hashes": 1
+    }
+  },
+  "new_java_compilation": "NOT_RUN",
+  "new_java_execution": "NOT_RUN",
+  "production_promotion": false,
+  "prompt_metrics": [
+    {
+      "id": "validation-stdin_min_offset-002",
+      "prefix_sha256": "3391b4ca2876fb89e1c0e24c5cedaad37b23b78f87f51fba72399449e4245d90",
+      "prefix_tokens": 58,
+      "reference_tokens": 87
+    },
+    {
+      "id": "validation-stdin_min_offset-003",
+      "prefix_sha256": "54bc569304f614d95ccd8c7b3431374ea9f5253be038073ffbd8e500647fd7cc",
+      "prefix_tokens": 58,
+      "reference_tokens": 87
+    },
+    {
+      "id": "validation-stdin_count_odd_offset-002",
+      "prefix_sha256": "5ac6d35e295a79dc068c2e20c591385afc5bb67cfd4d65849e491f3a9e278013",
+      "prefix_tokens": 62,
+      "reference_tokens": 117
+    },
+    {
+      "id": "validation-stdin_count_odd_offset-003",
+      "prefix_sha256": "9f612c5933ea2b9aee2848a40b6f3b0ce0638e96a0cf8faab01cd38eff898867",
+      "prefix_tokens": 62,
+      "reference_tokens": 117
+    },
+    {
+      "id": "validation-stdin_ascii_lower_suffix-002",
+      "prefix_sha256": "3fe77412ee8bb103483c333677978e76ec18ae78ddc7d7d3bc7cb8feb4ad4e62",
+      "prefix_tokens": 69,
+      "reference_tokens": 97
+    },
+    {
+      "id": "validation-stdin_ascii_lower_suffix-003",
+      "prefix_sha256": "0c5593b4cc6166c1c6fa34264be58ea7b49a46c7471d305384107cb7d901bf05",
+      "prefix_tokens": 69,
+      "reference_tokens": 97
+    }
+  ],
+  "root_cause": "NOT_ESTABLISHED",
+  "status": "INFERENCE_DIAGNOSTIC_COMPLETE",
+  "test_split_accessed": false,
+  "tokenizer_sha256": "186566808cb03e328cac9a6b7b384a8d0aefc54ccb83fbe97782a751726682fe",
+  "torch_version": "2.15.0+cpu"
+}
