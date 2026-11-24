@@ -1,0 +1,49 @@
+{
+  "evidence_type": "SHA_VERIFIED_ARCHIVE_REPORT_AND_OFFLINE_INVARIANTS",
+  "as_of_utc": "2026-11-24",
+  "training_run": {
+    "workflow_url": "https://github.com/SagaK-dev/SagaLLM/actions/runs/45167198398",
+    "run_id": 45167198398,
+    "workflow_path": ".github/workflows/java-contrastive-stdio-ab.yml",
+    "head_sha": "40dcce6fe2e4bd2ab83ea70cf5a9cd12368c0312",
+    "job_conclusion": "success",
+    "artifact_id": 14815096856,
+    "artifact_name": "sagallm-contrastive-stdio-matched-validation-ab",
+    "artifact_zip_sha256": "f1716f3111bd8df1bf63282f1970b9b9aadf340aeb18f5133e66a5ea9d55955e",
+    "artifact_zip_sha256_matches_github_digest": true
+  },
+  "extracted_artifact": {
+    "contrastive-stdio-ab-evidence/ab-report.json": "1f59f98acafc5b2939f5dc043717beb3b76dd5ff923506064377ca8a7221c468",
+    "contrastive-stdio-ab-evidence/contrastive-validation-candidate.pt": "379d57d6d8668995dc34fb310e0c5140041c5fd3e78b77932712785e96b01eae",
+    "stdio-java-data/manifest.json": "0cea8ded8a5c03d15b2b516a86665901266b0b375095579daa8d712661316a13",
+    "report_candidate_sha256_matches_extracted_file": true,
+    "report_manifest_sha256_matches_extracted_file": true
+  },
+  "audit": {
+    "tool": "scripts/audit_java_contrastive_ab.py",
+    "status": "OFFLINE_REPORT_INVARIANTS_PASS",
+    "model_checkpoint_sha256": "9802e848f0abea9979623f461b5e63cd7aed838acd087d06b20d747db1e2a0fc",
+    "tokenizer_sha256": "186566808cb03e328cac9a6b7b384a8d0aefc54ccb83fbe97782a751726682fe",
+    "comparison": {
+      "base_v018": {"correct_io": 0, "total_io": 18, "unique_source_sha256": 3},
+      "control_interleaved": {"correct_io": 0, "total_io": 18, "unique_source_sha256": 2},
+      "contrastive_same_variant": {"correct_io": 0, "total_io": 18, "unique_source_sha256": 1}
+    },
+    "validation_loss_best": {
+      "control_interleaved": 0.36085684,
+      "contrastive_same_variant": 0.38876915
+    },
+    "decision": "NO_VALIDATED_CONTRASTIVE_GAIN",
+    "production_adoption": false,
+    "benchmark_independence_proven": false,
+    "human_independent_java_evaluation": "NOT_RUN",
+    "external_replication": "NOT_RUN",
+    "model_java_coding_ability": "NOT_ESTABLISHED"
+  },
+  "limitations": [
+    "The SHA and invariant audit checks the downloaded report and archive, not a second independent training reproduction.",
+    "The 18 tests per model are synthetic validation-family tests, not an independent human-reviewed benchmark.",
+    "An Actions job success does not establish general Java behavior; no model weights were promoted.",
+    "The offline auditor does not authenticate GitHub metadata by itself; run/job metadata was separately inspected using GitHub APIs."
+  ]
+}
