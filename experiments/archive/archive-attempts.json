@@ -13,6 +13,28 @@
       "published_reports": 0,
       "error": "Report member missing/oversize",
       "correction": "Use exact verified contrastive-stdio-ab-evidence/ab-report.json in artifact 14815096856; ZIP and report SHA unchanged."
+    },
+    {
+      "run_id": 45391036954,
+      "job_id": 138434484402,
+      "commit_sha": "c16646728870a7b32b5217aa2fdab700b52db360",
+      "status": "SUCCESS_ARCHIVED_VERIFIED",
+      "tests_passed": 5,
+      "verified_reports": 12,
+      "published_reports": 12,
+      "published_commit": "0bf39a672faf03fd15ea71e09ead04e6167d595b"
+    },
+    {
+      "run_id": 45391129198,
+      "commit_sha": "0bf39a672faf03fd15ea71e09ead04e6167d595b",
+      "status": "ACTION_REQUIRED",
+      "note": "Post-publication archive workflow check requires action; original reports already verified and published by run 45391036954."
+    },
+    {
+      "run_id": 45391128821,
+      "commit_sha": "0bf39a672faf03fd15ea71e09ead04e6167d595b",
+      "status": "ACTION_REQUIRED",
+      "note": "Post-publication CPU CI check requires action; not a CPU test pass."
     }
   ]
 }

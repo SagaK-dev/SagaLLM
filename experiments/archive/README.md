@@ -9,8 +9,9 @@ GitHub Actions runs before this PR, 154 successful,
 Latest attempt metadata only, not proof of training or behavior.
 Six historical result files already exist in main's experiments directory.
 The [manifest](manifest.json) pins 12 reviewed report members;
-[reports/](reports/) contains original JSON bytes after the archive workflow
-succeeds. No raw logs, generated Java, raw stdout/stderr, data dumps or model
+[reports/](reports/) contains all 12 original JSON reports, byte-verified and committed by
+[archive run 45391036954](https://github.com/SagaK-dev/SagaLLM/actions/runs/45391036954)
+at commit 0bf39a672faf03fd15ea71e09ead04e6167d595b. No raw logs, generated Java, raw stdout/stderr, data dumps or model
 weights are copied into Git. A ZIP hash is not a report hash.
 
 | Stage | Run | Observed outcome | Decision |
@@ -36,6 +37,19 @@ runs have metadata and existing documentation only. Older result archives
 and all attempt/job logs have NOT been comprehensively inspected or
 copied. Missing report is not a failed experiment. Artifact retention
 is finite; hash evidence alone is not a permanent checkpoint backup.
+
+## Archive result
+
+- First attempt 45390881739 failed on the nested legacy report path, with
+  no publication. Corrected from the actual pinned archive member; hashes
+  unchanged. See [archive-attempts.json](archive-attempts.json).
+- Retry 45391036954: five offline tests passed, all 12 ZIP and report SHA-256
+  checks passed, local exact-byte verification passed, and 12 reports were
+  committed to this evidence branch. Git tree independently confirms all 12.
+- Bot-published commit checks reported ACTION_REQUIRED; they are not test
+  passes. Replace one-time write-enabled migration workflow with read-only
+  local validation on report/manifest edits. Future archival is an explicit
+  reviewed commit, not an automatically authorized write to main.
 
 ## Required practice for subsequent experiments
 

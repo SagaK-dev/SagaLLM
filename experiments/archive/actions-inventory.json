@@ -45,7 +45,7 @@
       "conclusion": "success",
       "created_at": "2026-11-24T12:03:35Z",
       "updated_at": "2026-11-24T12:04:56Z",
-      "report_status": "PINNED_REPORT_PENDING_ARCHIVE"
+      "report_status": "ARCHIVED_VERIFIED"
     },
     {
       "id": 45389874292,
@@ -69,7 +69,7 @@
       "conclusion": "success",
       "created_at": "2026-11-24T11:40:29Z",
       "updated_at": "2026-11-24T11:42:18Z",
-      "report_status": "PINNED_REPORT_PENDING_ARCHIVE"
+      "report_status": "ARCHIVED_VERIFIED"
     },
     {
       "id": 45386333730,
@@ -93,7 +93,7 @@
       "conclusion": "success",
       "created_at": "2026-11-24T10:49:07Z",
       "updated_at": "2026-11-24T10:50:20Z",
-      "report_status": "PINNED_REPORT_PENDING_ARCHIVE"
+      "report_status": "ARCHIVED_VERIFIED"
     },
     {
       "id": 45378356405,
@@ -117,7 +117,7 @@
       "conclusion": "success",
       "created_at": "2026-11-24T10:43:06Z",
       "updated_at": "2026-11-24T10:45:16Z",
-      "report_status": "PINNED_REPORT_PENDING_ARCHIVE"
+      "report_status": "ARCHIVED_VERIFIED"
     },
     {
       "id": 45377422275,
@@ -141,7 +141,7 @@
       "conclusion": "success",
       "created_at": "2026-11-24T10:26:19Z",
       "updated_at": "2026-11-24T10:27:08Z",
-      "report_status": "PINNED_REPORT_PENDING_ARCHIVE"
+      "report_status": "ARCHIVED_VERIFIED"
     },
     {
       "id": 45374792993,
@@ -165,7 +165,7 @@
       "conclusion": "success",
       "created_at": "2026-11-24T10:22:37Z",
       "updated_at": "2026-11-24T10:23:31Z",
-      "report_status": "PINNED_REPORT_PENDING_ARCHIVE"
+      "report_status": "ARCHIVED_VERIFIED"
     },
     {
       "id": 45374203092,
@@ -213,7 +213,7 @@
       "conclusion": "success",
       "created_at": "2026-11-24T10:16:42Z",
       "updated_at": "2026-11-24T10:19:18Z",
-      "report_status": "PINNED_REPORT_PENDING_ARCHIVE"
+      "report_status": "ARCHIVED_VERIFIED"
     },
     {
       "id": 45372372630,
@@ -237,7 +237,7 @@
       "conclusion": "success",
       "created_at": "2026-11-24T10:11:24Z",
       "updated_at": "2026-11-24T10:12:13Z",
-      "report_status": "PINNED_REPORT_PENDING_ARCHIVE"
+      "report_status": "ARCHIVED_VERIFIED"
     },
     {
       "id": 45372166275,
@@ -273,7 +273,7 @@
       "conclusion": "success",
       "created_at": "2026-11-24T09:56:47Z",
       "updated_at": "2026-11-24T09:57:38Z",
-      "report_status": "PINNED_REPORT_PENDING_ARCHIVE"
+      "report_status": "ARCHIVED_VERIFIED"
     },
     {
       "id": 45369987535,
@@ -297,7 +297,7 @@
       "conclusion": "success",
       "created_at": "2026-11-24T09:55:21Z",
       "updated_at": "2026-11-24T09:55:56Z",
-      "report_status": "PINNED_REPORT_PENDING_ARCHIVE"
+      "report_status": "ARCHIVED_VERIFIED"
     },
     {
       "id": 45369765617,
@@ -393,7 +393,7 @@
       "conclusion": "success",
       "created_at": "2026-11-23T11:39:48Z",
       "updated_at": "2026-11-23T11:42:34Z",
-      "report_status": "PINNED_REPORT_PENDING_ARCHIVE"
+      "report_status": "ARCHIVED_VERIFIED"
     },
     {
       "id": 45167039448,
@@ -1629,7 +1629,7 @@
       "conclusion": "success",
       "created_at": "2026-11-22T06:32:50Z",
       "updated_at": "2026-11-22T06:34:09Z",
-      "report_status": "PINNED_REPORT_PENDING_ARCHIVE"
+      "report_status": "ARCHIVED_VERIFIED"
     },
     {
       "id": 44994208318,
@@ -2159,5 +2159,13 @@
       "updated_at": "2026-11-21T11:54:41Z",
       "report_status": "CI_METADATA_ONLY"
     }
-  ]
+  ],
+  "report_archive": {
+    "verified_reports": 12,
+    "archive_run_id": 45391036954,
+    "archive_job_id": 138434484402,
+    "archive_source_commit": "c16646728870a7b32b5217aa2fdab700b52db360",
+    "published_commit": "0bf39a672faf03fd15ea71e09ead04e6167d595b",
+    "status": "ARCHIVED_VERIFIED"
+  }
 }

@@ -1,57 +1,26 @@
-name: SagaLLM preserve pinned experiment reports
+name: SagaLLM verify archived experiment reports
 on:
   pull_request:
     paths:
-      - 'experiments/archive/manifest.json'
+      - 'experiments/archive/**'
       - 'scripts/archive_experiment_reports.py'
       - 'tests/test_archive_experiment_reports.py'
       - '.github/workflows/archive-experiment-reports.yml'
+  workflow_dispatch:
 permissions:
   contents: read
-  actions: read
 jobs:
-  archive:
-    if: >-
-      github.event.pull_request.head.repo.full_name == github.repository &&
-      github.head_ref == 'evidence/experiment-ledger-2026-11-24' &&
-      github.actor == 'SagaK-dev'
-    permissions:
-      contents: write
-      actions: read
+  verify:
     runs-on: ubuntu-24.04
-    timeout-minutes: 12
+    timeout-minutes: 5
     steps:
       - uses: actions/checkout@v5
         with:
-          ref: ${{ github.event.pull_request.head.sha }}
           persist-credentials: false
       - uses: actions/setup-python@v6
         with:
           python-version: '3.11'
-      - name: Test offline archive invariants
+      - name: Test archive invariants
         run: python -m unittest discover -s tests -p test_archive_experiment_reports.py
-      - name: Download and verify exact report bytes
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          python -m scripts.archive_experiment_reports --manifest experiments/archive/manifest.json --output experiments/archive/reports
-          python -m scripts.archive_experiment_reports --manifest experiments/archive/manifest.json --output experiments/archive/reports --verify-local
-      - name: Publish verified reports to dedicated evidence branch only
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          EXPECTED_SHA: ${{ github.event.pull_request.head.sha }}
-        run: |
-          gh auth setup-git
-          test "$(git rev-parse HEAD)" = "$EXPECTED_SHA"
-          test "$(git ls-remote origin refs/heads/evidence/experiment-ledger-2026-11-24 | cut -f1)" = "$EXPECTED_SHA"
-          git add -- experiments/archive/reports/
-          if git diff --cached --quiet; then echo "Already archived"; exit 0; fi
-          python - <<'PY'
-          import subprocess
-          paths=subprocess.check_output(["git","diff","--cached","--name-only"],text=True).splitlines()
-          if not paths or not all(x.startswith("experiments/archive/reports/") and x.endswith(".json") for x in paths):
-              raise SystemExit("Unexpected staged path")
-          PY
-          git -c user.name='github-actions[bot]' -c user.email='41898282+github-actions[bot]@users.noreply.github.com' commit -m 'Archive verified experiment report bytes'
-          git push origin HEAD:refs/heads/evidence/experiment-ledger-2026-11-24
-          git rev-parse HEAD
+      - name: Verify every committed original report
+        run: python -m scripts.archive_experiment_reports --manifest experiments/archive/manifest.json --output experiments/archive/reports --verify-local
