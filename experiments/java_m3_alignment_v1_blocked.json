@@ -1,0 +1,23 @@
+{
+  "status": "BLOCKED_ALIGNMENT_ADMISSION",
+  "protocol": "edit-v1",
+  "run_id": 45372372592,
+  "run_sha": "6eb20c4d581c3aaaf5db4f91a9c4517d2c2bbaca",
+  "artifact_id": 14909651235,
+  "zip_digest": "sha256:8f93dcdcf83ad6acc151d03950fab1ecbdf9193affb7d9fffd604919250df532",
+  "report_sha256_from_log": "ed9e5b9fafa0b0c6c5c193ddb0ae852487346af1f145a680acc5896a5f5675d6",
+  "admitted_rows": 194,
+  "excluded_rows": 126,
+  "aligned_token_positions": 282,
+  "mask_sha256": "fc99268a95c221c51303073fc38650220f8e2c7e95bd8a3ba9fee03812864853",
+  "rows_per_pair_type": {
+    "stdin_add_offset__stdin_multiply_offset": 64,
+    "stdin_max_offset__stdin_absolute_gap_offset": 64,
+    "stdin_count_greater__stdin_even_sum_offset": 2,
+    "stdin_digit_sum_offset__stdin_clamp": 64,
+    "stdin_ascii_upper_suffix__stdin_ascii_reverse_suffix": 0
+  },
+  "optimizer_steps_completed": 0,
+  "new_inference": "NOT_RUN",
+  "production_promotion": false
+}
