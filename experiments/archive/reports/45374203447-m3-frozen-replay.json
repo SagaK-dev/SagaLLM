@@ -1,0 +1,252 @@
+{
+  "archive_sha256": "2d4d6bf653c394ddf75016b26099efcf2fc5eb09ec1edd1086d7baedbedcc97f",
+  "artifact_id": 14909169047,
+  "base_sha256": "9802e848f0abea9979623f461b5e63cd7aed838acd087d06b20d747db1e2a0fc",
+  "behavior": "NOT_RUN",
+  "checkpoint_hashes_verified": 6,
+  "compile": "NOT_RUN",
+  "deterministic_bounds": {
+    "4201-control": {
+      "fresh_development": {
+        "assumption": "DETERMINISTIC_STDOUT_FOR_IDENTICAL_SOURCE_AND_STDIN",
+        "cases": 18,
+        "conditional_correct_case_upper_bound": 14,
+        "incompatible_expectation_groups": 4,
+        "observed_passes": null
+      },
+      "regression": {
+        "assumption": "DETERMINISTIC_STDOUT_FOR_IDENTICAL_SOURCE_AND_STDIN",
+        "cases": 18,
+        "conditional_correct_case_upper_bound": 12,
+        "incompatible_expectation_groups": 6,
+        "observed_passes": null
+      }
+    },
+    "4201-ranking": {
+      "fresh_development": {
+        "assumption": "DETERMINISTIC_STDOUT_FOR_IDENTICAL_SOURCE_AND_STDIN",
+        "cases": 18,
+        "conditional_correct_case_upper_bound": 11,
+        "incompatible_expectation_groups": 7,
+        "observed_passes": null
+      },
+      "regression": {
+        "assumption": "DETERMINISTIC_STDOUT_FOR_IDENTICAL_SOURCE_AND_STDIN",
+        "cases": 18,
+        "conditional_correct_case_upper_bound": 9,
+        "incompatible_expectation_groups": 9,
+        "observed_passes": null
+      }
+    },
+    "4202-control": {
+      "fresh_development": {
+        "assumption": "DETERMINISTIC_STDOUT_FOR_IDENTICAL_SOURCE_AND_STDIN",
+        "cases": 18,
+        "conditional_correct_case_upper_bound": 14,
+        "incompatible_expectation_groups": 4,
+        "observed_passes": null
+      },
+      "regression": {
+        "assumption": "DETERMINISTIC_STDOUT_FOR_IDENTICAL_SOURCE_AND_STDIN",
+        "cases": 18,
+        "conditional_correct_case_upper_bound": 9,
+        "incompatible_expectation_groups": 9,
+        "observed_passes": null
+      }
+    },
+    "4202-ranking": {
+      "fresh_development": {
+        "assumption": "DETERMINISTIC_STDOUT_FOR_IDENTICAL_SOURCE_AND_STDIN",
+        "cases": 18,
+        "conditional_correct_case_upper_bound": 11,
+        "incompatible_expectation_groups": 7,
+        "observed_passes": null
+      },
+      "regression": {
+        "assumption": "DETERMINISTIC_STDOUT_FOR_IDENTICAL_SOURCE_AND_STDIN",
+        "cases": 18,
+        "conditional_correct_case_upper_bound": 9,
+        "incompatible_expectation_groups": 9,
+        "observed_passes": null
+      }
+    },
+    "4203-control": {
+      "fresh_development": {
+        "assumption": "DETERMINISTIC_STDOUT_FOR_IDENTICAL_SOURCE_AND_STDIN",
+        "cases": 18,
+        "conditional_correct_case_upper_bound": 14,
+        "incompatible_expectation_groups": 4,
+        "observed_passes": null
+      },
+      "regression": {
+        "assumption": "DETERMINISTIC_STDOUT_FOR_IDENTICAL_SOURCE_AND_STDIN",
+        "cases": 18,
+        "conditional_correct_case_upper_bound": 9,
+        "incompatible_expectation_groups": 9,
+        "observed_passes": null
+      }
+    },
+    "4203-ranking": {
+      "fresh_development": {
+        "assumption": "DETERMINISTIC_STDOUT_FOR_IDENTICAL_SOURCE_AND_STDIN",
+        "cases": 18,
+        "conditional_correct_case_upper_bound": 18,
+        "incompatible_expectation_groups": 0,
+        "observed_passes": null
+      },
+      "regression": {
+        "assumption": "DETERMINISTIC_STDOUT_FOR_IDENTICAL_SOURCE_AND_STDIN",
+        "cases": 18,
+        "conditional_correct_case_upper_bound": 9,
+        "incompatible_expectation_groups": 9,
+        "observed_passes": null
+      }
+    },
+    "base": {
+      "fresh_development": {
+        "assumption": "DETERMINISTIC_STDOUT_FOR_IDENTICAL_SOURCE_AND_STDIN",
+        "cases": 18,
+        "conditional_correct_case_upper_bound": 14,
+        "incompatible_expectation_groups": 4,
+        "observed_passes": null
+      },
+      "regression": {
+        "assumption": "DETERMINISTIC_STDOUT_FOR_IDENTICAL_SOURCE_AND_STDIN",
+        "cases": 18,
+        "conditional_correct_case_upper_bound": 12,
+        "incompatible_expectation_groups": 6,
+        "observed_passes": null
+      }
+    }
+  },
+  "fresh_suite_sha256": "d641a53e6498a096fda15e92871e10db6cc2380fe1bb1be543c8f4a06aeb035a",
+  "independent_benchmark": "NOT_ESTABLISHED",
+  "production_promotion": false,
+  "regression_oracles_sha256": "74ea37e0dcf69175894124a7ff982037960b5d5afb0dc0181eebe71321b400a7",
+  "report_sha256": "90c8b9bb12e381c415e798d88875fc401143a0c703a3b0424cfab6c2283932cd",
+  "review_authenticity": "NOT_VERIFIED_BY_SOFTWARE",
+  "run_id": 45373241422,
+  "source_hash_matches": 84,
+  "status": "FROZEN_REPLAY_COMPLETE",
+  "summaries": {
+    "4201-control": {
+      "checkpoint_sha256": "1ea3d9ce570308afbfca07dcac258a83b91ad483b900f47dd84c38003f51c04b",
+      "fresh_development": {
+        "cross_family_collisions": 2,
+        "eos": 6,
+        "same_source_within_family_pairs": 2,
+        "unique": 3
+      },
+      "regression": {
+        "cross_family_collisions": 4,
+        "eos": 6,
+        "same_source_within_family_pairs": 2,
+        "unique": 2
+      },
+      "regression_margin": 0.046648805340131126,
+      "validation_nll": 0.3997800976321576
+    },
+    "4201-ranking": {
+      "checkpoint_sha256": "5b16fec6648ee2665f72deb15b1af9b0b751bbe54948afde70b5ff2889c5a695",
+      "fresh_development": {
+        "cross_family_collisions": 4,
+        "eos": 6,
+        "same_source_within_family_pairs": 3,
+        "unique": 2
+      },
+      "regression": {
+        "cross_family_collisions": 4,
+        "eos": 6,
+        "same_source_within_family_pairs": 3,
+        "unique": 2
+      },
+      "regression_margin": 0.05173171808322271,
+      "validation_nll": 0.41577637674002593
+    },
+    "4202-control": {
+      "checkpoint_sha256": "57a310426270f0a17114891b9d80b9070407ac9b1c320c6991d9ab619b844a73",
+      "fresh_development": {
+        "cross_family_collisions": 4,
+        "eos": 6,
+        "same_source_within_family_pairs": 2,
+        "unique": 3
+      },
+      "regression": {
+        "cross_family_collisions": 12,
+        "eos": 6,
+        "same_source_within_family_pairs": 3,
+        "unique": 1
+      },
+      "regression_margin": 0.03528851022322973,
+      "validation_nll": 0.3837980050955817
+    },
+    "4202-ranking": {
+      "checkpoint_sha256": "d5a2e5d59a35b3048f0807cde998c215f562bb745a203cd2d119ae2fa50cc4ba",
+      "fresh_development": {
+        "cross_family_collisions": 4,
+        "eos": 6,
+        "same_source_within_family_pairs": 3,
+        "unique": 2
+      },
+      "regression": {
+        "cross_family_collisions": 12,
+        "eos": 6,
+        "same_source_within_family_pairs": 3,
+        "unique": 1
+      },
+      "regression_margin": 0.04483760644992193,
+      "validation_nll": 0.4038212549528604
+    },
+    "4203-control": {
+      "checkpoint_sha256": "e3c6ff78cb777ab03b4459141f5df7ed0708d165f268d8cb774980b662039ca0",
+      "fresh_development": {
+        "cross_family_collisions": 4,
+        "eos": 6,
+        "same_source_within_family_pairs": 2,
+        "unique": 3
+      },
+      "regression": {
+        "cross_family_collisions": 12,
+        "eos": 6,
+        "same_source_within_family_pairs": 3,
+        "unique": 1
+      },
+      "regression_margin": 0.04371170202891032,
+      "validation_nll": 0.38223222840113436
+    },
+    "4203-ranking": {
+      "checkpoint_sha256": "8515eed991721ed364b82a778e68ca515cbef12f7f343733e460aa6498902341",
+      "fresh_development": {
+        "cross_family_collisions": 2,
+        "eos": 6,
+        "same_source_within_family_pairs": 0,
+        "unique": 4
+      },
+      "regression": {
+        "cross_family_collisions": 0,
+        "eos": 6,
+        "same_source_within_family_pairs": 3,
+        "unique": 3
+      },
+      "regression_margin": 0.045315211017926536,
+      "validation_nll": 0.41411227504478093
+    },
+    "base": {
+      "fresh_development": {
+        "cross_family_collisions": 2,
+        "eos": 6,
+        "same_source_within_family_pairs": 2,
+        "unique": 3
+      },
+      "regression": {
+        "cross_family_collisions": 2,
+        "eos": 6,
+        "same_source_within_family_pairs": 2,
+        "unique": 3
+      },
+      "regression_margin": 0.022063255310058594
+    }
+  },
+  "tokenizer_sha256": "186566808cb03e328cac9a6b7b384a8d0aefc54ccb83fbe97782a751726682fe",
+  "torch_version": "2.15.0+cpu"
+}

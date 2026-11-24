@@ -1,0 +1,26 @@
+name: SagaLLM verify archived experiment reports
+on:
+  pull_request:
+    paths:
+      - 'experiments/archive/**'
+      - 'scripts/archive_experiment_reports.py'
+      - 'tests/test_archive_experiment_reports.py'
+      - '.github/workflows/archive-experiment-reports.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+      - name: Test archive invariants
+        run: python -m unittest discover -s tests -p test_archive_experiment_reports.py
+      - name: Verify every committed original report
+        run: python -m scripts.archive_experiment_reports --manifest experiments/archive/manifest.json --output experiments/archive/reports --verify-local
