@@ -22,6 +22,11 @@ def main() -> None:
     parser.add_argument("--allow-execution", action="store_true")
     parser.add_argument("--acknowledge-disposable-vm", action="store_true")
     parser.add_argument("--expected-suite-sha256")
+    parser.add_argument("--provenance", type=Path)
+    parser.add_argument("--expected-provenance-sha256")
+    parser.add_argument("--inventory", type=Path)
+    parser.add_argument("--expected-inventory-sha256")
+    parser.add_argument("--exposure-root", type=Path)
     parser.add_argument("--vm-review", type=Path)
     parser.add_argument("--expected-vm-review-sha256")
     parser.add_argument("--backend", choices=["docker", "podman"], default="docker")
@@ -35,6 +40,11 @@ def main() -> None:
         disposable_vm_acknowledged=args.acknowledge_disposable_vm,
         expected_suite_sha256=args.expected_suite_sha256,
         backend=args.backend, image=args.image,
+        provenance_path=args.provenance,
+        expected_provenance_sha256=args.expected_provenance_sha256,
+        inventory_path=args.inventory,
+        expected_inventory_sha256=args.expected_inventory_sha256,
+        exposure_root=args.exposure_root,
         vm_review_path=args.vm_review,
         expected_vm_review_sha256=args.expected_vm_review_sha256,
     )

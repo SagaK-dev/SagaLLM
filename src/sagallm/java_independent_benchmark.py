@@ -193,12 +193,42 @@ def _candidate(path: Path) -> str | None:
         return None
 
 
+def _private_intake_gate(suite_path, fingerprint, *, provenance_path,
+                         expected_provenance_sha256, inventory_path,
+                         expected_inventory_sha256, exposure_root):
+    # Import locally: the intake module itself uses suite validation.
+    from .java_private_intake import audit_private_intake
+    if any(value is None for value in (
+            provenance_path, expected_provenance_sha256, inventory_path,
+            expected_inventory_sha256, exposure_root)):
+        return "PINNED_PRIVATE_INTAKE_REQUIRED", None
+    try:
+        report = audit_private_intake(
+            suite_path, expected_suite_sha256=fingerprint,
+            provenance_path=provenance_path,
+            expected_provenance_sha256=expected_provenance_sha256,
+            inventory_path=inventory_path,
+            expected_inventory_sha256=expected_inventory_sha256,
+            exposure_root=exposure_root)
+    except (OSError, ValueError, TypeError, RecursionError):
+        # Do not disclose private file paths or malformed record content.
+        return "PRIVATE_INTAKE_INVALID", None
+    if report["machine_status"] != "PREFLIGHT_ONLY" or report["blockers"]:
+        return "PRIVATE_INTAKE_BLOCKED", report
+    return "PREFLIGHT_ONLY", report
+
+
 def evaluate_suite(suite_path: Path, candidate_dir: Path, *,
                    allow_execution: bool = False, expected_suite_sha256: str | None = None,
                    disposable_vm_acknowledged: bool = False,
                    backend: str = "docker", image: str = "eclipse-temurin:21-jdk",
                    vm_review_path: Path | None = None,
-                   expected_vm_review_sha256: str | None = None) -> dict:
+                   expected_vm_review_sha256: str | None = None,
+                   provenance_path: Path | None = None,
+                   expected_provenance_sha256: str | None = None,
+                   inventory_path: Path | None = None,
+                   expected_inventory_sha256: str | None = None,
+                   exposure_root: Path | None = None) -> dict:
     suite, fingerprint, protocol = read_suite(suite_path)
     result = {
         "protocol": SCHEMA,
@@ -239,6 +269,21 @@ def evaluate_suite(suite_path: Path, candidate_dir: Path, *,
         return result
     result["vm_review_sha256"] = vm_sha
     result["oci_image"] = image
+    intake_status, intake_report = _private_intake_gate(
+        suite_path, fingerprint, provenance_path=provenance_path,
+        expected_provenance_sha256=expected_provenance_sha256,
+        inventory_path=inventory_path,
+        expected_inventory_sha256=expected_inventory_sha256,
+        exposure_root=exposure_root)
+    result["private_intake_gate"] = intake_status
+    if intake_report is not None:
+        result["private_intake"] = intake_report
+        result["private_intake_report_canonical_sha256"] = hashlib.sha256(
+            json.dumps(intake_report, sort_keys=True, ensure_ascii=False,
+                       separators=(",", ":")).encode("utf-8")).hexdigest()
+    if intake_status != "PREFLIGHT_ONLY":
+        result["reason"] = intake_status
+        return result
     if (not candidate_dir.is_dir() or candidate_dir.is_symlink()
             or not candidate_dir.resolve().is_dir()):
         result["reason"] = "CANDIDATE_DIRECTORY_MISSING"
@@ -254,6 +299,7 @@ def evaluate_suite(suite_path: Path, candidate_dir: Path, *,
         return result
     results = []
     any_unavailable = False
+    attempted = False
     for task in suite["tasks"]:
         task_id = task["id"]
         code = _candidate(candidate_dir / (task_id + ".java"))
@@ -263,6 +309,7 @@ def evaluate_suite(suite_path: Path, candidate_dir: Path, *,
                             "cases_passed": 0, "cases_total": len(task["cases"])})
             continue
         outcomes = []
+        attempted = True
         for case in task["cases"]:
             outcome = run_java_in_oci(
                 code, case["stdout"], backend=backend, image=image,
@@ -274,6 +321,7 @@ def evaluate_suite(suite_path: Path, candidate_dir: Path, *,
             "status": ("PASS" if all(s == "PASS" for s in outcomes)
                        else "UNAVAILABLE" if any(s in ("NOT_RUN", "RUNTIME_ERROR") for s in outcomes)
                        else "FAIL"),
+            "candidate_sha256": hashlib.sha256(code.encode("utf-8")).hexdigest(),
             "case_statuses": outcomes,
             "cases_passed": sum(s == "PASS" for s in outcomes),
             "cases_total": len(outcomes),
@@ -282,8 +330,8 @@ def evaluate_suite(suite_path: Path, candidate_dir: Path, *,
         "behavioral_status": "PARTIAL_OR_UNAVAILABLE" if any_unavailable else "EVALUATED",
         "behavior_passed_tasks": (None if any_unavailable else
                                   sum(x["status"] == "PASS" for x in results)),
-        "java_executed": "POSSIBLE_IN_OCI_ONLY",
-        "oci_execution_attempted": True,
+        "java_executed": "POSSIBLE_IN_OCI_ONLY" if attempted else False,
+        "oci_execution_attempted": attempted,
         "model_selection": "NOT_PERMITTED_NO_INDEPENDENCE_PROOF",
         "results": results,
         "source_persisted": False,
