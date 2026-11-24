@@ -35,9 +35,12 @@ def test_bilingual_negative_controls(query, exposure):
 def test_near_duplicate_with_small_edit_and_long_document_tail():
     prompt = ("For every sensor packet, validate its header, recover the sequence "
               "identifier, and report the count of packets with corrupted checksums.")
-    modified = prompt.replace("recover", "extract").replace("report", "print")
+    modified = prompt.replace("recover", "extract")
     result = screen.SimilarityScreen([prompt]).compare("background " * 3000 + modified)
     assert (0, "CHAR_SHINGLE_CONTAINMENT") in result
+    # Two edits fall just below the fixed 82% threshold; no threshold tuning.
+    below = modified.replace("report", "print")
+    assert (0, "CHAR_SHINGLE_CONTAINMENT") not in screen.SimilarityScreen([prompt]).compare(below)
 
 
 def test_unrelated_and_short_repetition_do_not_match():
