@@ -14,6 +14,7 @@ import re
 from urllib.parse import urlsplit
 
 from .java_behavior import MAX_SOURCE_BYTES, oci_image_ready, run_java_in_oci
+from .java_vm_review import local_docker_context, review_gate
 
 SCHEMA = "sagallm-independent-java-io-v1"
 MAX_SUITE_BYTES = 128_000
@@ -154,7 +155,9 @@ def _candidate(path: Path) -> str | None:
 def evaluate_suite(suite_path: Path, candidate_dir: Path, *,
                    allow_execution: bool = False, expected_suite_sha256: str | None = None,
                    disposable_vm_acknowledged: bool = False,
-                   backend: str = "docker", image: str = "eclipse-temurin:21-jdk") -> dict:
+                   backend: str = "docker", image: str = "eclipse-temurin:21-jdk",
+                   vm_review_path: Path | None = None,
+                   expected_vm_review_sha256: str | None = None) -> dict:
     suite, fingerprint, protocol = read_suite(suite_path)
     result = {
         "protocol": SCHEMA,
@@ -185,9 +188,22 @@ def evaluate_suite(suite_path: Path, candidate_dir: Path, *,
             or expected_suite_sha256 != fingerprint):
         result["reason"] = "PINNED_SUITE_SHA256_REQUIRED"
         return result
+    vm_status, vm_sha = review_gate(
+        vm_review_path, expected_vm_review_sha256,
+        suite_sha=fingerprint, backend=backend, image=image)
+    result["vm_review_gate"] = vm_status
+    result["vm_review_metadata_verified_externally"] = False
+    if vm_status != "ELIGIBLE_SELF_ATTESTED":
+        result["reason"] = vm_status
+        return result
+    result["vm_review_sha256"] = vm_sha
+    result["oci_image"] = image
     if (not candidate_dir.is_dir() or candidate_dir.is_symlink()
             or not candidate_dir.resolve().is_dir()):
         result["reason"] = "CANDIDATE_DIRECTORY_MISSING"
+        return result
+    if not local_docker_context():
+        result["reason"] = "LOCAL_DOCKER_CONTEXT_REQUIRED"
         return result
     if not oci_image_ready(backend, image):
         result["reason"] = "LOCAL_OCI_RUNTIME_OR_IMAGE_UNAVAILABLE"

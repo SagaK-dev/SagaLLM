@@ -69,7 +69,14 @@ def test_no_opt_in_means_no_oci_or_candidate_access(tmp_path, monkeypatch):
     assert report["java_executed"] is False
 
 
+def _mock_vm_review(monkeypatch):
+    # Existing runtime tests are mocked; the actual gate is tested separately.
+    monkeypatch.setattr(bench, "review_gate", lambda *a, **k: ("ELIGIBLE_SELF_ATTESTED", "a" * 64))
+    monkeypatch.setattr(bench, "local_docker_context", lambda: True)
+
+
 def test_explicit_exec_requires_disposable_vm_review_and_frozen_sha(tmp_path, monkeypatch):
+    _mock_vm_review(monkeypatch)
     suite = _save(tmp_path, _draft())
     monkeypatch.setattr(bench, "oci_image_ready", lambda *a, **k: True)
     base = bench.evaluate_suite(suite, tmp_path, allow_execution=True)
@@ -100,6 +107,7 @@ def test_explicit_exec_requires_disposable_vm_review_and_frozen_sha(tmp_path, mo
 
 
 def test_mocked_oci_receives_each_stdin_and_exact_expected_stdout(tmp_path, monkeypatch):
+    _mock_vm_review(monkeypatch)
     suite_data = _attested()
     suite = _save(tmp_path, suite_data)
     candidates = tmp_path / "generated"
@@ -135,6 +143,7 @@ def test_mocked_oci_receives_each_stdin_and_exact_expected_stdout(tmp_path, monk
 
 
 def test_missing_and_symlinked_candidates_do_not_run(tmp_path, monkeypatch):
+    _mock_vm_review(monkeypatch)
     suite = _save(tmp_path, _attested())
     candidate_dir = tmp_path / "candidates"
     candidate_dir.mkdir()
@@ -218,3 +227,18 @@ def test_stdout_grading_ignores_stderr_from_subprocess():
     ], timeout=4)
     assert code == 0
     assert output == b"actual\n"
+
+def test_missing_vm_review_never_reaches_engine(tmp_path, monkeypatch):
+    suite = _save(tmp_path, _attested())
+    monkeypatch.setattr(bench, "review_gate", lambda *a, **k: ("PINNED_VM_REVIEW_REQUIRED", None))
+    def forbidden(*args, **kwargs):
+        raise AssertionError("No engine or candidate reads before VM gate")
+    monkeypatch.setattr(bench, "local_docker_context", forbidden)
+    monkeypatch.setattr(bench, "oci_image_ready", forbidden)
+    monkeypatch.setattr(bench, "_candidate", forbidden)
+    report = bench.evaluate_suite(suite, tmp_path, allow_execution=True,
+        disposable_vm_acknowledged=True,
+        expected_suite_sha256=hashlib.sha256(suite.read_bytes()).hexdigest())
+    assert report["reason"] == "PINNED_VM_REVIEW_REQUIRED"
+    assert report["behavioral_status"] == "NOT_RUN"
+    assert report["java_executed"] is False

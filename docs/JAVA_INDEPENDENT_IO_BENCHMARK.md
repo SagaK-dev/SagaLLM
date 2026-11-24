@@ -12,7 +12,7 @@ not demonstrate model coding ability.
   train-overlap review, and TWO distinct reviewer records.
 - A separate explicit OCI execution gate; absent an opt-in, recognized
   review records, precommitted SHA-256, an acknowledgement of a disposable
-  Linux VM, and a locally installed JDK image, execution is `NOT_RUN`.
+  Linux VM, a SHA-pinned VM review and a locally installed digest-pinned Java 17 image, execution is `NOT_RUN`.
 - One fresh OCI container per I/O case, exact stdout comparison, read-only
   source and stdin input mount, no network, no privileges, resource limits,
   bounded output and timeout. Existing OCI restrictions are NOT a security
@@ -68,7 +68,9 @@ python scripts/evaluate_java_independent_io.py \
   --output independently-reviewed-results.json \
   --allow-execution --acknowledge-disposable-vm \
   --expected-suite-sha256 <exact-64-character-sha256> \
-  --backend docker --image <preinstalled-jdk-image>
+  --vm-review /private/review.json \
+  --expected-vm-review-sha256 <exact-review-file-sha256> \
+  --backend docker --image <repository@sha256:reviewed-digest>
 ```
 
 The placeholders must be replaced with real, reviewed values. No Java is
@@ -84,3 +86,7 @@ review records, **not** independent validation. The protocol always labels
 Only stdin/stdout single-file tests are supported; the evaluation is not
 comprehensive correctness verification. The proposed draft has not been
 executed against SagaLLM, and no Java quality improvement is established.
+
+## M4 execution gate
+
+See [JAVA_M4_VM_REVIEW.md](JAVA_M4_VM_REVIEW.md). The independent evaluator rejects common CI environments, non-Linux hosts, mutable image tags, non-default or remote Docker contexts, and missing or mismatched review evidence. These are defense-in-depth checks, not proof of VM isolation. Podman is deferred for this independent evaluation path.

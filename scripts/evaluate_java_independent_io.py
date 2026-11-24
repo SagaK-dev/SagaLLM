@@ -22,6 +22,8 @@ def main() -> None:
     parser.add_argument("--allow-execution", action="store_true")
     parser.add_argument("--acknowledge-disposable-vm", action="store_true")
     parser.add_argument("--expected-suite-sha256")
+    parser.add_argument("--vm-review", type=Path)
+    parser.add_argument("--expected-vm-review-sha256")
     parser.add_argument("--backend", choices=["docker", "podman"], default="docker")
     parser.add_argument("--image", default="eclipse-temurin:21-jdk")
     args = parser.parse_args()
@@ -33,6 +35,8 @@ def main() -> None:
         disposable_vm_acknowledged=args.acknowledge_disposable_vm,
         expected_suite_sha256=args.expected_suite_sha256,
         backend=args.backend, image=args.image,
+        vm_review_path=args.vm_review,
+        expected_vm_review_sha256=args.expected_vm_review_sha256,
     )
     with args.output.open("x", encoding="utf-8") as handle:
         json.dump(result, handle, ensure_ascii=False, sort_keys=True, indent=2)
