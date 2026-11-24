@@ -41,6 +41,7 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           EXPECTED_SHA: ${{ github.event.pull_request.head.sha }}
         run: |
+          gh auth setup-git
           test "$(git rev-parse HEAD)" = "$EXPECTED_SHA"
           test "$(git ls-remote origin refs/heads/evidence/experiment-ledger-2026-11-24 | cut -f1)" = "$EXPECTED_SHA"
           git add -- experiments/archive/reports/
@@ -52,6 +53,5 @@ jobs:
               raise SystemExit("Unexpected staged path")
           PY
           git -c user.name='github-actions[bot]' -c user.email='41898282+github-actions[bot]@users.noreply.github.com' commit -m 'Archive verified experiment report bytes'
-          gh auth setup-git
           git push origin HEAD:refs/heads/evidence/experiment-ledger-2026-11-24
           git rev-parse HEAD

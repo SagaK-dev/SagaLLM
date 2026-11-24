@@ -16,7 +16,7 @@
       "artifact_id": 14815096856,
       "commit_sha": "40dcce6fe2e4bd2ab83ea70cf5a9cd12368c0312",
       "archive_sha256": "f1716f3111bd8df1bf63282f1970b9b9aadf340aeb18f5133e66a5ea9d55955e",
-      "member": "ab-report.json",
+      "member": "contrastive-stdio-ab-evidence/ab-report.json",
       "report_sha256": "1f59f98acafc5b2939f5dc043717beb3b76dd5ff923506064377ca8a7221c468",
       "slug": "contrastive-stdio-ab"
     },

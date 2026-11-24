@@ -1,0 +1,18 @@
+{
+  "schema": "sagallm-archive-attempts-v1",
+  "attempts": [
+    {
+      "run_id": 45390881739,
+      "job_id": 138433948571,
+      "commit_sha": "f98e392653154a57c6d5b9fc032f3f4f4fd6eb57",
+      "stage": "Download and verify exact report bytes",
+      "status": "FAILED_MEMBER_PATH",
+      "verified_before_failure": [
+        44994208434
+      ],
+      "published_reports": 0,
+      "error": "Report member missing/oversize",
+      "correction": "Use exact verified contrastive-stdio-ab-evidence/ab-report.json in artifact 14815096856; ZIP and report SHA unchanged."
+    }
+  ]
+}
