@@ -29,7 +29,9 @@ def test_oci_command_restricts_execution(tmp_path):
                   "--tmpfs=/tmp:rw,nosuid,nodev,noexec,size=32m,mode=1777", "readonly",
                   "javac -proc:none"):
         assert token in joined
-    assert argv[-3:] == ["/bin/sh", "-c", argv[-1]]
+    assert "--log-driver=none" in argv
+    assert "--entrypoint=/bin/sh" in argv
+    assert argv[-2] == "-c"
     with pytest.raises(ValueError):
         build_oci_command("docker", image="--privileged", mount_dir=tmp_path, cid_file=tmp_path / "cid")
     with pytest.raises(ValueError):

@@ -104,12 +104,12 @@ def build_oci_command(backend: str, *, image: str, mount_dir: Path, cid_file: Pa
     )
     return [
         backend, "run", "--rm", "--pull=never", "--cidfile", str(cid_file),
-        "--network=none", "--read-only", "--cap-drop=ALL",
+        "--network=none", "--read-only", "--cap-drop=ALL", "--log-driver=none",
         "--security-opt=no-new-privileges", "--pids-limit=64",
         "--memory=384m", "--memory-swap=384m", "--cpus=1.0",
         "--user=65534:65534", "--tmpfs=/tmp:rw,nosuid,nodev,noexec,size=32m,mode=1777",
         "--mount", "type=bind,src=" + str(mount_dir) + ",dst=/input,readonly",
-        "--workdir=/tmp", image, "/bin/sh", "-c", shell_script,
+        "--workdir=/tmp", "--entrypoint=/bin/sh", image, "-c", shell_script,
     ]
 
 
