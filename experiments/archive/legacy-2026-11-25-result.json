@@ -1,0 +1,27 @@
+{
+  "schema": "sagallm-archive-batch-result-v1",
+  "run_id": 45562154879,
+  "job_id": 139028191270,
+  "source_commit": "f50ea6d1aad863d9a2943c57cb2c9130762bb693",
+  "published_commit": "dbc554e0316b62a3a25f58cac058f37f5f896436",
+  "status": "ARCHIVED_VERIFIED",
+  "tests_passed": 5,
+  "originals_added": 3,
+  "originals_on_branch": 15,
+  "report_paths": [
+    {
+      "path": "experiments/archive/reports/45007278383-v018-paired-compile.json",
+      "git_blob_sha": "20ddd9207e50e17b6749ef7626fd57d476594bae"
+    },
+    {
+      "path": "experiments/archive/reports/45161749481-public-unreviewed-behavior.json",
+      "git_blob_sha": "d8f176e1957c3ec94b3628044abb22dc123592b5"
+    },
+    {
+      "path": "experiments/archive/reports/45164032104-stdio-semantic-sft.json",
+      "git_blob_sha": "055791bd8d3cf126d9ee09236a56eb6ce98284a8"
+    }
+  ],
+  "java_execution": "NOT_RUN",
+  "production_promotion": false
+}

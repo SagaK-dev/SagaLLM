@@ -1,58 +1,23 @@
-name: SagaLLM preserve three legacy reports (one-time)
+name: SagaLLM verify three legacy report originals
 on:
   pull_request:
     paths:
       - 'experiments/archive/legacy-2026-11-25.json'
+      - 'experiments/archive/reports/**'
       - '.github/workflows/archive-legacy-2026-11-25.yml'
+      - 'scripts/archive_experiment_reports.py'
+  workflow_dispatch:
 permissions:
   contents: read
-  actions: read
 jobs:
-  archive:
-    if: >-
-      github.event.pull_request.head.repo.full_name == github.repository &&
-      github.head_ref == 'evidence/legacy-reports-2026-11-25' &&
-      github.actor == 'SagaK-dev'
-    permissions:
-      contents: write
-      actions: read
+  verify:
     runs-on: ubuntu-24.04
-    timeout-minutes: 8
+    timeout-minutes: 5
     steps:
       - uses: actions/checkout@v5
         with:
-          ref: ${{ github.event.pull_request.head.sha }}
           persist-credentials: false
       - uses: actions/setup-python@v6
         with:
           python-version: '3.11'
-      - name: Verify archive invariants
-        run: python -m unittest discover -s tests -p test_archive_experiment_reports.py
-      - name: Preserve exactly three pinned reports
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          python -m scripts.archive_experiment_reports --manifest experiments/archive/legacy-2026-11-25.json --output experiments/archive/reports
-          python -m scripts.archive_experiment_reports --manifest experiments/archive/legacy-2026-11-25.json --output experiments/archive/reports --verify-local
-      - name: Publish to dedicated evidence branch
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          EXPECTED_SHA: ${{ github.event.pull_request.head.sha }}
-        run: |
-          gh auth setup-git
-          test "$(git rev-parse HEAD)" = "$EXPECTED_SHA"
-          test "$(git ls-remote origin refs/heads/evidence/legacy-reports-2026-11-25 | cut -f1)" = "$EXPECTED_SHA"
-          git add -- experiments/archive/reports/
-          if git diff --cached --quiet; then exit 0; fi
-          python - <<'PY'
-          import subprocess
-          paths=set(subprocess.check_output(["git","diff","--cached","--name-only"],text=True).splitlines())
-          expected=set("experiments/archive/reports/"+p for p in [
-              "45007278383-v018-paired-compile.json",
-              "45164032104-stdio-semantic-sft.json",
-              "45161749481-public-unreviewed-behavior.json"])
-          if paths != expected: raise SystemExit("Unexpected staged paths")
-          PY
-          git -c user.name='github-actions[bot]' -c user.email='41898282+github-actions[bot]@users.noreply.github.com' commit -m 'Preserve three verified historical report originals'
-          git push origin HEAD:refs/heads/evidence/legacy-reports-2026-11-25
-          git rev-parse HEAD
+      - run: python -m scripts.archive_experiment_reports --manifest experiments/archive/legacy-2026-11-25.json --output experiments/archive/reports --verify-local
