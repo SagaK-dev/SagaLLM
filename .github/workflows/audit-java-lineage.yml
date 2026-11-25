@@ -1,0 +1,35 @@
+name: SagaLLM historical Java lineage audit
+on:
+  pull_request:
+    paths:
+      - 'scripts/audit_java_lineage.py'
+      - 'tests/test_audit_java_lineage.py'
+      - '.github/workflows/audit-java-lineage.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  audit:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+      - run: python -m unittest discover -s tests -p test_audit_java_lineage.py
+      - name: Verify three historical archives
+        if: github.event_name == 'workflow_dispatch' || github.event.pull_request.head.repo.full_name == github.repository
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -eu
+          tmp=$(mktemp -d)
+          trap 'rm -rf "$tmp"' EXIT
+          gh api repos/SagaK-dev/SagaLLM/actions/artifacts/14738360825/zip > "$tmp/root.zip"
+          gh api repos/SagaK-dev/SagaLLM/actions/artifacts/14738368209/zip > "$tmp/mid.zip"
+          gh api repos/SagaK-dev/SagaLLM/actions/artifacts/14743051466/zip > "$tmp/end.zip"
+          python -m scripts.audit_java_lineage "$tmp/root.zip" "$tmp/mid.zip" "$tmp/end.zip"

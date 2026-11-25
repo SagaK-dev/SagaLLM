@@ -1,0 +1,5 @@
+# Historical Java checkpoint lineage
+
+PR #63 audit and CPU CI succeeded (45603949755 / 45603947450); the artifact-byte step succeeded. This stacked follow-up checks v0.16 -> v0.17 -> v0.18 selected checkpoint links using exact historical ZIPs. Run 44981937649 (e60075a8baca2e1250b660c6acec11040733eec6), 44982940959 (5d1eb19596d631704d42585b029eb8fb70e697f7), 44994208434 (c531d43d1d1d2e9da18a14045bfced3cfcaa2720). The v0.16 workflow pins four public Java revisions; v0.17 and v0.18 declare the same synthetic manifest, not independent additional corpora.
+
+The audit checks archive and member bytes without loading weights, compares report links and manifest pins, and emits only hashes and statuses. It does not establish actual optimizer exposure, full source inventory, license clearance, or independent evaluation. The public and synthetic JSONL contents were not included in these artifacts. Reconstruct and verify all split bytes at historical revisions, inventory development probes and obtain rights review before M2.4 completion. No promotion. CI results for this follow-up are pending.
