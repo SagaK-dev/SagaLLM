@@ -1,0 +1,19 @@
+{
+  "schema": "sagallm-m4-matched-report-comparison-evidence-v1",
+  "run_id": 45562031183,
+  "job_id": 139027777403,
+  "commit_sha": "4654247546d965b0401614d1d8bf548db45dba74",
+  "status": "FIXTURE_TESTS_PASS",
+  "tests_passed": 16,
+  "archive_verifier_run_id": 45562031220,
+  "archive_verifier_job_id": 139027778037,
+  "archive_verifier_status": "success",
+  "archived_original_reports": 13,
+  "cpu_ci_run_id": 45562031128,
+  "cpu_ci_status_at_snapshot": "in_progress",
+  "scope": "Synthetic fixtures only; no real model report comparison",
+  "independent_behavior": "NOT_RUN",
+  "benchmark_independence_proven": false,
+  "java_execution": "NOT_RUN",
+  "production_promotion": false
+}
