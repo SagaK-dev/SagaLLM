@@ -1,4 +1,4 @@
-# SagaLLM Development Plan — 2026-11-24 (revision 6 draft)
+# SagaLLM Development Plan — 2026-11-24 (revision 7 draft)
 
 Original baseline: 961130d684a459ee513e96d6be17511cb47315c8 (PR #44).
 Revision 2 baseline: 4346405a5749bfca79538822409c8f0862f79eaf (PR #55).
@@ -32,7 +32,7 @@ Primary hypothesis: prompt-conditioning collapse (different instructions yield i
 
 Windows are planning targets, not promises of external reviews, GPU allocation or metric improvement.
 
-## Revision 6 — evidence and work breakdown
+## Revision 7 — evidence and work breakdown
 
 - M0: PR #54 archived 12 exact reports and 177-run metadata; verifier 45391237711 SUCCESS; merged. Full rights/secret audit and Issue #22 closure criteria are separate.
 - M1/M3: the exploratory diagnostics and matched interventions in PRs #46–53 did run; their reports are archived. No validated gain/root cause established. First-layer attention-bias pilot run 45389874625 improved both-choice counts in only 1/7 models vs preregistered 5/7; do not tune on the exposed probes. M3 status: exploratory experiments completed, further experiments require a new hypothesis and independent gate; no promotion.
@@ -46,14 +46,14 @@ Windows are planning targets, not promises of external reviews, GPU allocation o
 | M2.3 | Near-duplicate and semantic/structural review leads, bilingual paraphrases, calibrated synthetic positives/negatives; bounded resources and no false independence claim | Merged via PR #57; final-head runs 45402092921 / 45402092849 / 45402092826 SUCCESS; general semantic/AST detection not established |
 | M2.4 | Exposure inventory coverage per checkpoint, including pretraining and dev probes, scalable pinned shard scanning; audit missing sources, no arbitrary sample as full coverage | Shard preparation merged via #58; final-head runs 45403303766 / 45403303936 / 45403303946 SUCCESS. Mandatory model-specific shard gate implemented in #59; final-head CI 45405719238 / 45405718831 / 45405719097 passed; PR awaiting merge; actual lineage authenticity unverified |
 | M2.5 | 5–12 new privately held-back human tasks, author separated from reviewers, two real per-task reviews, rights and semantic audit, exact freeze before inference | BLOCKED_ON_HUMAN_REVIEW |
-| M4.1 | Freeze model/tokenizer/checkpoint/generation settings and evaluator revision; hash each candidate; classify compile, behavior, timeout, unavailable separately, matched comparisons | PARTIAL: matched report comparison implemented and fixture CI passed in #60; stage-separated compile/runtime and authentic training evidence remain |
+| M4.1 | Freeze model/tokenizer/checkpoint/generation settings and evaluator revision; hash each candidate; classify compile, behavior, timeout, unavailable separately, matched comparisons | PARTIAL: matched report comparison implemented and fixture CI passed in #60; stage-separated classification implemented in follow-up; CI pending; authentic training evidence remains |
 | M4.2 | Actual reviewed disposable Linux VM and second independent audit; Java 17, exact stdout, no generated Java on shared CI | NOT_RUN |
 | M3.1 | New preregistered intervention and fresh unexposed development data; compare against pinned baseline with matched exposure/compute and report negative results | PLANNED; do not reuse exposed probes for selection |
 | M5/M6 | Cost/rights/compute feasibility and release hardening only after independent evidence and owner authorization | NOT_AUTHORIZED / NOT_READY |
 
 M2.3 acceptance is deliberately scoped to deterministic lexical near-duplicate and bilingual concept-rule leads with synthetic positive/negative tests, explicit resource limits and fail-closed integration. Translation, semantic equivalence and code AST similarity are not established; those require separate calibration on rights-reviewed examples before stronger claims.
 
-M2.4 uses a separately pinned declared source inventory and checkpoint/tokenizer bytes, ordered shard hashes and exact reconstruction of each source hash. Limits are 8 GiB total, 2,048 shards, 16 MiB or 20,000 records per shard. Revision 5 makes the shard scan mandatory for model evaluation with separately pinned pre-inference model freeze and post-generation candidate manifest, opaque parent checkpoint/evidence hashes and full declared training source assignment. Historical lineage and freeze timing remain unverified. Matched report comparison added in #60; 16 synthetic tests passed (45562031183, commit 4654247546d965b0401614d1d8bf548db45dba74). Next: stage-separated compile/runtime evidence, actual training-run evidence validation and rights-reviewed larger-corpus measurements. No real independent evaluation or new Java execution.
+M2.4 uses a separately pinned declared source inventory and checkpoint/tokenizer bytes, ordered shard hashes and exact reconstruction of each source hash. Limits are 8 GiB total, 2,048 shards, 16 MiB or 20,000 records per shard. Revision 5 makes the shard scan mandatory for model evaluation with separately pinned pre-inference model freeze and post-generation candidate manifest, opaque parent checkpoint/evidence hashes and full declared training source assignment. Historical lineage and freeze timing remain unverified. Matched report comparison added in #60; 16 synthetic tests passed (45562031183, commit 4654247546d965b0401614d1d8bf548db45dba74). Revision 7 implements staged OCI exit classification and legacy-safe report comparison; mocked CI pending. Next: actual training-run evidence validation and rights-reviewed larger-corpus measurements. No real independent evaluation or new Java execution.
 
 Machine preflight is not proof: it cannot verify inventory completeness,
 authorship, legal rights or semantic independence. No self-attested status

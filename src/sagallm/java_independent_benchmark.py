@@ -14,7 +14,8 @@ from pathlib import Path
 import re
 from urllib.parse import urlsplit
 
-from .java_behavior import MAX_SOURCE_BYTES, oci_image_ready, run_java_in_oci
+from .java_behavior import (MAX_SOURCE_BYTES, oci_image_ready, run_java_in_oci,
+    STAGED_EXECUTION_PROTOCOL, STAGED_STATUSES, STAGED_UNAVAILABLE, compile_phase_counts)
 from .java_vm_review import local_docker_context, local_image_has_no_volumes, review_gate
 
 SCHEMA = "sagallm-independent-java-io-v1"
@@ -349,6 +350,7 @@ def evaluate_suite(suite_path: Path, candidate_dir: Path, *,
         result["reason"] = "OCI_IMAGE_VOLUME_CHECK_FAILED"
         return result
     results = []
+    all_case_statuses = []
     any_unavailable = False
     attempted = False
     for task in suite["tasks"]:
@@ -356,6 +358,7 @@ def evaluate_suite(suite_path: Path, candidate_dir: Path, *,
         code = pinned_codes[task_id]
         if code is None:
             any_unavailable = True
+            all_case_statuses.extend(["CANDIDATE_MISSING"] * len(task["cases"]))
             results.append({"id": task_id, "status": "CANDIDATE_MISSING",
                             "cases_passed": 0, "cases_total": len(task["cases"])})
             continue
@@ -364,13 +367,16 @@ def evaluate_suite(suite_path: Path, candidate_dir: Path, *,
         for case in task["cases"]:
             outcome = run_java_in_oci(
                 code, case["stdout"], backend=backend, image=image,
-                allow_execution=True, stdin_data=case["stdin"])
+                allow_execution=True, stdin_data=case["stdin"], staged=True)
+            if outcome["status"] not in STAGED_STATUSES:
+                raise ValueError("Unknown staged OCI outcome")
             outcomes.append(outcome["status"])
-        any_unavailable |= any(s in ("NOT_RUN", "RUNTIME_ERROR") for s in outcomes)
+        all_case_statuses.extend(outcomes)
+        any_unavailable |= any(s in STAGED_UNAVAILABLE for s in outcomes)
         results.append({
             "id": task_id,
             "status": ("PASS" if all(s == "PASS" for s in outcomes)
-                       else "UNAVAILABLE" if any(s in ("NOT_RUN", "RUNTIME_ERROR") for s in outcomes)
+                       else "UNAVAILABLE" if any(s in STAGED_UNAVAILABLE for s in outcomes)
                        else "FAIL"),
             "candidate_sha256": hashlib.sha256(code.encode("utf-8")).hexdigest(),
             "case_statuses": outcomes,
@@ -385,6 +391,8 @@ def evaluate_suite(suite_path: Path, candidate_dir: Path, *,
         "oci_execution_attempted": attempted,
         "model_selection": "NOT_PERMITTED_NO_INDEPENDENCE_PROOF",
         "results": results,
+        "execution_protocol": STAGED_EXECUTION_PROTOCOL,
+        "compile_case_counts": compile_phase_counts(all_case_statuses),
         "source_persisted": False,
         "raw_stdout_stderr_persisted": False,
     })

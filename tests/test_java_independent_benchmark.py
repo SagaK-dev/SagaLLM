@@ -131,8 +131,8 @@ def test_mocked_oci_receives_each_stdin_and_exact_expected_stdout(tmp_path, monk
             encoding="utf-8")
     calls = []
     monkeypatch.setattr(bench, "oci_image_ready", lambda *a, **k: True)
-    def fake_oci(source, expected, *, backend, image, allow_execution, stdin_data):
-        assert allow_execution is True
+    def fake_oci(source, expected, *, backend, image, allow_execution, stdin_data, staged):
+        assert allow_execution is True and staged is True
         assert "public class Main" in source
         calls.append((stdin_data, expected))
         return {"status": "PASS", "behavior_match": True}
@@ -147,6 +147,7 @@ def test_mocked_oci_receives_each_stdin_and_exact_expected_stdout(tmp_path, monk
     assert calls[0] == ("10 90 60 120\n", "30\n")
     assert report["behavioral_status"] == "EVALUATED"
     assert report["behavior_passed_tasks"] == 5
+    assert report["compile_case_counts"] == {"passed": 15, "failed": 0, "unavailable": 0, "not_run": 0, "unknown": 0}
     assert all(len(x["candidate_sha256"]) == 64 for x in report["results"])
     assert report["java_executed"] == "POSSIBLE_IN_OCI_ONLY"
     assert report["model_selection"] == "NOT_PERMITTED_NO_INDEPENDENCE_PROOF"
