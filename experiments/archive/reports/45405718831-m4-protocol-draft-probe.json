@@ -1,0 +1,15 @@
+{
+  "behavior_passed_tasks": null,
+  "behavioral_status": "NOT_RUN",
+  "benchmark_independence_proven": false,
+  "io_case_count": 9,
+  "java_executed": false,
+  "model_selection": "NOT_PERMITTED",
+  "protocol": "sagallm-independent-java-io-v1",
+  "reason": "EXPLICIT_OPT_IN_REQUIRED",
+  "review_gate": "REVIEW_REQUIRED",
+  "review_metadata_verified_externally": false,
+  "safety": "OCI_BEST_EFFORT_NOT_SECURITY_PROOF",
+  "suite_sha256": "b9170af5494314ae70e7ac2137ff5d5462183ca8418f0b59e32822ceb9b8c674",
+  "task_count": 3
+}
