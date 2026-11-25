@@ -1,0 +1,38 @@
+name: SagaLLM v0.18 historical training evidence audit
+on:
+  pull_request:
+    paths:
+      - 'scripts/audit_v018_training.py'
+      - 'tests/test_audit_v018_training.py'
+      - 'experiments/archive/reports/44994208434-v018-context-sft.json'
+      - '.github/workflows/audit-v018-training.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  audit:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+      - name: Test and recount archived report
+        run: |
+          python -m unittest discover -s tests -p test_audit_v018_training.py
+          python -m scripts.audit_v018_training
+      - name: Check historical artifact bytes (same-repository PR or manual)
+        if: github.event_name == 'workflow_dispatch' || github.event.pull_request.head.repo.full_name == github.repository
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -eu
+          tmp=$(mktemp -d)
+          trap 'rm -rf "$tmp"' EXIT
+          gh api repos/SagaK-dev/SagaLLM/actions/artifacts/14738368209/zip > "$tmp/parent.zip"
+          gh api repos/SagaK-dev/SagaLLM/actions/artifacts/14743051466/zip > "$tmp/output.zip"
+          python -m scripts.audit_v018_training --parent-zip "$tmp/parent.zip" --output-zip "$tmp/output.zip"
