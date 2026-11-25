@@ -1,0 +1,66 @@
+{
+  "schema": "sagallm-m4-readiness-evidence-v1",
+  "source_pr": 59,
+  "commit_sha": "5c55ddd615248933a49835ad9d2c291cd59ff3e5",
+  "workflow_runs": [
+    {
+      "id": 45405719238,
+      "job_id": 138485792154,
+      "status": "success",
+      "kind": "private-intake synthetic fixtures"
+    },
+    {
+      "id": 45405718831,
+      "job_id": 138485791432,
+      "status": "success",
+      "kind": "independent protocol synthetic fixtures"
+    },
+    {
+      "id": 45405719097,
+      "job_id": 138485905166,
+      "status": "success",
+      "kind": "CPU CI"
+    },
+    {
+      "id": 45405615157,
+      "job_id": 138485415922,
+      "status": "failure",
+      "kind": "prior protocol run"
+    }
+  ],
+  "original_probe": {
+    "artifact_id": 14926680120,
+    "archive_sha256": "5327fd319060fc106c41f5a9cb3e437b127b64b0f44ad7e185a379ac638cb29a",
+    "report_sha256": "2342faae5e2e9a40f9c073e6994c2b4e2b4d996d6d20e6d1babd540b008877f2",
+    "report_member": "java-io-draft-probe.json",
+    "status": "NOT_RUN"
+  },
+  "historical_archive_candidates": [
+    {
+      "run_id": 45007278383,
+      "artifact_id": 14748252897,
+      "archive_sha256": "8159c7f07349d75f65197405b419a535f556ac52ced7b38348f3c943570959aa",
+      "member": "paired-java-compile.json",
+      "report_sha256": "5fc921385b9097f053007fdbcdb9bc3b39a7461acbdc1dcf2d19afbd6312b811"
+    },
+    {
+      "run_id": 45164032104,
+      "artifact_id": 14813711672,
+      "archive_sha256": "192e35c3bf35f814593131e2d2f206538744868aa65764f5f13a10b926a34d57",
+      "member": "stdio-semantic-sft-evidence/report.json",
+      "report_sha256": "bb3994dfcb6b13f5f94687d281a9a1d615117eecb95647b22cf0021ac79700f7"
+    },
+    {
+      "run_id": 45161749481,
+      "artifact_id": 14810574335,
+      "archive_sha256": "d72faa66ef3e90012afb57ef3f9316be499c5210a410a067129749c349ed9473",
+      "member": "exploratory-public-java-oci-io.json",
+      "report_sha256": "a0b1e779869c332a1c7b343ec870823800da7b9106f341e28d85b3a6529c0653"
+    }
+  ],
+  "downloaded_hashes_verified": true,
+  "archive_status": "HISTORICAL_THREE_REPORT_BYTES_PENDING_REVIEWED_COMMIT",
+  "behavior": "NOT_RUN",
+  "independence_proven": false,
+  "production_promotion": false
+}
