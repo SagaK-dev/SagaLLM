@@ -1,0 +1,23 @@
+name: SagaLLM verify three legacy report originals
+on:
+  pull_request:
+    paths:
+      - 'experiments/archive/legacy-2026-11-25.json'
+      - 'experiments/archive/reports/**'
+      - '.github/workflows/archive-legacy-2026-11-25.yml'
+      - 'scripts/archive_experiment_reports.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+      - run: python -m scripts.archive_experiment_reports --manifest experiments/archive/legacy-2026-11-25.json --output experiments/archive/reports --verify-local

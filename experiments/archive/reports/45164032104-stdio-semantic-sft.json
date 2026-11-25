@@ -1,0 +1,305 @@
+{
+  "experiment": "JAVA_STDIO_SEMANTIC_SFT_V1",
+  "status": "VALIDATION_STDIO_BEHAVIOR_EVALUATED",
+  "origin_checkpoint_sha256": "9802e848f0abea9979623f461b5e63cd7aed838acd087d06b20d747db1e2a0fc",
+  "tokenizer_sha256": "186566808cb03e328cac9a6b7b384a8d0aefc54ccb83fbe97782a751726682fe",
+  "canonical_train": {
+    "total": 17080,
+    "accepted": 17080,
+    "excluded_too_long": 0,
+    "families_accepted": 90,
+    "newly_admitted_beyond_original_context": 0
+  },
+  "stdio_manifest_sha256": "0cea8ded8a5c03d15b2b516a86665901266b0b375095579daa8d712661316a13",
+  "stdio_train_accepted": 320,
+  "stdio_validation_accepted": 36,
+  "stdio_train_families": [
+    "stdin_add_offset",
+    "stdin_multiply_offset",
+    "stdin_max_offset",
+    "stdin_absolute_gap_offset",
+    "stdin_count_greater",
+    "stdin_even_sum_offset",
+    "stdin_digit_sum_offset",
+    "stdin_ascii_upper_suffix",
+    "stdin_ascii_reverse_suffix",
+    "stdin_clamp"
+  ],
+  "stdio_validation_families": [
+    "stdin_min_offset",
+    "stdin_count_odd_offset",
+    "stdin_ascii_lower_suffix"
+  ],
+  "steps": 160,
+  "batch": 4,
+  "lr": 2e-05,
+  "broad_exposures": 320,
+  "stdio_exposures": 320,
+  "samples_repeated_in_optimizer": false,
+  "train_duration_seconds": 8.0,
+  "loss_history": [
+    {
+      "step": 0,
+      "validation_response_loss": 2.26339381
+    },
+    {
+      "step": 80,
+      "validation_response_loss": 0.56444729
+    },
+    {
+      "step": 160,
+      "validation_response_loss": 0.36067117
+    }
+  ],
+  "selected_step": 160,
+  "initial_validation_loss": 2.26339381,
+  "selected_validation_loss": 0.36067117,
+  "model_promotion": false,
+  "original_test_split_loaded": false,
+  "public_exercism_tasks_used": false,
+  "synthetic_project_authored_only": true,
+  "human_reviewed_independent_benchmark": false,
+  "behavioral_validation": "OCI_ATTEMPTED",
+  "generated_java_executed": "BEST_EFFORT_OCI_ONLY",
+  "candidate_checkpoint_sha256": "8d955d6c61fd677bda80934811f62ef5547090d610f41d4f06449a4a7d4ea3e2",
+  "oci_smoke": "PASS",
+  "oci_image_id": "sha256:fb4df7dcd7c9343cceee7cecf91544971499bec7a483f87f0f12a8c68d2e00d2",
+  "baseline_behavior": {
+    "tasks": 6,
+    "total_cases": 18,
+    "oci_invocations": 18,
+    "cases_passed": 0,
+    "tasks_all_pass": 0,
+    "unavailable": false,
+    "source_persisted": false,
+    "java_executed_on_python_host": false,
+    "cases": [
+      {
+        "id": "validation-stdin_min_offset-000",
+        "family": "stdin_min_offset",
+        "generated": "GENERATED",
+        "cases_total": 3,
+        "cases_oci_invoked": 3,
+        "cases_passed": 0,
+        "case_categories": [
+          "NONZERO_EXIT_OR_JAVAC_ERROR",
+          "NONZERO_EXIT_OR_JAVAC_ERROR",
+          "NONZERO_EXIT_OR_JAVAC_ERROR"
+        ],
+        "task_pass": false,
+        "unavailable": false,
+        "source_saved": false,
+        "source_sha256": "e42ec479ec0d3d1d766ca6146915ac40479d1d05d211a3f858734e680800f532"
+      },
+      {
+        "id": "validation-stdin_min_offset-001",
+        "family": "stdin_min_offset",
+        "generated": "GENERATED",
+        "cases_total": 3,
+        "cases_oci_invoked": 3,
+        "cases_passed": 0,
+        "case_categories": [
+          "NONZERO_EXIT_OR_JAVAC_ERROR",
+          "NONZERO_EXIT_OR_JAVAC_ERROR",
+          "NONZERO_EXIT_OR_JAVAC_ERROR"
+        ],
+        "task_pass": false,
+        "unavailable": false,
+        "source_saved": false,
+        "source_sha256": "e42ec479ec0d3d1d766ca6146915ac40479d1d05d211a3f858734e680800f532"
+      },
+      {
+        "id": "validation-stdin_count_odd_offset-000",
+        "family": "stdin_count_odd_offset",
+        "generated": "GENERATED",
+        "cases_total": 3,
+        "cases_oci_invoked": 3,
+        "cases_passed": 0,
+        "case_categories": [
+          "NONZERO_EXIT_OR_JAVAC_ERROR",
+          "NONZERO_EXIT_OR_JAVAC_ERROR",
+          "NONZERO_EXIT_OR_JAVAC_ERROR"
+        ],
+        "task_pass": false,
+        "unavailable": false,
+        "source_saved": false,
+        "source_sha256": "e42ec479ec0d3d1d766ca6146915ac40479d1d05d211a3f858734e680800f532"
+      },
+      {
+        "id": "validation-stdin_count_odd_offset-001",
+        "family": "stdin_count_odd_offset",
+        "generated": "GENERATED",
+        "cases_total": 3,
+        "cases_oci_invoked": 3,
+        "cases_passed": 0,
+        "case_categories": [
+          "NONZERO_EXIT_OR_JAVAC_ERROR",
+          "NONZERO_EXIT_OR_JAVAC_ERROR",
+          "NONZERO_EXIT_OR_JAVAC_ERROR"
+        ],
+        "task_pass": false,
+        "unavailable": false,
+        "source_saved": false,
+        "source_sha256": "e2f21accfae277ba5371de6771093cbc7f3d4cb560b696a5c6ff0067c254d78c"
+      },
+      {
+        "id": "validation-stdin_ascii_lower_suffix-000",
+        "family": "stdin_ascii_lower_suffix",
+        "generated": "GENERATED",
+        "cases_total": 3,
+        "cases_oci_invoked": 3,
+        "cases_passed": 0,
+        "case_categories": [
+          "NONZERO_EXIT_OR_JAVAC_ERROR",
+          "NONZERO_EXIT_OR_JAVAC_ERROR",
+          "NONZERO_EXIT_OR_JAVAC_ERROR"
+        ],
+        "task_pass": false,
+        "unavailable": false,
+        "source_saved": false,
+        "source_sha256": "c6bfec110a6fb2d89311aab24192952215ed7d537ed0cbe10df485432e00b4ff"
+      },
+      {
+        "id": "validation-stdin_ascii_lower_suffix-001",
+        "family": "stdin_ascii_lower_suffix",
+        "generated": "GENERATED",
+        "cases_total": 3,
+        "cases_oci_invoked": 3,
+        "cases_passed": 0,
+        "case_categories": [
+          "NONZERO_EXIT_OR_JAVAC_ERROR",
+          "NONZERO_EXIT_OR_JAVAC_ERROR",
+          "NONZERO_EXIT_OR_JAVAC_ERROR"
+        ],
+        "task_pass": false,
+        "unavailable": false,
+        "source_saved": false,
+        "source_sha256": "c6bfec110a6fb2d89311aab24192952215ed7d537ed0cbe10df485432e00b4ff"
+      }
+    ]
+  },
+  "selected_behavior": {
+    "tasks": 6,
+    "total_cases": 18,
+    "oci_invocations": 18,
+    "cases_passed": 0,
+    "tasks_all_pass": 0,
+    "unavailable": false,
+    "source_persisted": false,
+    "java_executed_on_python_host": false,
+    "cases": [
+      {
+        "id": "validation-stdin_min_offset-000",
+        "family": "stdin_min_offset",
+        "generated": "GENERATED",
+        "cases_total": 3,
+        "cases_oci_invoked": 3,
+        "cases_passed": 0,
+        "case_categories": [
+          "OUTPUT_MISMATCH_ZERO_EXIT",
+          "OUTPUT_MISMATCH_ZERO_EXIT",
+          "OUTPUT_MISMATCH_ZERO_EXIT"
+        ],
+        "task_pass": false,
+        "unavailable": false,
+        "source_saved": false,
+        "source_sha256": "a0d2ee38b3dc87906e34ba7e40ff49d1d847c9894572dca9a5663b99bea0aba0"
+      },
+      {
+        "id": "validation-stdin_min_offset-001",
+        "family": "stdin_min_offset",
+        "generated": "GENERATED",
+        "cases_total": 3,
+        "cases_oci_invoked": 3,
+        "cases_passed": 0,
+        "case_categories": [
+          "OUTPUT_MISMATCH_ZERO_EXIT",
+          "OUTPUT_MISMATCH_ZERO_EXIT",
+          "OUTPUT_MISMATCH_ZERO_EXIT"
+        ],
+        "task_pass": false,
+        "unavailable": false,
+        "source_saved": false,
+        "source_sha256": "a0d2ee38b3dc87906e34ba7e40ff49d1d847c9894572dca9a5663b99bea0aba0"
+      },
+      {
+        "id": "validation-stdin_count_odd_offset-000",
+        "family": "stdin_count_odd_offset",
+        "generated": "GENERATED",
+        "cases_total": 3,
+        "cases_oci_invoked": 3,
+        "cases_passed": 0,
+        "case_categories": [
+          "NONZERO_EXIT_OR_JAVAC_ERROR",
+          "OUTPUT_MISMATCH_ZERO_EXIT",
+          "OUTPUT_MISMATCH_ZERO_EXIT"
+        ],
+        "task_pass": false,
+        "unavailable": false,
+        "source_saved": false,
+        "source_sha256": "a0d2ee38b3dc87906e34ba7e40ff49d1d847c9894572dca9a5663b99bea0aba0"
+      },
+      {
+        "id": "validation-stdin_count_odd_offset-001",
+        "family": "stdin_count_odd_offset",
+        "generated": "GENERATED",
+        "cases_total": 3,
+        "cases_oci_invoked": 3,
+        "cases_passed": 0,
+        "case_categories": [
+          "NONZERO_EXIT_OR_JAVAC_ERROR",
+          "OUTPUT_MISMATCH_ZERO_EXIT",
+          "OUTPUT_MISMATCH_ZERO_EXIT"
+        ],
+        "task_pass": false,
+        "unavailable": false,
+        "source_saved": false,
+        "source_sha256": "a0d2ee38b3dc87906e34ba7e40ff49d1d847c9894572dca9a5663b99bea0aba0"
+      },
+      {
+        "id": "validation-stdin_ascii_lower_suffix-000",
+        "family": "stdin_ascii_lower_suffix",
+        "generated": "GENERATED",
+        "cases_total": 3,
+        "cases_oci_invoked": 3,
+        "cases_passed": 0,
+        "case_categories": [
+          "NONZERO_EXIT_OR_JAVAC_ERROR",
+          "NONZERO_EXIT_OR_JAVAC_ERROR",
+          "NONZERO_EXIT_OR_JAVAC_ERROR"
+        ],
+        "task_pass": false,
+        "unavailable": false,
+        "source_saved": false,
+        "source_sha256": "24b6d819e87dac0b2157a2f7ba6e0f9615aeb53a6e2431927e0685ed45610b56"
+      },
+      {
+        "id": "validation-stdin_ascii_lower_suffix-001",
+        "family": "stdin_ascii_lower_suffix",
+        "generated": "GENERATED",
+        "cases_total": 3,
+        "cases_oci_invoked": 3,
+        "cases_passed": 0,
+        "case_categories": [
+          "NONZERO_EXIT_OR_JAVAC_ERROR",
+          "NONZERO_EXIT_OR_JAVAC_ERROR",
+          "NONZERO_EXIT_OR_JAVAC_ERROR"
+        ],
+        "task_pass": false,
+        "unavailable": false,
+        "source_saved": false,
+        "source_sha256": "24b6d819e87dac0b2157a2f7ba6e0f9615aeb53a6e2431927e0685ed45610b56"
+      }
+    ]
+  },
+  "gate": {
+    "decision": "NO_VALIDATED_BEHAVIOR_GAIN",
+    "compiled_and_behavioral_case_delta": 0,
+    "validation_loss_delta": 1.90272265,
+    "validated_gain": false,
+    "production_adoption": false
+  },
+  "production_model_unchanged": true,
+  "general_capability_established": false,
+  "raw_generated_java_or_stdout_persisted": false
+}
