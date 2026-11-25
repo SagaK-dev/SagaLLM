@@ -32,3 +32,7 @@ Partial/unavailable means no full-suite behavior delta. A legacy
 FAIL is not retrospectively resolved. Execution protocol and module
 fingerprints distinguish historical results. New tests use only mocked
 launcher and synthetic fixture reports, no real OCI/Java.
+
+## Execution evidence
+
+At b939cc2c1525869489448f2709171c0099864517, independent-protocol run 45573850033 passed 135 tests; matched-report run 45573849889 passed 35 tests; private-intake run 45573849921 passed 71 tests. Counts overlap; do not sum them as unique tests. The independent draft probe is NOT_RUN / REVIEW_REQUIRED. Artifact 15002852734 ZIP and member SHA-256 were checked after download. Exact bytes are preserved in experiments/archive/reports/45573850033-m4-staged-protocol-draft-probe.json. See experiments/java_staged_execution_results.json for CI snapshot. No actual independent execution or model promotion.
