@@ -5,6 +5,9 @@ on:
       - 'src/sagallm/java_matched_reports.py'
       - 'scripts/compare_java_independent_reports.py'
       - 'tests/test_java_matched_reports.py'
+      - 'tests/test_java_staged_execution.py'
+      - 'src/sagallm/java_behavior.py'
+      - 'src/sagallm/java_independent_benchmark.py'
       - '.github/workflows/java-matched-reports.yml'
 permissions:
   contents: read
@@ -23,4 +26,4 @@ jobs:
           python-version: '3.11'
       - run: python -m pip install 'pytest>=8,<10'
       - name: Verify matched and incomplete report semantics
-        run: python -m pytest -q tests/test_java_matched_reports.py
+        run: python -m pytest -q tests/test_java_matched_reports.py tests/test_java_staged_execution.py

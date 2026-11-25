@@ -23,6 +23,11 @@ MAX_SOURCE_BYTES = 24_000
 MAX_OUTPUT_BYTES = 64 * 1024
 ALLOWED_BACKENDS = ("docker", "podman")
 JAVA_IMAGE_DEFAULT = "eclipse-temurin:21-jdk"
+STAGED_EXECUTION_PROTOCOL = "sagallm-java-oci-staged-exit-v1"
+STAGED_STATUSES = frozenset({"PASS", "COMPILE_FAIL", "COMPILE_UNAVAILABLE",
+    "JAVA_NONZERO_EXIT", "OUTPUT_MISMATCH", "TIMEOUT", "OUTPUT_LIMIT",
+    "REJECTED", "NOT_RUN", "RUNTIME_ERROR"})
+STAGED_UNAVAILABLE = frozenset({"COMPILE_UNAVAILABLE", "NOT_RUN", "RUNTIME_ERROR"})
 # Only untrusted tasks in the v0.12 original fixture have behavioral oracles.
 HELDOUT_FAMILIES = ("fibonacci", "prime", "palindrome")
 WORDS = ("Saga", "Java", "学習", "Hello", "コード", "練習", "Sunny", "Blue")
@@ -88,7 +93,7 @@ def oci_image_ready(backend: str, image: str) -> bool:
 
 
 def build_oci_command(backend: str, *, image: str, mount_dir: Path, cid_file: Path,
-                      stdin_file_present: bool = False) -> list[str]:
+                      stdin_file_present: bool = False, staged: bool = False) -> list[str]:
     """Return an argv list; no generated text is ever interpolated as shell code."""
     if backend not in ALLOWED_BACKENDS:
         raise ValueError("Unsupported local OCI backend")
@@ -102,6 +107,20 @@ def build_oci_command(backend: str, *, image: str, mount_dir: Path, cid_file: Pa
         "java -Xmx64m -Dfile.encoding=UTF-8 -cp /tmp/classes Main"
         + (" < /input/stdin.txt" if stdin_file_present else "")
     )
+    if staged:
+        # Map child exit codes in the reviewed static wrapper. Never parse
+        # generated stdout as a control marker. Outer limits leave phase unknown.
+        shell_script = (
+            "command -v javac >/dev/null && command -v java >/dev/null || exit 42; "
+            "mkdir -p /tmp/classes || exit 42; "
+            "javac -proc:none --release 17 -encoding UTF-8 -d /tmp/classes /input/Main.java >/dev/null; "
+            'rc=$?; if [ "$rc" -eq 1 ]; then exit 40; fi; '
+            'if [ "$rc" -ne 0 ]; then exit 43; fi; '
+            "java -Xmx64m -Dfile.encoding=UTF-8 -cp /tmp/classes Main"
+            + (" < /input/stdin.txt" if stdin_file_present else " < /dev/null")
+            + "; rc=$?; "
+            'if [ "$rc" -ne 0 ]; then exit 41; fi; exit 0'
+        )
     return [
         backend, "run", "--rm", "--pull=never", "--cidfile", str(cid_file),
         "--network=none", "--read-only", "--cap-drop=ALL", "--log-driver=none",
@@ -163,7 +182,7 @@ def _cleanup_stale_container(backend: str, cid_file: Path) -> None:
 
 def run_java_in_oci(source: str, expected: str, *, backend: str = "docker",
                     image: str = JAVA_IMAGE_DEFAULT, allow_execution: bool = False,
-                    timeout: float = 12.0, stdin_data: str = "") -> dict:
+                    timeout: float = 12.0, stdin_data: str = "", staged: bool = False) -> dict:
     """Run a generated single-file Java program only with explicit local OCI opt-in.
 
     Does not pull images, mount the user's working directory or forward network.
@@ -199,7 +218,7 @@ def run_java_in_oci(source: str, expected: str, *, backend: str = "docker",
         root.chmod(0o755)
         cid_file = root / "container.cid"
         cmd = build_oci_command(backend, image=image, mount_dir=source_dir,
-                                cid_file=cid_file, stdin_file_present=bool(stdin_data))
+                                cid_file=cid_file, stdin_file_present=bool(stdin_data), staged=staged)
         try:
             code, output = _bounded_capture(cmd, timeout)
         except (TimeoutError, subprocess.TimeoutExpired):
@@ -211,6 +230,20 @@ def run_java_in_oci(source: str, expected: str, *, backend: str = "docker",
         except OSError:
             _cleanup_stale_container(backend, cid_file)
             return {"status": "RUNTIME_ERROR", "behavior_match": None, "returncode": None}
+        if staged:
+            if code == 0:
+                match = output == expected.encode("utf-8")
+                return {"status": "PASS" if match else "OUTPUT_MISMATCH",
+                        "behavior_match": match, "returncode": code,
+                        "observed_stdout_sha256": hashlib.sha256(output).hexdigest(),
+                        "expected_stdout_sha256": hashlib.sha256(expected.encode("utf-8")).hexdigest()}
+            if code == 40:
+                return {"status": "COMPILE_FAIL", "behavior_match": False, "returncode": code}
+            if code == 43:
+                return {"status": "COMPILE_UNAVAILABLE", "behavior_match": None, "returncode": code}
+            if code == 41:
+                return {"status": "JAVA_NONZERO_EXIT", "behavior_match": False, "returncode": code}
+            return {"status": "RUNTIME_ERROR", "behavior_match": None, "returncode": code}
         if code in (125, 126, 127):
             return {"status": "RUNTIME_ERROR", "behavior_match": None,
                     "reason": "OCI launcher failed; not a Java behavior failure", "returncode": code}
@@ -220,3 +253,22 @@ def run_java_in_oci(source: str, expected: str, *, backend: str = "docker",
                 "expected_stdout_sha256": hashlib.sha256(expected.encode("utf-8")).hexdigest(),
                 "isolation": "OCI_BEST_EFFORT_NOT_SECURITY_PROOF",
                 "network": "none", "image_pull": "never"}
+
+
+def compile_phase_counts(statuses):
+    """Per-case counts; timeout/outer errors do not establish compilation."""
+    counts = {"passed": 0, "failed": 0, "unavailable": 0, "not_run": 0, "unknown": 0}
+    for status in statuses:
+        if status in ("PASS", "OUTPUT_MISMATCH", "JAVA_NONZERO_EXIT"):
+            counts["passed"] += 1
+        elif status == "COMPILE_FAIL":
+            counts["failed"] += 1
+        elif status == "COMPILE_UNAVAILABLE":
+            counts["unavailable"] += 1
+        elif status in ("NOT_RUN", "REJECTED", "CANDIDATE_MISSING"):
+            counts["not_run"] += 1
+        elif status in ("TIMEOUT", "OUTPUT_LIMIT", "RUNTIME_ERROR"):
+            counts["unknown"] += 1
+        else:
+            raise ValueError("Unknown staged case status")
+    return counts

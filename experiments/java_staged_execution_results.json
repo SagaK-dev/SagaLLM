@@ -1,0 +1,43 @@
+{
+  "schema": "sagallm-java-staged-execution-ci-v1",
+  "source_commit": "b939cc2c1525869489448f2709171c0099864517",
+  "pr": 62,
+  "scope": "Mocked launcher and synthetic protocol tests; draft probe only; no generated Java or actual independent model comparison.",
+  "runs": [
+    {
+      "id": 45573850033,
+      "job_id": 139066795521,
+      "tests_passed": 135,
+      "conclusion": "success"
+    },
+    {
+      "id": 45573849889,
+      "job_id": 139066795542,
+      "tests_passed": 35,
+      "conclusion": "success"
+    },
+    {
+      "id": 45573849921,
+      "job_id": 139066795208,
+      "tests_passed": 71,
+      "conclusion": "success"
+    },
+    {
+      "id": 45573849928,
+      "job_id": 139066804969,
+      "conclusion": "in_progress"
+    }
+  ],
+  "probe": {
+    "artifact_id": 15002852734,
+    "archive_sha256": "a27732645d7a7bf9f46c24d364948a0e934fa9e232128dbcecc2ca98f123d0b2",
+    "report_sha256": "2342faae5e2e9a40f9c073e6994c2b4e2b4d996d6d20e6d1babd540b008877f2",
+    "downloaded_zip_and_report_hashes_verified": true,
+    "reason": "EXPLICIT_OPT_IN_REQUIRED",
+    "behavioral_status": "NOT_RUN",
+    "review_gate": "REVIEW_REQUIRED",
+    "java_executed": false
+  },
+  "independent_benchmark": "NOT_ESTABLISHED",
+  "production_promotion": false
+}

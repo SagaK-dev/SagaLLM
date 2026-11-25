@@ -31,3 +31,7 @@ M2.5 remains BLOCKED_ON_HUMAN_REVIEW; actual M4 remains NOT_RUN.
 ## Implementation evidence
 
 Run 45562031183 / job 139027777403: 16 synthetic tests passed at commit 4654247546d965b0401614d1d8bf548db45dba74. Archive verifier run 45562031220 passed, including the exact original NOT_RUN probe from #59. CPU CI was still running at this evidence snapshot. No real reports compared or model evaluated. See experiments/java_matched_report_comparison_evidence.json.
+
+## Staged execution protocol
+
+New reports declare `sagallm-java-oci-staged-exit-v1` and count compile phases per case. The comparator rejects mixing legacy and staged reports; it validates the staged counts independently. See [JAVA_STAGED_EXECUTION.md](JAVA_STAGED_EXECUTION.md). Legacy `FAIL` is never reclassified. Outer timeout/output limit and launcher errors do not establish the compilation stage.

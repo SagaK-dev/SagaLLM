@@ -9,6 +9,8 @@ from pathlib import Path
 import math
 
 from .java_independent_benchmark import SCHEMA, SHA_PATTERN, ID_PATTERN, _unique_object
+from .java_behavior import (STAGED_EXECUTION_PROTOCOL, STAGED_STATUSES,
+                            STAGED_UNAVAILABLE, compile_phase_counts)
 
 MAX_REPORT_BYTES=4*1024*1024
 STATES={"PASS","FAIL","TIMEOUT","OUTPUT_LIMIT","REJECTED","NOT_RUN","RUNTIME_ERROR","CANDIDATE_MISSING"}
@@ -74,6 +76,11 @@ def normalize(report):
             and isinstance(g["generation_code_sha_declared"],str)
             and len(g["generation_code_sha_declared"])==40
             and all(c in "0123456789abcdef" for c in g["generation_code_sha_declared"]),"Invalid generation settings")
+    execution_protocol=report.get("execution_protocol")
+    require(execution_protocol in (None, STAGED_EXECUTION_PROTOCOL),"Unknown execution protocol")
+    staged=execution_protocol==STAGED_EXECUTION_PROTOCOL
+    states=STAGED_STATUSES|{"CANDIDATE_MISSING"} if staged else STATES
+    unavailable_states=STAGED_UNAVAILABLE|{"CANDIDATE_MISSING"} if staged else UNAVAILABLE
     rows=report.get("results")
     require(isinstance(rows,list) and 5<=len(rows)<=12
             and report.get("task_count")==len(rows),"Invalid task coverage")
@@ -92,19 +99,24 @@ def normalize(report):
                     and pin(row.get("candidate_sha256")),"Missing candidate pin")
             cases=row["case_statuses"]
             require(isinstance(cases,list) and len(cases)==n
-                    and all(isinstance(x,str) and x in STATES-{"CANDIDATE_MISSING"} for x in cases),"Invalid case statuses")
+                    and all(isinstance(x,str) and x in states-{"CANDIDATE_MISSING"} for x in cases),"Invalid case statuses")
             expected=("PASS" if all(x=="PASS" for x in cases) else
-                      "UNAVAILABLE" if any(x in UNAVAILABLE for x in cases) else "FAIL")
+                      "UNAVAILABLE" if any(x in unavailable_states for x in cases) else "FAIL")
             require(row["status"]==expected and row["cases_passed"]==cases.count("PASS"),"Task count/status mismatch")
             attempted=True
         tasks[tid]=cases
     require(sum(map(len,tasks.values()))==report.get("io_case_count"),"Total case count mismatch")
-    unavailable=any(x in UNAVAILABLE for cases in tasks.values() for x in cases)
+    unavailable=any(x in unavailable_states for cases in tasks.values() for x in cases)
     require(status==("PARTIAL_OR_UNAVAILABLE" if unavailable else "EVALUATED")
             and report.get("behavior_passed_tasks")== (None if unavailable else sum(all(x=="PASS" for x in c) for c in tasks.values()))
             and report.get("oci_execution_attempted") is attempted
             and report.get("java_executed")==("POSSIBLE_IN_OCI_ONLY" if attempted else False),"Aggregate mismatch")
-    return {"tasks":tasks,"freeze":f,"status":status}
+    if staged:
+        require(report.get("compile_case_counts")==compile_phase_counts(x for c in tasks.values() for x in c),"Compile phase totals mismatch")
+    else:
+        require("compile_case_counts" not in report,"Legacy report cannot establish compile phases")
+    return {"tasks":tasks,"freeze":f,"status":status,"execution_protocol":execution_protocol,
+            "states":states,"unavailable":unavailable_states}
 
 
 def compare(left,right,left_sha,right_sha):
@@ -115,6 +127,7 @@ def compare(left,right,left_sha,right_sha):
             "compile_status":"NOT_DISTINGUISHABLE_IN_INPUT_REPORTS","new_java_execution":"NOT_RUN"}
     if l is None or r is None:
         return {**result,"status":"NOT_COMPARABLE","reason":"INPUT_BEHAVIOR_NOT_RUN","delta":None}
+    require(l["execution_protocol"]==r["execution_protocol"],"Unmatched execution protocol")
     lf,rf=l["freeze"],r["freeze"]
     require(left["suite_sha256"]==right["suite_sha256"] and left["oci_image"]==right["oci_image"]
             and left["vm_review_sha256"]==right["vm_review_sha256"],"Unmatched suite, image or VM review")
@@ -122,14 +135,17 @@ def compare(left,right,left_sha,right_sha):
     require(list(l["tasks"])==list(r["tasks"]) and all(len(c)==len(r["tasks"][k]) for k,c in l["tasks"].items()),"Unmatched task or case coverage")
     require(lf["checkpoint_sha256"]!=rf["checkpoint_sha256"],"Expected distinct model checkpoints")
     pairs=[(a,b) for k,c in l["tasks"].items() for a,b in zip(c,r["tasks"][k])]
-    shared=[(a,b) for a,b in pairs if a not in UNAVAILABLE and b not in UNAVAILABLE]
+    shared=[(a,b) for a,b in pairs if a not in l["unavailable"] and b not in l["unavailable"]]
     def counts(index):
-        return {s:sum(p[index]==s for p in pairs) for s in sorted(STATES)}
+        return {s:sum(p[index]==s for p in pairs) for s in sorted(l["states"])}
     cells={"both_pass":sum(a==b=="PASS" for a,b in shared),
            "left_only_pass":sum(a=="PASS" and b!="PASS" for a,b in shared),
            "right_only_pass":sum(b=="PASS" and a!="PASS" for a,b in shared),
            "neither_pass":sum(a!="PASS" and b!="PASS" for a,b in shared)}
     fully_matched=len(shared)==len(pairs)
+    if l["execution_protocol"]==STAGED_EXECUTION_PROTOCOL:
+        result.update(compile_status="PER_CASE_STAGE_COUNTS",execution_protocol=STAGED_EXECUTION_PROTOCOL,
+                      left_compile_case_counts=left["compile_case_counts"],right_compile_case_counts=right["compile_case_counts"])
     return {**result,"status":"MATCHED_DESCRIPTIVE_COMPLETE" if fully_matched else "MATCHED_PARTIAL_UNAVAILABLE",
             "suite_sha256":left["suite_sha256"],"left_checkpoint_sha256":lf["checkpoint_sha256"],
             "right_checkpoint_sha256":rf["checkpoint_sha256"],"total_cases":len(pairs),
@@ -138,7 +154,8 @@ def compare(left,right,left_sha,right_sha):
             "delta":cells["right_only_pass"]-cells["left_only_pass"] if fully_matched else None,
             "left_fully_correct_tasks":left["behavior_passed_tasks"] if fully_matched else None,
             "right_fully_correct_tasks":right["behavior_passed_tasks"] if fully_matched else None,
-            "limitations":["No compile/runtime separation in historical FAIL status",
+            "limitations":[("No compile/runtime separation in historical FAIL status" if not l["execution_protocol"]
+                            else "Outer timeout/output limit or launcher failure does not establish a compile stage"),
                            "Case matching relies on exact suite hash and declared order",
                            "Reported freeze metadata and human reviews are not independently authenticated",
                            "Different model training exposures may confound comparison"]}

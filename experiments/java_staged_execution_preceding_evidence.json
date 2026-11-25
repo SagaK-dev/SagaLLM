@@ -1,0 +1,31 @@
+{
+  "schema": "sagallm-java-stage-classification-preceding-evidence-v1",
+  "status": "PR60_AND_PR61_FINAL_HEAD_CI_VERIFIED",
+  "prior": [
+    {
+      "pr": 60,
+      "commit": "619e96e01c975c0d3bdaf197f185b4342370e45b",
+      "runs": [
+        45562297313,
+        45562297289,
+        45562297273
+      ],
+      "conclusion": "success"
+    },
+    {
+      "pr": 61,
+      "commit": "fe31880f6cb9bde71e01b22942964cb6df327186",
+      "runs": [
+        45562246397,
+        45562246402,
+        45562246410
+      ],
+      "conclusion": "success"
+    }
+  ],
+  "implementation": "STAGED_EXIT_CLASSIFICATION",
+  "ci": "PENDING",
+  "java_execution": "NOT_RUN",
+  "independent_benchmark": "NOT_ESTABLISHED",
+  "production_promotion": false
+}
