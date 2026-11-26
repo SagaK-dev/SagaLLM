@@ -1,0 +1,29 @@
+name: SagaLLM historical exposure ledger
+on:
+  pull_request:
+    paths:
+      - 'scripts/audit_historical_exposure.py'
+      - 'tests/test_audit_historical_exposure.py'
+      - 'experiments/archive/**'
+      - '.github/workflows/audit-historical-exposure.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  ledger:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+      - run: python -m unittest discover -s tests -p test_audit_historical_exposure.py
+      - run: python -m scripts.audit_historical_exposure > historical-exposure.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: historical-exposure-ledger
+          path: historical-exposure.json
+          if-no-files-found: error
