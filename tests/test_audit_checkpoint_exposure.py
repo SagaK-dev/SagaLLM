@@ -1,5 +1,11 @@
 import copy
+import hashlib
+import json
+from pathlib import Path
+import tempfile
 import unittest
+from unittest.mock import patch
+import zipfile
 from scripts import audit_checkpoint_exposure as audit
 
 
@@ -33,3 +39,48 @@ class CheckpointMapTests(unittest.TestCase):
                 mutate(data)
                 with self.assertRaises(ValueError):
                     audit.map_reports(data)
+
+    def test_coefficient_numeric_types(self):
+        for value in (0, 0.0):
+            data = copy.deepcopy(self.reports)
+            data[1]["results"]["4201"]["control"]["coefficient"] = value
+            self.assertEqual(audit.map_reports(data)["checkpoint_count"], 12)
+        for value in (False, True, "0", None, 0.5, 1.0, float("nan"), float("inf")):
+            with self.subTest(value=value):
+                data = copy.deepcopy(self.reports)
+                data[1]["results"]["4201"]["control"]["coefficient"] = value
+                with self.assertRaises(ValueError):
+                    audit.map_reports(data)
+        for value in (1, 1.0):
+            data = copy.deepcopy(self.reports)
+            data[1]["results"]["4201"]["parameter_ce"]["coefficient"] = value
+            self.assertEqual(audit.map_reports(data)["checkpoint_count"], 12)
+
+    def test_reconstruction_archive_gate(self):
+        evidence = {"status": "DECLARED_DEVELOPMENT_DATA_PINS_MATCH",
+                    "pins": audit.PINS, "actual_exposure_verified": False,
+                    "full_exposure_inventory": "NOT_ESTABLISHED",
+                    "independent_evaluation": "NOT_RUN", "model_selection_permitted": False}
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "evidence.zip"
+
+            def write(data, extra=False):
+                raw = json.dumps(data).encode()
+                with zipfile.ZipFile(path, "w") as z:
+                    z.writestr("development-data-evidence.json", raw)
+                    if extra:
+                        z.writestr("extra.json", "{}")
+                return hashlib.sha256(path.read_bytes()).hexdigest(), hashlib.sha256(raw).hexdigest()
+
+            pin, member = write(evidence)
+            with patch.object(audit, "DEVELOPMENT_ZIP", pin):
+                self.assertEqual(audit.read_reconstruction(path), member)
+                path.write_bytes(path.read_bytes() + b"x")
+                with self.assertRaises(ValueError):
+                    audit.read_reconstruction(path)
+            for changed, extra in ((dict(evidence, model_selection_permitted=True), False),
+                                   (evidence, True)):
+                pin, _ = write(changed, extra)
+                with patch.object(audit, "DEVELOPMENT_ZIP", pin):
+                    with self.assertRaises(ValueError):
+                        audit.read_reconstruction(path)
