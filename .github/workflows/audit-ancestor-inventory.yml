@@ -1,0 +1,76 @@
+name: SagaLLM scoped ancestor exposure inventory
+on:
+  pull_request:
+    paths:
+      - 'scripts/audit_ancestor_inventory.py'
+      - 'scripts/audit_checkpoint_exposure.py'
+      - 'scripts/audit_reconstructed_corpora.py'
+      - 'scripts/audit_java_lineage.py'
+      - 'scripts/audit_v018_training.py'
+      - 'scripts/audit_development_data.py'
+      - 'tests/test_audit_ancestor_inventory.py'
+      - 'experiments/archive/reports/**'
+      - 'src/sagallm/java_private_intake.py'
+      - '.github/workflows/audit-ancestor-inventory.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  reconstruct:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+      - run: PYTHONPATH=src python -m unittest discover -s tests -p test_audit_ancestor_inventory.py
+      - name: Reconstruct exact historical corpora and compare bytes
+        if: github.event_name == 'workflow_dispatch' || github.event.pull_request.head.repo.full_name == github.repository
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PYTHONHASHSEED: '0'
+          GIT_TERMINAL_PROMPT: '0'
+        shell: bash
+        run: |
+          set -euo pipefail
+          tmp=$(mktemp -d)
+          trap 'rm -rf "$tmp"' EXIT
+          gh api repos/SagaK-dev/SagaLLM/actions/artifacts/14738360825/zip > "$tmp/public.zip"
+          gh api repos/SagaK-dev/SagaLLM/actions/artifacts/14738368209/zip > "$tmp/sft.zip"
+          gh api repos/SagaK-dev/SagaLLM/actions/artifacts/15103840915/zip > "$tmp/map.zip"
+          unset GH_TOKEN
+          git fetch --depth=1 origin e60075a8baca2e1250b660c6acec11040733eec6 5d1eb19596d631704d42585b029eb8fb70e697f7
+          git worktree add --detach "$tmp/public-code" e60075a8baca2e1250b660c6acec11040733eec6
+          git worktree add --detach "$tmp/sft-code" 5d1eb19596d631704d42585b029eb8fb70e697f7
+          mkdir "$tmp/upstream"
+          fetch() {
+            git init -q "$tmp/upstream/$1"
+            git -C "$tmp/upstream/$1" -c core.hooksPath=/dev/null fetch --depth=1 "$2" "$3"
+            git -C "$tmp/upstream/$1" -c core.hooksPath=/dev/null checkout -q --detach FETCH_HEAD
+            test "$(git -C "$tmp/upstream/$1" rev-parse HEAD)" = "$3"
+          }
+          fetch algorithms https://github.com/TheAlgorithms/Java.git f4d6708297f86629a9e415070935b903ea8b1858
+          fetch gson https://github.com/google/gson.git d9b5079eaa4567219771bba6d04289cf45c7589b
+          fetch guava https://github.com/google/guava.git 36e3995499d6c3b74b1207d362fa9e19915d2589
+          fetch patterns https://github.com/iluwatar/java-design-patterns.git 4cabb204f240240bea319605a5ffa46ded728001
+          PYTHONPATH="$tmp/public-code/src" python -m sagallm.java_public_corpus --sources "$tmp/upstream" --output "$tmp/public"
+          PYTHONPATH="$tmp/public-code/src" python -m sagallm.java_public_corpus --verify "$tmp/public"
+          PYTHONPATH="$tmp/sft-code/src" python - "$tmp/sft" <<'PY'
+          import sys
+          from sagallm.java_diverse_corpus import build_java_diverse_corpus, verify_java_diverse_corpus
+          build_java_diverse_corpus(sys.argv[1])
+          verify_java_diverse_corpus(sys.argv[1])
+          PY
+          PYTHONPATH=src python -m scripts.audit_ancestor_inventory "$tmp" "$tmp/public.zip" "$tmp/sft.zip" "$tmp/map.zip" "$GITHUB_WORKSPACE/ancestor-inventory.json" > "$GITHUB_WORKSPACE/ancestor-inventory-evidence.json"
+      - uses: actions/upload-artifact@v4
+        if: github.event_name == 'workflow_dispatch' || github.event.pull_request.head.repo.full_name == github.repository
+        with:
+          name: historical-ancestor-inventory-metadata
+          path: |
+            ancestor-inventory.json
+            ancestor-inventory-evidence.json
+          if-no-files-found: error
