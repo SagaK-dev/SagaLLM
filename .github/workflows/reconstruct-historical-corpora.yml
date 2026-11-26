@@ -1,8 +1,10 @@
-name: SagaLLM historical corpus reconstruction
+name: SagaLLM historical corpus reconstruction and overlap
 on:
   pull_request:
     paths:
       - 'scripts/audit_reconstructed_corpora.py'
+      - 'scripts/audit_cross_corpus_overlap.py'
+      - 'tests/test_audit_cross_corpus_overlap.py'
       - 'tests/test_audit_reconstructed_corpora.py'
       - '.github/workflows/reconstruct-historical-corpora.yml'
   workflow_dispatch:
@@ -21,6 +23,7 @@ jobs:
         with:
           python-version: '3.11'
       - run: python -m unittest discover -s tests -p test_audit_reconstructed_corpora.py
+      - run: python -m unittest discover -s tests -p test_audit_cross_corpus_overlap.py
       - name: Reconstruct exact historical corpora and compare bytes
         if: github.event_name == 'workflow_dispatch' || github.event.pull_request.head.repo.full_name == github.repository
         env:
@@ -58,3 +61,4 @@ jobs:
           verify_java_diverse_corpus(sys.argv[1])
           PY
           python -m scripts.audit_reconstructed_corpora "$tmp/public.zip" "$tmp/sft.zip" "$tmp/public" "$tmp/sft"
+          python -m scripts.audit_cross_corpus_overlap "$tmp/public.zip" "$tmp/sft.zip" "$tmp/public" "$tmp/sft"
