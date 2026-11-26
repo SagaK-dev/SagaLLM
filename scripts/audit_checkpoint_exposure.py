@@ -113,7 +113,8 @@ def map_reports(reports):
                 require(isinstance(checkpoint, str) and SHA.fullmatch(checkpoint)
                         and checkpoint not in seen, "Invalid or duplicate checkpoint")
                 seen.add(checkpoint)
-                require(type(row["coefficient"]) is int and row["coefficient"] == int(arm == treatment)
+                require(type(row["coefficient"]) in (int, float)
+                        and row["coefficient"] == int(arm == treatment)
                         and type(row["selected_step"]) is int
                         and 0 <= row["selected_step"] <= report["steps_per_arm"],
                         "Arm metadata mismatch")
