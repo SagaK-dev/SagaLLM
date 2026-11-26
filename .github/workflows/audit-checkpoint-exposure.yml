@@ -1,0 +1,44 @@
+name: SagaLLM partial checkpoint exposure map
+on:
+  pull_request:
+    paths:
+      - 'scripts/audit_checkpoint_exposure.py'
+      - 'tests/test_audit_checkpoint_exposure.py'
+      - 'scripts/audit_development_data.py'
+      - 'scripts/audit_v018_training.py'
+      - 'scripts/audit_java_lineage.py'
+      - 'experiments/archive/reports/**'
+      - '.github/workflows/audit-checkpoint-exposure.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  map:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+      - run: python -m unittest discover -s tests -p test_audit_checkpoint_exposure.py
+      - name: Verify prior reconstruction artifact and map declarations
+        if: github.event_name == 'workflow_dispatch' || github.event.pull_request.head.repo.full_name == github.repository
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -eu
+          tmp=$(mktemp -d)
+          trap 'rm -rf "$tmp"' EXIT
+          gh api repos/SagaK-dev/SagaLLM/actions/artifacts/15101943417/zip > "$tmp/evidence.zip"
+          unset GH_TOKEN
+          python -m scripts.audit_checkpoint_exposure --reconstruction-zip "$tmp/evidence.zip" > checkpoint-exposure-map.json
+      - uses: actions/upload-artifact@v4
+        if: github.event_name == 'workflow_dispatch' || github.event.pull_request.head.repo.full_name == github.repository
+        with:
+          name: historical-partial-checkpoint-exposure-map
+          path: checkpoint-exposure-map.json
+          if-no-files-found: error
