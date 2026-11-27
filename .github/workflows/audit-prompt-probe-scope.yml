@@ -1,0 +1,45 @@
+name: SagaLLM historical prompt probe scope
+on:
+  pull_request:
+    paths:
+      - 'scripts/audit_prompt_probe_scope.py'
+      - 'scripts/audit_ranking_auxiliary.py'
+      - 'tests/test_audit_prompt_probe_scope.py'
+      - 'experiments/archive/reports/45377422360-m3-parameter-ce.json'
+      - 'experiments/archive/reports/45378356573-m3-prompt-signal.json'
+      - 'experiments/archive/reports/45389874625-m3-prompt-bias.json'
+      - '.github/workflows/audit-prompt-probe-scope.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  scope:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+      - run: python -m unittest discover -s tests -p test_audit_prompt_probe_scope.py
+      - name: Verify exact prior artifact and archived probe identities
+        if: github.event_name == 'workflow_dispatch' || github.event.pull_request.head.repo.full_name == github.repository
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          tmp=$(mktemp -d)
+          trap 'rm -rf "$tmp"' EXIT
+          gh api repos/SagaK-dev/SagaLLM/actions/artifacts/15186012660/zip > "$tmp/prior.zip"
+          unset GH_TOKEN
+          python -m scripts.audit_prompt_probe_scope --prior-zip "$tmp/prior.zip" > prompt-probe-scope.json
+      - uses: actions/upload-artifact@v4
+        if: github.event_name == 'workflow_dispatch' || github.event.pull_request.head.repo.full_name == github.repository
+        with:
+          name: historical-prompt-probe-scope-metadata
+          path: prompt-probe-scope.json
+          if-no-files-found: error
