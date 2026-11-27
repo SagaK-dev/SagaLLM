@@ -144,7 +144,7 @@ def replay_and_binding(rank, replay, binding, ce):
             expected.update(checkpoint_sha256=cp, validation_nll=arm["best_validation_nll"])
         require(expected == replay["summaries"][key], "Recounted replay summary mismatch")
         b = binding["models"][key]
-        require(b["prior_generation_collisions"] == {s: expected[s]["cross_family_collisions"]
+        require(b["prior_generation_collisions"] == {s: expected[s]["same_source_within_family_pairs"]
                                                      for s in SPLITS}, "Binding collision mismatch")
         for group, count, prefix in (("train", 20, "train-"), ("validation", 3, "validation-")):
             require(pair_ids(b[group], count, prefix, lengths=True) ==
