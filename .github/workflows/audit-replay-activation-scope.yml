@@ -1,0 +1,44 @@
+name: SagaLLM historical replay activation scope
+on:
+  pull_request:
+    paths:
+      - 'scripts/audit_replay_activation_scope.py'
+      - 'scripts/audit_prompt_probe_scope.py'
+      - 'scripts/audit_ranking_auxiliary.py'
+      - 'tests/test_audit_replay_activation_scope.py'
+      - 'experiments/archive/reports/**'
+      - '.github/workflows/audit-replay-activation-scope.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  scope:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+      - run: python -m unittest discover -s tests -p test_audit_replay_activation_scope.py
+      - name: Verify exact prior artifact and archived report scope
+        if: github.event_name == 'workflow_dispatch' || github.event.pull_request.head.repo.full_name == github.repository
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          tmp=$(mktemp -d)
+          trap 'rm -rf "$tmp"' EXIT
+          gh api repos/SagaK-dev/SagaLLM/actions/artifacts/15199246826/zip > "$tmp/prior.zip"
+          unset GH_TOKEN
+          python -m scripts.audit_replay_activation_scope --prior-zip "$tmp/prior.zip" > replay-activation-scope.json
+      - uses: actions/upload-artifact@v4
+        if: github.event_name == 'workflow_dispatch' || github.event.pull_request.head.repo.full_name == github.repository
+        with:
+          name: historical-replay-activation-scope-metadata
+          path: replay-activation-scope.json
+          if-no-files-found: error
