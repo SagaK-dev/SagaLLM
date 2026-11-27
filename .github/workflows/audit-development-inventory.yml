@@ -1,0 +1,66 @@
+name: SagaLLM scoped development exposure inventory
+on:
+  pull_request:
+    paths:
+      - 'scripts/audit_development_inventory.py'
+      - 'scripts/audit_ancestor_inventory.py'
+      - 'scripts/audit_checkpoint_exposure.py'
+      - 'scripts/audit_development_data.py'
+      - 'scripts/audit_v018_training.py'
+      - 'src/sagallm/java_private_intake.py'
+      - 'tests/test_audit_development_inventory.py'
+      - '.github/workflows/audit-development-inventory.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  reconstruct:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+      - name: Install CPU dependencies
+        run: |
+          python -m pip install 'torch>=2.3' --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install -e '.[test,fast-tokenizer]'
+      - run: PYTHONPATH=src python -m unittest discover -s tests -p test_audit_development_inventory.py
+      - name: Reconstruct pinned historical development inputs
+        if: github.event_name == 'workflow_dispatch' || github.event.pull_request.head.repo.full_name == github.repository
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PYTHONHASHSEED: '0'
+          GIT_TERMINAL_PROMPT: '0'
+        shell: bash
+        run: |
+          set -euo pipefail
+          tmp=$(mktemp -d)
+          trap 'rm -rf "$tmp"' EXIT
+          gh api repos/SagaK-dev/SagaLLM/actions/artifacts/15104411637/zip > "$tmp/ancestor.zip"
+          unset GH_TOKEN
+          git fetch --depth=1 origin fdf53625d8e64596748113b53fd6f4c63e2a1c74
+          git worktree add --detach "$tmp/historical" fdf53625d8e64596748113b53fd6f4c63e2a1c74
+          test "$(git -C "$tmp/historical" rev-parse HEAD)" = fdf53625d8e64596748113b53fd6f4c63e2a1c74
+          (
+            cd "$tmp/historical"
+            PYTHONPATH="$tmp/historical/src" python - "$tmp/stdio" <<'PY'
+          import sys
+          from sagallm.java_stdio_curriculum import build_curriculum, verify_curriculum
+          build_curriculum(sys.argv[1])
+          verify_curriculum(sys.argv[1])
+          PY
+          )
+          PYTHONPATH=src python -m scripts.audit_development_inventory "$tmp" "$tmp/historical" "$tmp/ancestor.zip" "$GITHUB_WORKSPACE/scoped-development-inventory.json" > "$GITHUB_WORKSPACE/development-inventory-evidence.json"
+      - uses: actions/upload-artifact@v4
+        if: github.event_name == 'workflow_dispatch' || github.event.pull_request.head.repo.full_name == github.repository
+        with:
+          name: historical-development-inventory-metadata
+          path: |
+            scoped-development-inventory.json
+            development-inventory-evidence.json
+          if-no-files-found: error
