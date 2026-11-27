@@ -1,0 +1,58 @@
+name: SagaLLM historical Parameter CE exposure reconstruction
+on:
+  pull_request:
+    paths:
+      - 'scripts/audit_parameter_ce_exposure.py'
+      - 'scripts/audit_ranking_auxiliary.py'
+      - 'tests/test_audit_parameter_ce_exposure.py'
+      - 'experiments/archive/reports/45377422360-m3-parameter-ce.json'
+      - '.github/workflows/audit-parameter-ce-exposure.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  reconstruct:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+      - run: python -m unittest discover -s tests -p test_audit_parameter_ce_exposure.py
+      - name: Reconstruct historical Parameter CE pairs and schedules
+        if: github.event_name == 'workflow_dispatch' || github.event.pull_request.head.repo.full_name == github.repository
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PYTHONHASHSEED: '0'
+          GIT_TERMINAL_PROMPT: '0'
+        shell: bash
+        run: |
+          set -euo pipefail
+          tmp=$(mktemp -d)
+          trap 'rm -rf "$tmp"' EXIT
+          gh api repos/SagaK-dev/SagaLLM/actions/artifacts/15179611408/zip > "$tmp/prior.zip"
+          gh api repos/SagaK-dev/SagaLLM/actions/artifacts/14743051466/zip > "$tmp/model.zip"
+          unset GH_TOKEN
+          echo "b039250f6ebecb4f8631ba38050cf219eb41b53308ea8d0b13bb45f566477789  $tmp/model.zip" | sha256sum -c -
+          unzip -p "$tmp/model.zip" java-context-model/tokenizer.json > "$tmp/tokenizer.json"
+          rm "$tmp/model.zip"
+          git fetch --depth=1 origin fdf53625d8e64596748113b53fd6f4c63e2a1c74
+          git worktree add --detach "$tmp/historical" fdf53625d8e64596748113b53fd6f4c63e2a1c74
+          test "$(git -C "$tmp/historical" rev-parse HEAD)" = fdf53625d8e64596748113b53fd6f4c63e2a1c74
+          cp scripts/audit_parameter_ce_exposure.py scripts/audit_ranking_auxiliary.py "$tmp/historical/scripts/"
+          cd "$tmp/historical"
+          python -m pip install 'torch>=2.3' --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install -e '.[test,fast-tokenizer]'
+          python -m scripts.audit_parameter_ce_exposure --report "$GITHUB_WORKSPACE/experiments/archive/reports/45377422360-m3-parameter-ce.json" --prior-zip "$tmp/prior.zip" --tokenizer "$tmp/tokenizer.json" --historical "$tmp/historical" --root "$tmp" --inventory-output "$GITHUB_WORKSPACE/scoped-parameter-ce-inventory.json" > "$GITHUB_WORKSPACE/parameter-ce-evidence.json"
+      - uses: actions/upload-artifact@v4
+        if: github.event_name == 'workflow_dispatch' || github.event.pull_request.head.repo.full_name == github.repository
+        with:
+          name: historical-parameter-ce-exposure-metadata
+          path: |
+            scoped-parameter-ce-inventory.json
+            parameter-ce-evidence.json
+          if-no-files-found: error
