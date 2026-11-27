@@ -1,0 +1,11 @@
+# M2.4-h.3 — historical Ranking auxiliary reconstruction
+
+PR #71 final head `4d7bd416a27c641f890e5d138a384d21fd8794a5` passed CPU CI 45955292145 and dedicated CI 45955292307. Job 140360264545 completed unit tests, reconstruction and upload. Artifact 15178332987 was unexpired at inspection; API ZIP digest `a7d15ef29336efeecf2b52f9a4a7c9cd000e94f55bc2c8f03c5e1e375792353f`. The new audit pins that archive, verifies its two member names and inventory digest, and retains non-promotion gates. Prior source bytes are not rescanned.
+
+At historical Ranking revision `babcbe130905d4acc7e4617497f0ebcea68569a9`, regenerate the pinned broad TRAIN and STDIO curriculum, check the holdback and tokenizer pins, encode STDIO TRAIN and call the original operation-span-v2 pairing routine. Compare the complete alignment metadata to original run 45373241422 report SHA-256 `90c8b9bb12e381c415e798d88875fc401143a0c703a3b0424cfab6c2283932cd`. Expected: 160 unordered pairs, 320 admitted directions, 3,767 masked token positions; mask SHA-256 `de57942b734602b3337db5082cb856583391c12b3a5e543e37b5983f980194a2`.
+
+Reconstruct all three seed schedules and verify the digest in both arms; check that the report declares 160 steps and selected step 160 for all six checkpoints. Verify selection/regression ID scope. This reconstructs declared deterministic schedules, not the actual historical optimizer trace.
+
+For exposure screening, represent the 320 directions as 640 own/wrong prompt + reference text rows. Check each reconstructed input tensor and masked target against the historical auxiliary routine. Full reference text is a conservative representation of input and target together, not exact tensor serialization or a new independent benchmark. Both arms computed the auxiliary graph, but the control coefficient was zero. Store the derived SHA separately from the original mask SHA. Add one metadata entry to the prior scoped inventory; no raw source or token arrays uploaded.
+
+No model loading, inference, training or Java execution. No complete inventory, rights review, independent evaluation, model promotion or Issue #22 closure. New CI pending. Next: reconstruct Parameter CE pair manifest and text coverage at its own revision, then account for remaining experiments and probes.
