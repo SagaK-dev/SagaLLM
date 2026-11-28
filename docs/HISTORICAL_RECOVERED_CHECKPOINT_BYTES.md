@@ -1,0 +1,7 @@
+# M2.4-m — checkpoint byte verification of recovered historical runs
+
+PR #80 dedicated CI 46088955891 reverified 35 report instances, 30 distinct report digests and five duplicate instances. It indexed 20 checkpoint-hash claims, including 16 previously unmapped hashes, and four data-hash declarations. Artifact 15240695936 ZIP SHA-256: 97d59becda044e504f9d8076282cac382a311bff8194829c1c16fea105872b0b.
+
+This audit pins the triage, recovery and ledger artifacts, regenerates the report ledger and requires exact equality. It selects only checkpoint archive/member paths explicitly found in historical workflow definitions. Each original ZIP is downloaded and its size/SHA-256 rechecked; allowed checkpoint members are streamed through SHA-256 without deserializing, extracting or publishing weights. Compare actual bytes to indexed hash claims, distinguish compatible same-artifact output claims, matches elsewhere, unmatched digests and missing members. For A/B members, matching digest alone does not certify the named arm. All failures are reported. The metadata artifact never includes model files.
+
+A successful CI records the bounded audit attempt, not complete model lineage. It does not establish optimizer exposure, architecture compatibility, data rights, independent evaluation or performance. Permanent archival of screened report originals, semantic model-parent reconciliation and missing-source recovery remain open. Issue #22 remains open.
