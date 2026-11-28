@@ -1,0 +1,7 @@
+# M2.4-l — recovered report ledger and checkpoint claim index
+
+PR #79 at 4983241a886b498c5540433f7ce9e725f53a2196 completed recovery CI 46088835743 and job 140804692672 successfully. It verified 33/33 candidate ZIP archives and preserved 35 screened original JSON members (426121 bytes) in artifact 15240845377. ZIP SHA-256: 25a0d7cbacdead46d18c7261287a601bf7a2c114c8ff9a5a6ebf22a0e8ba3040. This is temporary preservation (expires February 26, 2027), not permanent Git archival.
+
+This stage pins the exact recovery ZIP and #78 triage ZIP, validates archive/member identity, all candidate outcomes, original member digests, aggregate counts, metadata screening, and the exact member set. Reports are grouped by byte SHA-256, preserving all original run/artifact associations. Extract only explicit checkpoint and data hash fields. Compare checkpoint claims against the 18 previously mapped declarations; unmatched hashes are review candidates, not new trained model certifications. No generated-source hashes are treated as checkpoints. The artifact contains a metadata-only ledger, not model binaries, raw source, or training inputs.
+
+Acceptance: real recovered archive verification, mutation tests, metadata-only ledger artifact. Remaining: durable archival of reviewed original bytes, semantic examination of checkpoint claims, exact weights/lineage and model-specific exposure verification, recovery of missing artifacts and local runs, corpus rights, independent evaluation. All promotion gates remain closed; Issue #22 remains open.
