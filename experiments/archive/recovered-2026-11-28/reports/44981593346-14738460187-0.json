@@ -1,0 +1,86 @@
+{
+  "status": "TRAINED_CPU",
+  "training_task": "JAVA_SOURCE_NEXT_TOKEN_ONLY",
+  "javascript_or_java": "Java",
+  "random_initialization": true,
+  "external_pretrained_weights": false,
+  "original_synthetic_sft_examples_used_in_this_run": 0,
+  "source_counts": {
+    "train": 2468,
+    "validation": 254,
+    "test": 204
+  },
+  "source_files_total": 2926,
+  "source_urls": [
+    "https://github.com/TheAlgorithms/Java",
+    "https://github.com/google/gson",
+    "https://github.com/google/guava",
+    "https://github.com/iluwatar/java-design-patterns"
+  ],
+  "optimizer_steps_requested": 950,
+  "optimizer_steps_completed": 950,
+  "distinct_training_files_seen": 2468,
+  "distinct_training_windows_seen": 5700,
+  "available_training_files": 2468,
+  "available_training_windows": 8501,
+  "best_checkpoint_step": 400,
+  "best_checkpoint_distinct_training_windows_seen": 2400,
+  "best_checkpoint_distinct_training_files_seen": 2400,
+  "batch_size": 6,
+  "block_size": 192,
+  "tokenizer_backend": "hf",
+  "tokenizer_sha256": "186566808cb03e328cac9a6b7b384a8d0aefc54ccb83fbe97782a751726682fe",
+  "model_parameters": 1722048,
+  "first_validation_sample_loss": 7.667982121308644,
+  "best_validation_sample_loss": 1.4032466263355066,
+  "best_full_validation_loss": 1.604594492702745,
+  "heldout_test_loss_once_after_selection": 1.5542653747834265,
+  "test_used_for_model_selection": false,
+  "train_last_batch_loss": 3.732738494873047,
+  "training_seconds": 77.27,
+  "termination": "STEP_LIMIT",
+  "history": [
+    {
+      "step": 200,
+      "loss_last_batch": 1.7466802597045898,
+      "validation_sample_loss": 1.8415881556769211,
+      "distinct_training_files_seen": 1200,
+      "distinct_training_windows_seen": 1200
+    },
+    {
+      "step": 400,
+      "loss_last_batch": 0.8906828761100769,
+      "validation_sample_loss": 1.4032466263355066,
+      "distinct_training_files_seen": 2400,
+      "distinct_training_windows_seen": 2400
+    },
+    {
+      "step": 600,
+      "loss_last_batch": 3.2747628688812256,
+      "validation_sample_loss": 2.0701506286859512,
+      "distinct_training_files_seen": 2468,
+      "distinct_training_windows_seen": 3600
+    },
+    {
+      "step": 800,
+      "loss_last_batch": 2.9727048873901367,
+      "validation_sample_loss": 2.2297076135873795,
+      "distinct_training_files_seen": 2468,
+      "distinct_training_windows_seen": 4800
+    },
+    {
+      "step": 950,
+      "loss_last_batch": 3.732738494873047,
+      "validation_sample_loss": 2.741009145975113,
+      "distinct_training_files_seen": 2468,
+      "distinct_training_windows_seen": 5700
+    }
+  ],
+  "best_checkpoint_sha256": "166cd6c7d3d85be45887d5be25ac1def0f4699db9ddf52ad46e94d2623b98e2c",
+  "last_checkpoint_sha256": "52a60b7ad6181a85e1d0a2960b1a9806dfb85b9eb824c5263116b276d0856b07",
+  "dataset_manifest_sha256": "9e11217e9bd47d836a680a39e0820cd02f159a62e8e9f2c4cd864dd64ae7bf11",
+  "java_compile_test": "NOT_RUN",
+  "java_instruction_following": "NOT_ESTABLISHED",
+  "java_behavior_test": "NOT_RUN",
+  "source_legal_review": "PINNED_MIT_APACHE2_LICENSE_TEXT_NOT_LEGAL_ADVICE"
+}
