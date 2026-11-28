@@ -1,0 +1,51 @@
+name: SagaLLM unarchived artifact metadata triage
+on:
+  pull_request:
+    paths:
+      - 'scripts/audit_unarchived_artifact_triage.py'
+      - 'tests/test_audit_unarchived_artifact_triage.py'
+      - '.github/workflows/audit-unarchived-artifact-triage.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  triage:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+      - run: python -m unittest discover -s tests -p test_audit_unarchived_artifact_triage.py
+      - name: Join exact prior artifacts and inspect candidate artifact metadata
+        if: github.event_name == 'workflow_dispatch' || github.event.pull_request.head.repo.full_name == github.repository
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          tmp=$(mktemp -d)
+          trap 'rm -rf "$tmp"' EXIT
+          gh api repos/SagaK-dev/SagaLLM/actions/artifacts/15239323736/zip > "$tmp/discovery.zip"
+          gh api repos/SagaK-dev/SagaLLM/actions/artifacts/15240220228/zip > "$tmp/integrated.zip"
+          observed=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+          python -m scripts.audit_unarchived_artifact_triage --discovery-zip "$tmp/discovery.zip" --integrated-zip "$tmp/integrated.zip" --observed-at "$observed" > unarchived-artifact-triage.json
+          python - <<'PY'
+          import json
+          d = json.load(open("unarchived-artifact-triage.json"))
+          t = d["triage"]
+          print(json.dumps({"run_count": t["run_count"], "artifact_count": t["artifact_count"],
+              "artifact_status_counts": t["artifact_status_counts"],
+              "runs_without_visible_artifacts": len(t["runs_without_visible_artifacts"]),
+              "first_priority": t["priority_by_expiry"][:3]}, sort_keys=True))
+          PY
+      - uses: actions/upload-artifact@v4
+        if: github.event_name == 'workflow_dispatch' || github.event.pull_request.head.repo.full_name == github.repository
+        with:
+          name: historical-unarchived-artifact-triage-metadata
+          path: unarchived-artifact-triage.json
+          if-no-files-found: error
