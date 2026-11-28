@@ -1,0 +1,40 @@
+{
+  "actual_training_process_attested": false,
+  "best_step_declared": 24,
+  "checkpoint_bindings": [
+    {
+      "bytes": 20718692,
+      "journal_prefix_sha256": "5ed1d6c4360ab19929170f82f8278cb8ae72139cca6d2ba8b258e03ee803bd39",
+      "role": "best",
+      "sha256": "b9c440a1f917f49f1889d6f799bb327c1726b46608d05bd7cce898296e5ef2eb",
+      "step_declared": 24
+    },
+    {
+      "bytes": 20718628,
+      "journal_prefix_sha256": "86abaa397972329e4e06579cee075f25b99e7819c42d4df11d8e8c3b7ff6ae41",
+      "role": "last",
+      "sha256": "78a724a0dd694d5e344b19cc358f4c8f2d2fd089ac3ef6957fb87b517a1819f9",
+      "step_declared": 24
+    }
+  ],
+  "checkpoint_deserialized": false,
+  "distinct_train_rows_rechecked": 96,
+  "embedded_metadata_independently_read": false,
+  "gradient_influence_verified": false,
+  "historical_exposure_verified": false,
+  "independent_evaluation": "NOT_RUN",
+  "learning_rate_schedule_status": "RECORDED_STEP_RATES_MATCH",
+  "loss_targets_rechecked": 6335,
+  "model_selection_permitted": false,
+  "report_sha256": "fc871dbda792e310a0d929d5d771c72bbb0d2d83600d747c1d393939106333d8",
+  "row_exposures_rechecked": 96,
+  "schema": "sagallm-integrated-sft-offline-audit-v1",
+  "selection_arithmetic_rechecked": true,
+  "source_and_optimizer_declarations": "DECLARATIONS_CONSISTENT",
+  "status": "PINNED_REPORT_TRACE_SCHEDULE_AND_CHECKPOINT_BYTES_MATCH",
+  "steps_rechecked": 24,
+  "tip_sha256": "e9a7839736a5323997fb1bc11a83ae723dbbea63ef64a72e323f82379419d24f",
+  "trace_sha256": "d90a06a8469b0f70705ffaa8a377776f4d8444b354033847c2bd72038e314ce8",
+  "validation_losses_recomputed": false,
+  "validation_or_test_rows_read": false
+}

@@ -62,6 +62,32 @@ class LegacyDiscoveryTests(unittest.TestCase):
             with self.assertRaises(ValueError):
                 a.live_pages(path, "2026-11-24T01:00:00Z")
 
+    def test_windowed_pages_reject_gaps_overlap_and_duplicate_ids(self):
+        start="2026-11-25T00:00:00Z";cutoff="2026-11-25T00:00:02Z"
+        def window(lo,hi,rows):
+            return {"start_utc":lo,"end_utc":hi,"pages":[{"total_count":len(rows),"workflow_runs":rows}]}
+        first=window(start,start,[api_row(1)])
+        second=window("2026-11-25T00:00:01Z",cutoff,[])
+        data={"schema":"sagallm-actions-windowed-pages-v1","start_utc":start,"cutoff_utc":cutoff,"windows":[first,second]}
+        with tempfile.TemporaryDirectory() as tmp:
+            p=Path(tmp)/"pages.json"
+            p.write_text(json.dumps(data));self.assertEqual(set(a.live_pages(p,cutoff)),{1})
+            for windows in ([first],[first,window(cutoff,cutoff,[])],[first,window(start,cutoff,[])],
+                            [first,window("2026-11-25T00:00:01Z",cutoff,[{**api_row(1),"created_at":"2026-11-25T00:00:01Z"}])]):
+                p.write_text(json.dumps({**data,"windows":windows}))
+                with self.assertRaises(ValueError):a.live_pages(p,cutoff)
+
+    def test_collector_bisects_large_count(self):
+        from scripts.collect_legacy_run_pages import collect
+        start="2026-11-25T00:00:00Z";end="2026-11-25T00:00:01Z"
+        def fetch(lo,hi,page):
+            if lo!=hi:return {"total_count":1001,"workflow_runs":[]}
+            return {"total_count":1,"workflow_runs":[{**api_row(1 if lo==start else 2),"created_at":lo}]}
+        d=collect(start,end,fetch)
+        self.assertEqual(len(d["windows"]),2)
+        self.assertEqual(d["windows"][0]["end_utc"],start)
+        self.assertEqual(d["windows"][1]["start_utc"],end)
+
     def test_legacy_originals_when_staged(self):
         import os
         root = os.environ.get("LEGACY_REPORTS_DIR")

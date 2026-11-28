@@ -1,0 +1,22 @@
+name: SagaLLM verify durable schedule sweep and prefix originals
+on:
+  pull_request:
+    paths:
+      - 'experiments/archive/schedule-sweep-46124885819/**'
+      - 'scripts/archive_schedule_sweep_prefix.py'
+      - '.github/workflows/archive-schedule-sweep-prefix.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+      - run: python -m scripts.archive_schedule_sweep_prefix
