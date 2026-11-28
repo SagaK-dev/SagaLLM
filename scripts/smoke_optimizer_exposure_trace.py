@@ -7,6 +7,7 @@ import tempfile
 import torch
 
 from sagallm.config import ModelConfig
+from sagallm.exposure_source_binding import replay_source_binding
 from sagallm.exposure_trace import ExposureTrace, SCHEMA, canonical, digest, file_sha, traced_sft_step, verify_trace
 from sagallm.java_instruction_sft import encode_row, pack
 from sagallm.model import SagaTransformer
@@ -32,9 +33,12 @@ def smoke(output):
     if any(r is None for r in encoded):
         raise ValueError("Fixture exceeds context")
     raw=b"".join(canonical(r)+b"\n" for r in records)
-    manifest={"schema":"synthetic-trace-fixture-v1","train_split_sha256":digest(raw),"rows":4}
+    manifest={"schema":"synthetic-trace-fixture-v1","files":{"train":{"filename":"train.jsonl","sha256":digest(raw),"count":4}}}
     with tempfile.TemporaryDirectory() as tmp:
         root=Path(tmp)
+        dataset=root/"dataset";dataset.mkdir()
+        (dataset/"train.jsonl").write_bytes(raw)
+        (dataset/"manifest.json").write_bytes(canonical(manifest))
         tok_path=root/"tokenizer.json";tok.save(tok_path)
         base=root/"base.pt"
         checkpoint_save(base,model,optimizer,0,cfg,{"tokenizer_sha256":file_sha(tok_path)})
@@ -63,10 +67,15 @@ def smoke(output):
             raise ValueError("Trace finalization mismatch")
         if any(verified["checkpoints"][b["role"]]!=b for b in checkpoint_checks):
             raise ValueError("Checkpoint trace index mismatch")
+        source_binding=replay_source_binding(trace_path,expected_trace_sha256=final["trace_sha256"],
+            expected_tip=final["tip_sha256"],dataset_dir=dataset,tokenizer_path=tok_path,
+            base_checkpoint=base,context=256)
+        if source_binding["packed_batches_rechecked"]!=2 or source_binding["recorded_row_exposures_rechecked"]!=4:
+            raise ValueError("Trace source binding mismatch")
     result={"schema":"sagallm-exposure-trace-smoke-v1","status":"SYNTHETIC_CPU_TRACE_SMOKE_COMPLETE",
             "actual_fixture_optimizer_returns":2,"fixture_batch_size":2,"fixture_row_exposures":4,
             "checkpoint_bindings_rechecked":2,"checkpoint_selection":"FIXED_SMOKE_FIXTURE_NOT_PERFORMANCE_SELECTION",
-            "fixture_trace":verified,"new_fixture_training":True,"historical_model_training":False,
+            "fixture_trace":verified,"fixture_source_binding":source_binding,"new_fixture_training":True,"historical_model_training":False,
             "java_compiled":False,"java_executed":False,"independent_evaluation":"NOT_RUN",
             "model_selection_permitted":False,"actual_historical_exposure_verified":False}
     (output/"trace-smoke-report.json").write_text(json.dumps(result,sort_keys=True,indent=2)+"\n",encoding="utf8")
