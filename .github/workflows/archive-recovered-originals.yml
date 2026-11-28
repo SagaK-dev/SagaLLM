@@ -47,9 +47,12 @@ jobs:
           git add -- experiments/archive/recovered-2026-11-28
           python - <<'PY'
           import subprocess
+          from pathlib import Path
           paths = subprocess.check_output(["git","diff","--cached","--name-only"],text=True).splitlines()
           assert len(paths)==36 and all(p.startswith("experiments/archive/recovered-2026-11-28/") for p in paths)
-          assert subprocess.check_output(["git","diff","--cached","--diff-filter=ACMRTUXB","--name-only"],text=True).splitlines()==paths
+          assert subprocess.check_output(["git","diff","--cached","--diff-filter=A","--name-only"],text=True).splitlines()==paths
+          for p in paths:
+              assert subprocess.check_output(["git","show",":"+p])==Path(p).read_bytes()
           PY
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
