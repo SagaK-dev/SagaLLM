@@ -1,7 +1,7 @@
 """Integrate archived declarations without claiming actual model-specific exposure."""
 from scripts.audit_ranking_auxiliary import pin, parse, require
 from scripts.audit_replay_activation_scope import SPECS as REPLAY_SPECS, models, hexsha
-from scripts.audit_v018_training import BASE as V017, BEST, LAST, REPORT as V018_REPORT
+from scripts.audit_v018_training import BASE as V017, BEST, LAST, DATA, REPORT as V018_REPORT
 from scripts.audit_java_lineage import ROOT
 
 PATHS = {
