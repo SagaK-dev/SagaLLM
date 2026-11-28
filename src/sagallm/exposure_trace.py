@@ -20,7 +20,7 @@ ZERO = "0" * 64
 MAX_STEPS = 1500
 MAX_ROWS = 8
 MAX_SEQUENCE = 4096
-MAX_EVENTS = MAX_STEPS * 2 + 64
+MAX_EVENTS = MAX_STEPS * 3 + 4
 MAX_BYTES = 24 * 1024 * 1024
 HEX = re.compile(r"[0-9a-f]{64}\Z")
 
@@ -153,6 +153,7 @@ class ExposureTrace:
 
     def _begin(self,rows,x,y):
         require(self.pending is None and self.completed<self.header["max_steps"]
+                and "last" not in self.checkpoints
                 and len(rows)==self.header["batch_size"],"Unexpected training step")
         record=batch_record(rows,x,y)
         step=self.completed+1
@@ -172,7 +173,11 @@ class ExposureTrace:
         return {"schema":SCHEMA,"completed_optimizer_returns":self.completed,"prefix_sha256":self.tip}
 
     def bind_checkpoint(self,role,path,metadata):
-        require(role in ("best","last") and metadata==self.checkpoint_metadata(),"Invalid checkpoint binding")
+        require(role in ("best","last") and "last" not in self.checkpoints
+                and (role!="last" or "best" in self.checkpoints)
+                and (role!="best" or "best" not in self.checkpoints or
+                     self.checkpoints["best"]["completed_optimizer_returns"]<self.completed)
+                and metadata==self.checkpoint_metadata(),"Invalid checkpoint binding")
         value={"role":role,"checkpoint_sha256":file_sha(path),**metadata}
         self._append("checkpoint",value)
         self.checkpoints[role]=value
@@ -237,7 +242,8 @@ def verify_trace(path,*,expected_sha256=None,expected_tip=None):
             require(kind=="header","Missing header");validate_header(pay);header=pay
         elif kind=="step_intent":
             require(set(pay)=={"step","rows","input_sha256","labels_sha256","shape","loss_targets"}
-                    and pending is None and pay["step"]==completed+1<=header["max_steps"]
+                    and pending is None and "last" not in checkpoints and type(pay["step"]) is int
+                    and pay["step"]==completed+1<=header["max_steps"]
                     and len(pay["rows"])==header["batch_size"]
                     and is_sha(pay["input_sha256"]) and is_sha(pay["labels_sha256"])
                     and len(pay["shape"])==2 and pay["shape"][0]==header["batch_size"]
@@ -256,7 +262,11 @@ def verify_trace(path,*,expected_sha256=None,expected_tip=None):
             completed+=1;pending=None
         elif kind=="checkpoint":
             require(set(pay)=={"role","checkpoint_sha256","schema","completed_optimizer_returns","prefix_sha256"}
-                    and pending is None and pay["role"] in ("best","last") and is_sha(pay["checkpoint_sha256"])
+                    and pending is None and "last" not in checkpoints and pay["role"] in ("best","last")
+                    and (pay["role"]!="last" or "best" in checkpoints)
+                    and (pay["role"]!="best" or "best" not in checkpoints or
+                         checkpoints["best"]["completed_optimizer_returns"]<completed)
+                    and is_sha(pay["checkpoint_sha256"])
                     and pay["schema"]==SCHEMA and pay["completed_optimizer_returns"]==completed
                     and pay["prefix_sha256"]==tip,"Invalid checkpoint event")
             checkpoints[pay["role"]]=pay
