@@ -1,0 +1,46 @@
+name: SagaLLM canonical SFT template and tokenizer audit
+on:
+  pull_request:
+    paths:
+      - 'scripts/audit_canonical_sft_template_quality.py'
+      - 'tests/test_audit_canonical_sft_template_quality.py'
+      - '.github/workflows/audit-canonical-sft-template-quality.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  audit:
+    if: github.repository == 'SagaK-dev/SagaLLM' && (github.event_name == 'workflow_dispatch' || github.event.pull_request.head.repo.full_name == github.repository)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    env:
+      OMP_NUM_THREADS: '2'
+      MKL_NUM_THREADS: '2'
+      PYTHONHASHSEED: '0'
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.11.18'
+      - run: |
+          python -m pip install 'torch==2.15.0+cpu' --index-url https://download.pytorch.org/whl/cpu -c requirements/pilot-46104477318-observed.txt
+          python -m pip install -r requirements/pilot-46104477318-observed.txt
+      - run: PYTHONPATH=src python -m unittest discover -s tests -p test_audit_canonical_sft_template_quality.py
+      - name: Rebuild exact corpus and inspect static signatures and admission
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          tmp=$(mktemp -d)
+          trap 'rm -rf "$tmp"' EXIT
+          gh api repos/SagaK-dev/SagaLLM/actions/artifacts/14738368209/zip > "$tmp/parent.zip"
+          unset GH_TOKEN GITHUB_TOKEN
+          PYTHONPATH=src python -m scripts.audit_canonical_sft_template_quality --parent-zip "$tmp/parent.zip" --output canonical-quality.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: canonical-sft-template-tokenizer-quality-metadata
+          path: canonical-quality.json
+          if-no-files-found: error
