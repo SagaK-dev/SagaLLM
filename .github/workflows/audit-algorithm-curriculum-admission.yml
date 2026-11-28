@@ -4,6 +4,12 @@ on:
     paths:
       - 'scripts/audit_algorithm_curriculum_admission.py'
       - 'tests/test_audit_algorithm_curriculum_admission.py'
+      - 'scripts/verify_compact_algorithm_admission.py'
+      - 'src/sagallm/java_algorithm_compact_tasks.py'
+      - 'src/sagallm/java_algorithm_curriculum.py'
+      - 'src/sagallm/java_instruction_sft.py'
+      - 'src/sagallm/tokenization.py'
+      - 'tests/test_compact_algorithm_admission.py'
       - '.github/workflows/audit-algorithm-curriculum-admission.yml'
   workflow_dispatch:
 permissions:
@@ -29,6 +35,7 @@ jobs:
           python -m pip install 'torch==2.15.0+cpu' --index-url https://download.pytorch.org/whl/cpu -c requirements/pilot-46104477318-observed.txt
           python -m pip install -r requirements/pilot-46104477318-observed.txt
       - run: PYTHONPATH=src python -m unittest discover -s tests -p test_audit_algorithm_curriculum_admission.py
+      - run: PYTHONPATH=src python -m unittest discover -s tests -p test_compact_algorithm_admission.py
       - name: Reconcile verified reference records and measure SFT admission
         env:
           GH_TOKEN: ${{ github.token }}
@@ -38,8 +45,17 @@ jobs:
           trap 'rm -rf "$tmp"' EXIT
           gh api repos/SagaK-dev/SagaLLM/actions/artifacts/14738368209/zip > "$tmp/parent.zip"
           gh api repos/SagaK-dev/SagaLLM/actions/artifacts/15257146273/zip > "$tmp/reference.zip"
+          gh api repos/SagaK-dev/SagaLLM/actions/artifacts/15256607793/zip > "$tmp/admission.zip"
           unset GH_TOKEN GITHUB_TOKEN
           PYTHONPATH=src python -m scripts.audit_algorithm_curriculum_admission --parent-zip "$tmp/parent.zip" --reference-zip "$tmp/reference.zip" --output algorithm-admission.json
+          echo 'a91edd752e57c6e5a4392b808c5b1178388571599494c84947921ca17814f367  algorithm-admission.json' | sha256sum -c -
+          PYTHONPATH=src python -m scripts.verify_compact_algorithm_admission --parent-zip "$tmp/parent.zip" --reference-zip "$tmp/reference.zip" --admission-zip "$tmp/admission.zip" --output compact-admission.json
+          echo 'b0d7596dba88acaa07735897e7ee5fac4af0e9e779914073cc9ad5cdf9c0dba1  compact-admission.json' | sha256sum -c -
+      - uses: actions/upload-artifact@v4
+        with:
+          name: compact-algorithm-admission-384
+          path: compact-admission.json
+          if-no-files-found: error
       - uses: actions/upload-artifact@v4
         with:
           name: verified-algorithm-sft-admission-metadata

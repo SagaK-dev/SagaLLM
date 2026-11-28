@@ -53,6 +53,31 @@ def verify_report(path):
     require(seen=={(r["family"],r["variant"]) for r in records},"Implementation coverage")
     return records
 
+def canonical_index(dataset):
+    index = {}
+    for split in ("train", "validation", "test"):
+        values = {"task": set(), "source": set(), "signature": set()}
+        with (dataset / f"{split}.jsonl").open(encoding="utf-8") as stream:
+            for line in stream:
+                task, source = source_task(json.loads(line))
+                values["task"].add(sha(task.encode()))
+                values["source"].add(sha(source.encode()))
+                values["signature"].add(signature(source))
+        index[split] = values
+    return index
+
+
+def sft_candidate(record, prefix):
+    return {
+        "id": prefix + record["id"],
+        "family": record["family"],
+        "messages": [
+            {"role": "user", "content": _model_user_message(record["task"], "public class Main {}", "Main")},
+            {"role": "assistant", "content": record["source"]},
+        ],
+    }
+
+
 def run(reference_zip,parent_zip):
     records=verify_report(reference_zip)
     with tempfile.TemporaryDirectory() as tmp:
@@ -61,16 +86,10 @@ def run(reference_zip,parent_zip):
         dataset=root/"canonical";build_java_diverse_corpus(dataset)
         verify_java_diverse_corpus(dataset)
         require(sha_file(dataset/"manifest.json")==DATA,"Canonical pin drift")
-        old={k:{"task":set(),"source":set(),"signature":set()} for k in ("train","validation","test")}
-        for split,idx in old.items():
-            for line in (dataset/(split+".jsonl")).read_bytes().splitlines():
-                task,source=source_task(json.loads(line))
-                idx["task"].add(sha(task.encode()));idx["source"].add(sha(source.encode()));idx["signature"].add(signature(source))
+        old = canonical_index(dataset)
         results=[]
         for r in records:
-            candidate={"id":"algorithm-v1-"+r["id"],"family":r["family"],"messages":[
-                {"role":"user","content":_model_user_message(r["task"],"public class Main {}","Main")},
-                {"role":"assistant","content":r["source"]}]}
+            candidate = sft_candidate(r, "algorithm-v1-")
             task,source=source_task(candidate)
             require(task==r["task"] and source==r["source"],"SFT conversion drift")
             require(tokenizer.decode(tokenizer.encode(compact_prompt(task)))==compact_prompt(task)
