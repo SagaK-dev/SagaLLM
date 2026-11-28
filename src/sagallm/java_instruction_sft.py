@@ -6,6 +6,7 @@ verified against canonical regeneration. This does not run generated Java.
 from __future__ import annotations
 
 from collections import defaultdict
+from contextlib import nullcontext
 from dataclasses import replace
 import hashlib
 import json
@@ -18,6 +19,8 @@ import time
 import torch
 
 from .config import ModelConfig
+from .exposure_trace import ExposureTrace, SCHEMA as EXPOSURE_SCHEMA, traced_sft_step, verify_trace
+from .exposure_source_binding import replay_source_binding
 from .java_diverse_corpus import verify_java_diverse_corpus
 from .model import SagaTransformer
 from .tokenization import load_tokenizer
@@ -434,7 +437,8 @@ def train_instruction_sft(base_checkpoint:str|Path,tokenizer_file:str|Path,
                           eval_count:int=30,test_count:int=30,compile_cases:int=10,
                           lr:float=0.00015,seed:int=717,max_seconds:float=360,
                           require_pinned:bool=True, target_context:int|None=None,
-                          pinned_checkpoint_sha256:str=V016_BASE_BEST_SHA256)->dict:
+                          pinned_checkpoint_sha256:str=V016_BASE_BEST_SHA256,
+                          record_exposure:bool=False)->dict:
     if not (1<=steps<=1500 and 1<=batch_size<=8 and 1<=eval_every<=500
             and 1<=eval_count<=100 and 1<=test_count<=100 and 0<=compile_cases<=12
             and 0<lr<=0.001 and 10<=max_seconds<=600):
@@ -442,7 +446,13 @@ def train_instruction_sft(base_checkpoint:str|Path,tokenizer_file:str|Path,
     root=Path(dataset);dest=Path(output)
     if dest.exists() or dest.is_symlink():raise FileExistsError('Refuse to replace experiment output')
     # Verify ALL splits before allocating a model. This recomputes canonical data.
+    manifest_sha=sha_file(root/'manifest.json')
     verify_java_diverse_corpus(root)
+    train_sha=sha_file(root/'train.jsonl')
+    if record_exposure:
+        manifest=json.loads((root/'manifest.json').read_bytes())
+        if sha_file(root/'manifest.json')!=manifest_sha or manifest['files']['train']['sha256']!=train_sha:
+            raise ValueError('TRAIN source identity changed during verification')
     state,original_cfg,base_sha,tok_sha=_validate_base(
         Path(base_checkpoint),Path(tokenizer_file),require_pinned=require_pinned,
         pinned_checkpoint_sha256=pinned_checkpoint_sha256)
@@ -453,7 +463,9 @@ def train_instruction_sft(base_checkpoint:str|Path,tokenizer_file:str|Path,
         original_context=original_cfg.max_position_embeddings)
     valid_rows,valid_info=read_split(root,'validation',tokenizer,cfg.max_position_embeddings,
         original_context=original_cfg.max_position_embeddings)
-    # Do not decode, tokenize, inspect or score TEST until best checkpoint chosen.
+    if record_exposure and (sha_file(root/'train.jsonl')!=train_sha or sha_file(root/'manifest.json')!=manifest_sha):
+        raise ValueError('TRAIN source identity changed during encoding')
+    # TEST is verified structurally above but not encoded/scored until selection is complete.
     if len(train_rows)<batch_size or not valid_rows:
         raise ValueError('Too few complete SFT examples for this context size')
     if len({r['family'] for r in train_rows})<10:
@@ -473,40 +485,79 @@ def train_instruction_sft(base_checkpoint:str|Path,tokenizer_file:str|Path,
               'original_context_length':original_cfg.max_position_embeddings,
               'trained_context_length':cfg.max_position_embeddings,
               'context_extension':'ROPE_EXTRAPOLATION_UNVALIDATED' if target_context else 'NONE','tokenizer_sha256':tok_sha,
-              'base_checkpoint_sha256':base_sha,'dataset_manifest_sha256':sha_file(root/'manifest.json'),
+              'base_checkpoint_sha256':base_sha,'dataset_manifest_sha256':manifest_sha,
               'prompt_version':PROMPT_VERSION,'optimizer_base_lr':lr,'seed':seed}
-    best_path=dest/'java-sft-best.pt'
-    checkpoint_save(best_path,model,optimizer,0,cfg,{**metadata,'selected_validation_response_loss':baseline})
-    order=interleaved_order(train_rows,seed);seen=set()
-    train_start=time.monotonic();history=[];best_loss=baseline;best_step=0
-    best_seen=0;completed=0;last_batch_loss=None;termination='STEP_LIMIT'
-    for step in range(1,steps+1):
-        if time.monotonic()-train_start>max_seconds:
-            termination='TIME_BUDGET';break
-        current=[]
-        for j in range(batch_size):
-            pos=((step-1)*batch_size+j)%len(order)
-            index=order[pos];current.append(train_rows[index]);seen.add(index)
-        x,y=pack(current)
-        optimizer.zero_grad(set_to_none=True)
-        loss=model(x,labels=y).loss
-        if not bool(torch.isfinite(loss)):raise FloatingPointError('Nonfinite SFT loss')
-        loss.backward();torch.nn.utils.clip_grad_norm_(model.parameters(),1.0);optimizer.step()
-        last_batch_loss=float(loss.detach());completed=step
-        if step%eval_every==0 or step==steps:
-            val=response_loss(model,validation)
-            record={'step':step,'last_train_response_loss':last_batch_loss,
-                    'validation_response_loss':val,'distinct_train_examples_seen':len(seen),
-                    'distinct_train_families_seen':len({train_rows[i]['family'] for i in seen})}
-            history.append(record);print(json.dumps(record),flush=True)
-            if val<best_loss-0.001:
-                best_loss=val;best_step=step;best_seen=len(seen)
-                checkpoint_save(best_path,model,optimizer,step,cfg,
-                                {**metadata,'selected_validation_response_loss':val,
-                                 'distinct_training_examples_seen':best_seen})
-    checkpoint_save(dest/'java-sft-last.pt',model,optimizer,completed,cfg,
-                    {**metadata,'selection':'last','distinct_training_examples_seen':len(seen)})
-    # TEST first becomes accessible after best checkpoint selection is complete.
+    exposure=None
+    trace_path=dest/'optimizer-exposure.jsonl'
+    if record_exposure:
+        header={'schema':EXPOSURE_SCHEMA,'split':'train','base_checkpoint_sha256':base_sha,
+                'tokenizer_sha256':tok_sha,'data_manifest_sha256':manifest_sha,
+                'train_split_sha256':train_sha,'seed':seed,'max_steps':steps,'batch_size':batch_size}
+    with (ExposureTrace(trace_path,header) if record_exposure else nullcontext()) as trace:
+        def save_bound(role,path,step,info):
+            if trace is None:
+                checkpoint_save(path,model,optimizer,step,cfg,info)
+                return
+            if trace.completed!=step:
+                raise ValueError('Checkpoint step differs from optimizer trace')
+            binding=trace.checkpoint_metadata()
+            checkpoint_save(path,model,optimizer,step,cfg,{**info,'exposure_trace':binding})
+            trace.bind_checkpoint(role,path,binding)
+        best_path=dest/'java-sft-best.pt'
+        save_bound('best',best_path,0,{**metadata,'selected_validation_response_loss':baseline})
+        order=interleaved_order(train_rows,seed);seen=set()
+        train_start=time.monotonic();history=[];best_loss=baseline;best_step=0
+        best_seen=0;completed=0;last_batch_loss=None;termination='STEP_LIMIT'
+        for step in range(1,steps+1):
+            if time.monotonic()-train_start>max_seconds:
+                termination='TIME_BUDGET';break
+            current=[]
+            for j in range(batch_size):
+                pos=((step-1)*batch_size+j)%len(order)
+                index=order[pos];current.append(train_rows[index]);seen.add(index)
+            x,y=pack(current)
+            if trace is not None:
+                last_batch_loss=traced_sft_step(model,optimizer,trace,current,x,y)
+            else:
+                optimizer.zero_grad(set_to_none=True)
+                loss=model(x,labels=y).loss
+                if not bool(torch.isfinite(loss)):raise FloatingPointError('Nonfinite SFT loss')
+                loss.backward();torch.nn.utils.clip_grad_norm_(model.parameters(),1.0);optimizer.step()
+                last_batch_loss=float(loss.detach())
+            completed=step
+            if step%eval_every==0 or step==steps:
+                val=response_loss(model,validation)
+                record={'step':step,'last_train_response_loss':last_batch_loss,
+                        'validation_response_loss':val,'distinct_train_examples_seen':len(seen),
+                        'distinct_train_families_seen':len({train_rows[i]['family'] for i in seen})}
+                history.append(record);print(json.dumps(record),flush=True)
+                if val<best_loss-0.001:
+                    best_loss=val;best_step=step;best_seen=len(seen)
+                    save_bound('best',best_path,step,
+                                    {**metadata,'selected_validation_response_loss':val,
+                                     'distinct_training_examples_seen':best_seen})
+        save_bound('last',dest/'java-sft-last.pt',completed,
+                        {**metadata,'selection':'last','distinct_training_examples_seen':len(seen)})
+        if trace is not None:
+            final=trace.finish()
+            verified=verify_trace(trace_path,expected_sha256=final['trace_sha256'],expected_tip=final['tip_sha256'])
+            if (verified['status']!='FINALIZED_LOCAL_TRACE' or verified['completed_optimizer_returns']!=completed
+                or verified['checkpoints']['best']['completed_optimizer_returns']!=best_step
+                or verified['checkpoints']['last']['completed_optimizer_returns']!=completed):
+                raise ValueError('Final exposure trace step mismatch')
+            for role,path in (('best',best_path),('last',dest/'java-sft-last.pt')):
+                binding=verified['checkpoints'][role]
+                if sha_file(path)!=binding['checkpoint_sha256']:
+                    raise ValueError('Saved checkpoint hash mismatch')
+            source=replay_source_binding(trace_path,expected_trace_sha256=final['trace_sha256'],
+                expected_tip=final['tip_sha256'],dataset_dir=root,tokenizer_path=tok_target,
+                base_checkpoint=base_checkpoint,context=cfg.max_position_embeddings)
+            if source['recorded_row_exposures_rechecked']!=completed*batch_size:
+                raise ValueError('Exposure count mismatch')
+            exposure={'status':'LOCAL_TRACE_AND_TRAIN_SOURCE_VERIFIED','journal_file':trace_path.name,
+                      'trace':verified,'source_binding':source,
+                      'independent_attestation':False,'historical_exposure_verified':False}
+    # TEST tokenization and scoring occur only after best checkpoint selection is complete.
     test_rows,test_info=read_split(root,'test',tokenizer,cfg.max_position_embeddings,
         original_context=original_cfg.max_position_embeddings)
     if not test_rows:raise ValueError('No accepted held-out test examples')
@@ -525,7 +576,7 @@ def train_instruction_sft(base_checkpoint:str|Path,tokenizer_file:str|Path,
         best_compile=heldout_compilation(model,tokenizer,test_rows,max_cases=compile_cases)
     report={'status':'TRAINED_CPU','phase':'JAVA_INSTRUCTION_SFT','model_origin':'PINNED_REAL_JAVA_V017_SFT' if target_context else 'PINNED_REAL_JAVA_V016',
             'checkpoint_sha256_base':base_sha,'tokenizer_sha256':tok_sha,
-            'data_manifest_sha256':sha_file(root/'manifest.json'),'prompt_version':PROMPT_VERSION,
+            'data_manifest_sha256':manifest_sha,'prompt_version':PROMPT_VERSION,
             'dataset_source':'project-authored parametric synthetic Java v0.15; NOT independent human tasks',
             'original_split_counts':{'train':train_info,'validation':valid_info,'test':test_info},
             'model_parameters':cfg.parameter_count(),'model_context_length':cfg.max_position_embeddings,
@@ -545,5 +596,7 @@ def train_instruction_sft(base_checkpoint:str|Path,tokenizer_file:str|Path,
             'best_checkpoint_sha256':sha_file(best_path),
             'last_checkpoint_sha256':sha_file(dest/'java-sft-last.pt'),
             'training_seconds':round(time.monotonic()-train_start,2)}
+    if exposure is not None:
+        report['optimizer_exposure']=exposure
     (dest/'train-report.json').write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\n',encoding='utf8')
     return report
