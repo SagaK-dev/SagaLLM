@@ -431,6 +431,19 @@ def heldout_compilation(model, tokenizer, rows:list[dict], *, max_cases:int=10,
             'prompt_style':prompt_style,'case_offset':case_offset}
 
 
+def source_origin(base_sha:str,tok_sha:str,*,require_pinned:bool,pinned_checkpoint_sha256:str):
+    """Describe verified identities, never infer provenance from context length."""
+    if not require_pinned:
+        return 'LOCAL_CHECKPOINT_PIN_NOT_REQUIRED','java_instruction_sft_local','PIN_NOT_REQUIRED'
+    if base_sha!=pinned_checkpoint_sha256 or tok_sha!=V016_TOKENIZER_SHA256:
+        raise ValueError('Source provenance pin mismatch')
+    if base_sha==V016_BASE_BEST_SHA256:
+        return 'PINNED_REAL_JAVA_V016','java_instruction_sft_v017','KNOWN_HISTORICAL_PIN_MATCHED'
+    if base_sha==V017_SFT_BEST_SHA256:
+        return 'PINNED_REAL_JAVA_V017_SFT','java_instruction_sft_v018','KNOWN_HISTORICAL_PIN_MATCHED'
+    return 'CUSTOM_PINNED_LOCAL_CHECKPOINT','java_instruction_sft_custom','CALLER_PIN_MATCHED'
+
+
 def train_instruction_sft(base_checkpoint:str|Path,tokenizer_file:str|Path,
                           dataset:str|Path,output:str|Path,*,steps:int=500,
                           batch_size:int=4,eval_every:int=100,
@@ -461,6 +474,8 @@ def train_instruction_sft(base_checkpoint:str|Path,tokenizer_file:str|Path,
     state,original_cfg,base_sha,tok_sha=_validate_base(
         Path(base_checkpoint),Path(tokenizer_file),require_pinned=require_pinned,
         pinned_checkpoint_sha256=pinned_checkpoint_sha256)
+    origin,stage,pin_status=source_origin(base_sha,tok_sha,require_pinned=require_pinned,
+                                        pinned_checkpoint_sha256=pinned_checkpoint_sha256)
     cfg=extend_rope_context(original_cfg,target_context)
     tokenizer=load_tokenizer(tokenizer_file)
     if tokenizer.vocab_size>cfg.vocab_size:raise ValueError('Checkpoint vocabulary mismatch')
@@ -486,7 +501,7 @@ def train_instruction_sft(base_checkpoint:str|Path,tokenizer_file:str|Path,
     baseline=response_loss(model,validation)
     dest.mkdir(parents=True)
     tok_target=dest/'tokenizer.json';tok_target.write_bytes(Path(tokenizer_file).read_bytes())
-    metadata={'stage':'java_instruction_sft_v018' if target_context else 'java_instruction_sft_v017',
+    metadata={'stage':stage,'model_origin':origin,'source_pin_status':pin_status,
               'original_context_length':original_cfg.max_position_embeddings,
               'trained_context_length':cfg.max_position_embeddings,
               'context_extension':'ROPE_EXTRAPOLATION_UNVALIDATED' if target_context else 'NONE','tokenizer_sha256':tok_sha,
@@ -585,7 +600,7 @@ def train_instruction_sft(base_checkpoint:str|Path,tokenizer_file:str|Path,
         baseline_compile=heldout_compilation(model,tokenizer,test_rows,max_cases=compile_cases)
         checkpoint_load(best_path,model)
         best_compile=heldout_compilation(model,tokenizer,test_rows,max_cases=compile_cases)
-    report={'status':'TRAINED_CPU','phase':'JAVA_INSTRUCTION_SFT','model_origin':'PINNED_REAL_JAVA_V017_SFT' if target_context else 'PINNED_REAL_JAVA_V016',
+    report={'status':'TRAINED_CPU','phase':'JAVA_INSTRUCTION_SFT','model_origin':origin,'source_pin_status':pin_status,
             'checkpoint_sha256_base':base_sha,'tokenizer_sha256':tok_sha,
             'data_manifest_sha256':manifest_sha,'prompt_version':PROMPT_VERSION,
             'dataset_source':'project-authored parametric synthetic Java v0.15; NOT independent human tasks',
@@ -594,6 +609,9 @@ def train_instruction_sft(base_checkpoint:str|Path,tokenizer_file:str|Path,
             'original_model_context_length':original_cfg.max_position_embeddings,
             'context_extension':'ROPE_EXTRAPOLATION_UNVALIDATED' if target_context else 'NONE',
             'optimizer_steps_requested':steps,'optimizer_steps_completed':completed,'termination':termination,
+            'optimizer_spec':{'name':'AdamW','lr':lr,'weight_decay':0.01,'gradient_clip_norm':1.0,
+                'batch_size':batch_size,'seed':seed,'eval_every':eval_every,'eval_count':eval_count,
+                'test_count':test_count,'max_seconds':max_seconds},
             'distinct_training_examples_seen':len(seen),
             'best_checkpoint_step':best_step,'best_checkpoint_train_examples_seen':best_seen,
             'initial_validation_response_loss':baseline,'best_validation_response_loss':best_loss,
