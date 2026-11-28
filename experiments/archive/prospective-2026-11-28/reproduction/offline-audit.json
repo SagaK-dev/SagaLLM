@@ -1,0 +1,38 @@
+{
+  "actual_training_process_attested": false,
+  "best_step_declared": 4,
+  "checkpoint_bindings": [
+    {
+      "bytes": 20718372,
+      "journal_prefix_sha256": "db5368658fc4f6c77963ad8b7bde6abf3611760adbe8672f5099a0e8e387e6a9",
+      "role": "best",
+      "sha256": "729b0fbe346c38c819cb70d1373a4c1cce9fbbd8ce29eadf790ff233c9e73ccc",
+      "step_declared": 4
+    },
+    {
+      "bytes": 20718372,
+      "journal_prefix_sha256": "ee3ec50096b3d251bb4a20d20e6a72b744673f31eddb7202c64a1493add61092",
+      "role": "last",
+      "sha256": "dacb86e7833e1857c1a55ce9724ee5a3406f28493f6681317cad8964c8288def",
+      "step_declared": 12
+    }
+  ],
+  "checkpoint_deserialized": false,
+  "distinct_train_rows_rechecked": 48,
+  "embedded_metadata_independently_read": false,
+  "gradient_influence_verified": false,
+  "historical_exposure_verified": false,
+  "independent_evaluation": "NOT_RUN",
+  "loss_targets_rechecked": 3094,
+  "model_selection_permitted": false,
+  "report_sha256": "88f40790ef6f0ee1f00e1c07f25ecc1b144640734621036bd8fcd8da6b3753e1",
+  "row_exposures_rechecked": 48,
+  "schema": "sagallm-integrated-sft-offline-audit-v1",
+  "selection_arithmetic_rechecked": true,
+  "status": "PINNED_REPORT_TRACE_SCHEDULE_AND_CHECKPOINT_BYTES_MATCH",
+  "steps_rechecked": 12,
+  "tip_sha256": "8e9b398dbabe5c37130caacd184aaa49e9d7bce901776b7c7803c7d375502fce",
+  "trace_sha256": "6a2ccd2622c4fb2c4df1b838ea1a22fc3ca344e98fd3b98d292b9e35b8cfec05",
+  "validation_losses_recomputed": false,
+  "validation_or_test_rows_read": false
+}

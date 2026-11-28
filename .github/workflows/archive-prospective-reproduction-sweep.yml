@@ -1,0 +1,23 @@
+name: SagaLLM verify durable reproduction and sweep metadata
+on:
+  pull_request:
+    paths:
+      - 'experiments/archive/prospective-2026-11-28/**'
+      - 'scripts/archive_prospective_reproduction_sweep.py'
+      - '.github/workflows/archive-prospective-reproduction-sweep.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+      - name: Verify exact committed originals and trace bindings offline
+        run: python -m scripts.archive_prospective_reproduction_sweep

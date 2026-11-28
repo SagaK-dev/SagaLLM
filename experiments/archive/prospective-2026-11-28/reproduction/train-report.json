@@ -1,0 +1,140 @@
+{
+  "status": "TRAINED_CPU",
+  "phase": "JAVA_INSTRUCTION_SFT",
+  "model_origin": "PINNED_REAL_JAVA_V017_SFT",
+  "checkpoint_sha256_base": "a17268d80ff443e4a0347f3a29df433556506f13537c78ce282836fa8fe4e5f9",
+  "tokenizer_sha256": "186566808cb03e328cac9a6b7b384a8d0aefc54ccb83fbe97782a751726682fe",
+  "data_manifest_sha256": "1e9c0ff933c5096cf2d633e81ec0c90498006fab45397a28a4c073fbf181a23a",
+  "prompt_version": "compact_java_17_sft_v1",
+  "dataset_source": "project-authored parametric synthetic Java v0.15; NOT independent human tasks",
+  "original_split_counts": {
+    "train": {
+      "total": 17080,
+      "accepted": 17080,
+      "excluded_too_long": 0,
+      "families_accepted": 90,
+      "newly_admitted_beyond_original_context": 562
+    },
+    "validation": {
+      "total": 228,
+      "accepted": 228,
+      "excluded_too_long": 0,
+      "families_accepted": 10,
+      "newly_admitted_beyond_original_context": 15
+    },
+    "test": {
+      "total": 228,
+      "accepted": 228,
+      "excluded_too_long": 0,
+      "families_accepted": 10,
+      "newly_admitted_beyond_original_context": 28
+    }
+  },
+  "model_parameters": 1722048,
+  "model_context_length": 384,
+  "original_model_context_length": 192,
+  "context_extension": "ROPE_EXTRAPOLATION_UNVALIDATED",
+  "optimizer_steps_requested": 12,
+  "optimizer_steps_completed": 12,
+  "termination": "STEP_LIMIT",
+  "distinct_training_examples_seen": 48,
+  "best_checkpoint_step": 4,
+  "best_checkpoint_train_examples_seen": 16,
+  "initial_validation_response_loss": 1.77098398970429,
+  "best_validation_response_loss": 1.7621078081149792,
+  "heldout_test_response_loss_before_sft": 2.166559250304213,
+  "heldout_test_response_loss_best_sft": 2.161091944179848,
+  "heldout_test_response_loss_last_sft": 2.1825095421638436,
+  "test_used_for_model_selection": false,
+  "compile_only_base": {
+    "status": "NOT_RUN"
+  },
+  "compile_only_best": {
+    "status": "NOT_RUN"
+  },
+  "java_code_executed": false,
+  "java_behavior_test": "NOT_RUN",
+  "java_coding_ability": "NOT_ESTABLISHED",
+  "history": [
+    {
+      "step": 4,
+      "last_train_response_loss": 0.9177119135856628,
+      "validation_response_loss": 1.7621078081149792,
+      "distinct_train_examples_seen": 16,
+      "distinct_train_families_seen": 16
+    },
+    {
+      "step": 8,
+      "last_train_response_loss": 0.9686223268508911,
+      "validation_response_loss": 1.7625165152126516,
+      "distinct_train_examples_seen": 32,
+      "distinct_train_families_seen": 32
+    },
+    {
+      "step": 12,
+      "last_train_response_loss": 0.7552918195724487,
+      "validation_response_loss": 1.773398568644326,
+      "distinct_train_examples_seen": 48,
+      "distinct_train_families_seen": 48
+    }
+  ],
+  "best_checkpoint_sha256": "729b0fbe346c38c819cb70d1373a4c1cce9fbbd8ce29eadf790ff233c9e73ccc",
+  "last_checkpoint_sha256": "dacb86e7833e1857c1a55ce9724ee5a3406f28493f6681317cad8964c8288def",
+  "training_seconds": 1.47,
+  "optimizer_exposure": {
+    "status": "LOCAL_TRACE_AND_TRAIN_SOURCE_VERIFIED",
+    "journal_file": "optimizer-exposure.jsonl",
+    "trace": {
+      "status": "FINALIZED_LOCAL_TRACE",
+      "trace_sha256": "6a2ccd2622c4fb2c4df1b838ea1a22fc3ca344e98fd3b98d292b9e35b8cfec05",
+      "tip_sha256": "8e9b398dbabe5c37130caacd184aaa49e9d7bce901776b7c7803c7d375502fce",
+      "events": 29,
+      "completed_optimizer_returns": 12,
+      "pending_step": null,
+      "checkpoints": {
+        "best": {
+          "checkpoint_sha256": "729b0fbe346c38c819cb70d1373a4c1cce9fbbd8ce29eadf790ff233c9e73ccc",
+          "completed_optimizer_returns": 4,
+          "prefix_sha256": "db5368658fc4f6c77963ad8b7bde6abf3611760adbe8672f5099a0e8e387e6a9",
+          "role": "best",
+          "schema": "sagallm-optimizer-exposure-v1"
+        },
+        "last": {
+          "checkpoint_sha256": "dacb86e7833e1857c1a55ce9724ee5a3406f28493f6681317cad8964c8288def",
+          "completed_optimizer_returns": 12,
+          "prefix_sha256": "ee3ec50096b3d251bb4a20d20e6a72b744673f31eddb7202c64a1493add61092",
+          "role": "last",
+          "schema": "sagallm-optimizer-exposure-v1"
+        }
+      },
+      "authenticated_attestation": false,
+      "gradient_influence_verified": false,
+      "historical_exposure_verified": false
+    },
+    "source_binding": {
+      "schema": "sagallm-exposure-trace-source-binding-v1",
+      "status": "RECORDED_TRAIN_INPUTS_MATCH_PINNED_SOURCE",
+      "trace_sha256": "6a2ccd2622c4fb2c4df1b838ea1a22fc3ca344e98fd3b98d292b9e35b8cfec05",
+      "tip_sha256": "8e9b398dbabe5c37130caacd184aaa49e9d7bce901776b7c7803c7d375502fce",
+      "data_manifest_sha256": "1e9c0ff933c5096cf2d633e81ec0c90498006fab45397a28a4c073fbf181a23a",
+      "train_split_sha256": "181346d5395efdd2ef376730321e1585d453b2b09a822302f6f2d03137e1aa8d",
+      "tokenizer_sha256": "186566808cb03e328cac9a6b7b384a8d0aefc54ccb83fbe97782a751726682fe",
+      "base_checkpoint_sha256": "a17268d80ff443e4a0347f3a29df433556506f13537c78ce282836fa8fe4e5f9",
+      "train_source_rows": 17080,
+      "distinct_recorded_rows": 48,
+      "recorded_row_exposures_rechecked": 48,
+      "packed_batches_rechecked": 12,
+      "loss_targets_rechecked": 3094,
+      "requested_reencoding_context": 384,
+      "validation_or_test_source_read": false,
+      "checkpoint_deserialized": false,
+      "actual_training_process_attested": false,
+      "gradient_influence_verified": false,
+      "historical_exposure_verified": false,
+      "independent_evaluation": "NOT_RUN",
+      "model_selection_permitted": false
+    },
+    "independent_attestation": false,
+    "historical_exposure_verified": false
+  }
+}
