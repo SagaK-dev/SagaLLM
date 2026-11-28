@@ -21,6 +21,7 @@ import torch
 from .config import ModelConfig
 from .exposure_trace import ExposureTrace, SCHEMA as EXPOSURE_SCHEMA, traced_sft_step, verify_trace
 from .exposure_source_binding import replay_source_binding
+from .sft_lr_schedule import validate_schedule, step_lr, group_lr
 from .java_diverse_corpus import verify_java_diverse_corpus
 from .model import SagaTransformer
 from .tokenization import load_tokenizer
@@ -451,11 +452,16 @@ def train_instruction_sft(base_checkpoint:str|Path,tokenizer_file:str|Path,
                           lr:float=0.00015,seed:int=717,max_seconds:float=360,
                           require_pinned:bool=True, target_context:int|None=None,
                           pinned_checkpoint_sha256:str=V016_BASE_BEST_SHA256,
-                          record_exposure:bool=False,validation_only:bool=False)->dict:
+                          record_exposure:bool=False,validation_only:bool=False,lr_schedule:dict|None=None)->dict:
     if not (1<=steps<=1500 and 1<=batch_size<=8 and 1<=eval_every<=500
             and 1<=eval_count<=100 and 1<=test_count<=100 and 0<=compile_cases<=12
             and 0<lr<=0.001 and 10<=max_seconds<=600):
         raise ValueError('Unsafe SFT budget')
+    if lr_schedule is not None:
+        lr_schedule=dict(lr_schedule)
+        validate_schedule(lr_schedule,steps)
+        if not record_exposure or lr_schedule['peak_lr']!=lr:
+            raise ValueError('Explicit schedule requires trace and matching peak LR')
     if validation_only and compile_cases:
         raise ValueError('Validation-only mode requires compile_cases=0')
     root=Path(dataset);dest=Path(output)
@@ -509,12 +515,16 @@ def train_instruction_sft(base_checkpoint:str|Path,tokenizer_file:str|Path,
               'context_extension':'ROPE_EXTRAPOLATION_UNVALIDATED' if target_context else 'NONE','tokenizer_sha256':tok_sha,
               'base_checkpoint_sha256':base_sha,'dataset_manifest_sha256':manifest_sha,
               'prompt_version':PROMPT_VERSION,'optimizer_base_lr':lr,'seed':seed}
+    if lr_schedule is not None:
+        metadata['lr_schedule']=lr_schedule
     exposure=None
     trace_path=dest/'optimizer-exposure.jsonl'
     if record_exposure:
         header={'schema':EXPOSURE_SCHEMA,'split':'train','base_checkpoint_sha256':base_sha,
                 'tokenizer_sha256':tok_sha,'data_manifest_sha256':manifest_sha,
                 'train_split_sha256':train_sha,'seed':seed,'max_steps':steps,'batch_size':batch_size}
+        if lr_schedule is not None:
+            header['lr_schedule']=lr_schedule
     with (ExposureTrace(trace_path,header) if record_exposure else nullcontext()) as trace:
         def save_bound(role,path,step,info):
             if trace is None:
@@ -538,6 +548,9 @@ def train_instruction_sft(base_checkpoint:str|Path,tokenizer_file:str|Path,
                 pos=((step-1)*batch_size+j)%len(order)
                 index=order[pos];current.append(train_rows[index]);seen.add(index)
             x,y=pack(current)
+            if lr_schedule is not None:
+                for group in optimizer.param_groups:
+                    group['lr']=step_lr(lr_schedule,steps,step)
             if trace is not None:
                 last_batch_loss=traced_sft_step(model,optimizer,trace,current,x,y)
             else:
@@ -576,6 +589,11 @@ def train_instruction_sft(base_checkpoint:str|Path,tokenizer_file:str|Path,
                     saved['train_state']['exposure_trace']!={k:binding[k] for k in
                         ('schema','completed_optimizer_returns','prefix_sha256')}):
                     raise ValueError('Embedded checkpoint trace binding mismatch')
+                if lr_schedule is not None:
+                    expected_lr=lr if saved['step']==0 else step_lr(lr_schedule,steps,saved['step'])
+                    if (saved['train_state']['lr_schedule']!=lr_schedule or
+                        any(g['lr']!=expected_lr for g in saved['optimizer']['param_groups'])):
+                        raise ValueError('Saved optimizer schedule mismatch')
                 del saved
             source=replay_source_binding(trace_path,expected_trace_sha256=final['trace_sha256'],
                 expected_tip=final['tip_sha256'],dataset_dir=root,tokenizer_path=tok_target,
@@ -635,6 +653,8 @@ def train_instruction_sft(base_checkpoint:str|Path,tokenizer_file:str|Path,
             'best_checkpoint_sha256':sha_file(best_path),
             'last_checkpoint_sha256':sha_file(dest/'java-sft-last.pt'),
             'training_seconds':round(time.monotonic()-train_start,2)}
+    if lr_schedule is not None:
+        report['optimizer_spec']['lr_schedule']=lr_schedule
     if exposure is not None:
         report['optimizer_exposure']=exposure
     (dest/'train-report.json').write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\n',encoding='utf8')
