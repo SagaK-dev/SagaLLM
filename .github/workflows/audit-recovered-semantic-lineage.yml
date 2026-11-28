@@ -1,0 +1,47 @@
+name: SagaLLM recovered semantic lineage
+on:
+  pull_request:
+    paths:
+      - 'scripts/audit_recovered_semantic_lineage.py'
+      - 'tests/test_audit_recovered_semantic_lineage.py'
+      - '.github/workflows/audit-recovered-semantic-lineage.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  lineage:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+      - run: python -m unittest discover -s tests -p test_audit_recovered_semantic_lineage.py
+      - name: Reconcile actual recovered output roles and declared parents
+        if: github.event_name == 'workflow_dispatch' || github.event.pull_request.head.repo.full_name == github.repository
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          tmp=$(mktemp -d)
+          trap 'rm -rf "$tmp"' EXIT
+          gh api repos/SagaK-dev/SagaLLM/actions/artifacts/15239309131/zip > "$tmp/triage.zip"
+          gh api repos/SagaK-dev/SagaLLM/actions/artifacts/15240845377/zip > "$tmp/recovery.zip"
+          gh api repos/SagaK-dev/SagaLLM/actions/artifacts/15239793469/zip > "$tmp/byte.zip"
+          unset GH_TOKEN
+          python -m scripts.audit_recovered_semantic_lineage --triage-zip "$tmp/triage.zip" --recovery-zip "$tmp/recovery.zip" --byte-zip "$tmp/byte.zip" > recovered-semantic-lineage.json
+          python - <<'PY'
+          import json
+          d=json.load(open("recovered-semantic-lineage.json"))
+          print(json.dumps({k:d[k] for k in ("prior_checkpoint_count","combined_checkpoint_hash_count","new_checkpoint_hash_count","recovered_checkpoint_hash_count","recovered_member_count","step_zero_distinct_hashes","step_zero_member_instances","positive_step_distinct_hashes","declared_parent_graph_acyclic")},sort_keys=True))
+          PY
+      - uses: actions/upload-artifact@v4
+        if: github.event_name == 'workflow_dispatch' || github.event.pull_request.head.repo.full_name == github.repository
+        with:
+          name: historical-recovered-semantic-lineage-metadata
+          path: recovered-semantic-lineage.json
+          if-no-files-found: error
