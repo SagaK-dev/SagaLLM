@@ -1,0 +1,53 @@
+name: SagaLLM unified model state scope
+on:
+  pull_request:
+    paths:
+      - 'scripts/audit_unified_model_state_scope.py'
+      - 'tests/test_audit_unified_model_state_scope.py'
+      - '.github/workflows/audit-unified-model-state-scope.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  integrate:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+      - run: python -m unittest discover -s tests -p test_audit_unified_model_state_scope.py
+      - name: Integrate exact evidence and durable public report originals
+        if: github.event_name == 'workflow_dispatch' || github.event.pull_request.head.repo.full_name == github.repository
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          tmp=$(mktemp -d)
+          trap 'rm -rf "$tmp"' EXIT
+          for id in 15246425930 15246461863 15245577790; do
+            gh api "repos/SagaK-dev/SagaLLM/actions/artifacts/$id/zip" > "$tmp/$id.zip"
+          done
+          unset GH_TOKEN
+          git fetch --depth=1 origin 04b16fbb3a4901123d2891827b38beb6f492b4f4 0d1fbd6fb22dc6b9b272a1ed6f886e9338ffcb6e
+          git worktree add --detach "$tmp/originals" 04b16fbb3a4901123d2891827b38beb6f492b4f4
+          git show 0d1fbd6fb22dc6b9b272a1ed6f886e9338ffcb6e:examples/java_external_io_INTAKE.json > "$tmp/suite.json"
+          git show 0d1fbd6fb22dc6b9b272a1ed6f886e9338ffcb6e:scripts/evaluate_java_public_compile_diagnostic.py > "$tmp/prompt.py"
+          python -m scripts.audit_unified_model_state_scope --lineage-zip "$tmp/15246425930.zip" --tensor-zip "$tmp/15246461863.zip" --trial-zip "$tmp/15245577790.zip" --originals "$tmp/originals/experiments/archive/recovered-2026-11-28" --suite "$tmp/suite.json" --prompt-script "$tmp/prompt.py" --inventory-output scoped-unified-inventory.json > unified-model-state-scope.json
+          python - <<'PY'
+          import json
+          d=json.load(open("unified-model-state-scope.json"))
+          print(json.dumps({k:d[k] for k in ("serialized_checkpoint_hash_count","known_tensor_alias_count","model_state_equivalence_classes_upper_bound","exact_distinct_model_state_count","inventory_entries","public_development_scope")},sort_keys=True))
+          PY
+      - uses: actions/upload-artifact@v4
+        if: github.event_name == 'workflow_dispatch' || github.event.pull_request.head.repo.full_name == github.repository
+        with:
+          name: historical-unified-model-state-scope-metadata
+          path: |
+            scoped-unified-inventory.json
+            unified-model-state-scope.json
+          if-no-files-found: error
