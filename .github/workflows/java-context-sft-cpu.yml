@@ -2,6 +2,7 @@ name: SagaLLM pinned Java longer-context SFT (CPU)
 
 on:
   pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
     paths:
       - 'src/sagallm/java_instruction_sft.py'
       - 'scripts/train_java_instruction.py'
@@ -19,6 +20,7 @@ concurrency:
 
 jobs:
   java-context-sft:
+    if: github.event_name == 'workflow_dispatch' || !github.event.pull_request.draft
     runs-on: ubuntu-latest
     timeout-minutes: 16
     env:
