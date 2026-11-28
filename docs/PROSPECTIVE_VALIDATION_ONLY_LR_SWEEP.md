@@ -1,0 +1,5 @@
+# M2.5-i — validation-only matched learning-rate development sweep
+
+Before execution, fix three learning rates 1e-5, 4e-5 and 8e-5; seeds 717 and 719; exact original v0.17 parent; canonical synthetic corpus; 384 context; 12 AdamW steps per run; batch size 4; validation every 4 steps on the same 30 rows. All six runs start independently from the same parent. Require identical ordered batch payloads and baseline validation loss within each seed group; recheck all 288 row exposures and 72 successful optimizer returns with the offline trace verifier.
+
+Add an explicit validation-only mode to the existing SFT entrypoint, default off; reject compilation, skip TEST tokenization/scoring, report null TEST losses and NOT_RUN. Structural verification still reads the original split bytes. The runtime guard checks that the TRAIN and validation encoders alone are called. Report all six arms and descriptive two-seed means. No cross-arm model adoption, no claim of statistical significance or independent capability, no generated Java execution. No candidate weights or raw corpus uploaded. Historical input rights and independent evaluation remain unresolved.
