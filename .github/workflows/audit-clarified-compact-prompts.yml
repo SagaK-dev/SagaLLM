@@ -49,6 +49,7 @@ jobs:
           gh api repos/SagaK-dev/SagaLLM/actions/artifacts/15258415001/zip > "$tmp/boundary.zip"
           unset GH_TOKEN GITHUB_TOKEN
           PYTHONPATH=src python -m scripts.audit_clarified_compact_prompts --parent-zip "$tmp/parent.zip" --reference-zip "$tmp/reference.zip" --compact-zip "$tmp/compact.zip" --boundary-zip "$tmp/boundary.zip" --output clarified-compact-prompts.json
+          echo 'd2ec7ea34b7f245d7bca7ba8782cd33ba6d0f7dd8dabb8bcb37b43448b38c253  clarified-compact-prompts.json' | sha256sum -c -
       - uses: actions/upload-artifact@v4
         with:
           name: clarified-compact-prompt-metadata
