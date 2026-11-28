@@ -11,7 +11,8 @@ import torch
 from sagallm.config import ModelConfig
 from sagallm.java_instruction_sft import (
     _validate_base, compact_prompt, encode_row, eval_sample, interleaved_order,
-    pack, response_loss, source_task, train_instruction_sft,
+    pack, response_loss, source_task, train_instruction_sft, source_origin,
+    V016_BASE_BEST_SHA256, V017_SFT_BEST_SHA256, V016_TOKENIZER_SHA256,
 )
 from sagallm.java_diverse_corpus import build_java_diverse_corpus
 from sagallm.model import SagaTransformer
@@ -97,6 +98,9 @@ def test_real_canonical_split_two_step_cpu_sft(tmp_path):
     result=train_instruction_sft(initial,tok,dataset,tmp_path/'sft',steps=2,
                  batch_size=2,eval_every=1,eval_count=6,test_count=6,
                  compile_cases=0,max_seconds=25,require_pinned=False,record_exposure=True)
+    assert result['model_origin']=='LOCAL_CHECKPOINT_PIN_NOT_REQUIRED'
+    assert result['source_pin_status']=='PIN_NOT_REQUIRED'
+    assert result['optimizer_spec']['batch_size']==2
     exposure=result['optimizer_exposure']
     assert exposure['status']=='LOCAL_TRACE_AND_TRAIN_SOURCE_VERIFIED'
     assert exposure['trace']['completed_optimizer_returns']==2
@@ -112,3 +116,14 @@ def test_real_canonical_split_two_step_cpu_sft(tmp_path):
     assert (tmp_path/'sft'/'java-sft-best.pt').is_file()
     assert (tmp_path/'sft'/'java-sft-last.pt').is_file()
     assert json.loads((tmp_path/'sft'/'train-report.json').read_text())['best_checkpoint_sha256']
+
+def test_origin_tracks_pins_not_context():
+    for base,expected in ((V016_BASE_BEST_SHA256,'PINNED_REAL_JAVA_V016'),
+                         (V017_SFT_BEST_SHA256,'PINNED_REAL_JAVA_V017_SFT'),
+                         ('a'*64,'CUSTOM_PINNED_LOCAL_CHECKPOINT')):
+        assert source_origin(base,V016_TOKENIZER_SHA256,require_pinned=True,
+            pinned_checkpoint_sha256=base)[0]==expected
+        assert source_origin(base,V016_TOKENIZER_SHA256,require_pinned=False,
+            pinned_checkpoint_sha256=base)[0]=='LOCAL_CHECKPOINT_PIN_NOT_REQUIRED'
+    with pytest.raises(ValueError):
+        source_origin('a'*64,'b'*64,require_pinned=True,pinned_checkpoint_sha256='a'*64)
