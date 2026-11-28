@@ -1,0 +1,101 @@
+{
+  "best_step_equal": true,
+  "checkpoints": [
+    {
+      "config_sha256_equal": true,
+      "file_sha256_equal": true,
+      "model_sha256_equal": true,
+      "optimizer_sha256_equal": true,
+      "original": {
+        "config_sha256": "09f9e4bc17178a44224f6050a488c0aa67395f3d79545055a50a1ebee2bdb78d",
+        "file_sha256": "729b0fbe346c38c819cb70d1373a4c1cce9fbbd8ce29eadf790ff233c9e73ccc",
+        "model_sha256": "183d97b658722a78461cd043c2b3a1940b17d6e07e1be4989018db86ab65e76c",
+        "optimizer_sha256": "9bd45feccf6e8f06ecc714f0637df9b0a80d1b76f8e672e7e304d2ff1875fe04",
+        "step": 4
+      },
+      "rerun": {
+        "config_sha256": "09f9e4bc17178a44224f6050a488c0aa67395f3d79545055a50a1ebee2bdb78d",
+        "file_sha256": "729b0fbe346c38c819cb70d1373a4c1cce9fbbd8ce29eadf790ff233c9e73ccc",
+        "model_sha256": "183d97b658722a78461cd043c2b3a1940b17d6e07e1be4989018db86ab65e76c",
+        "optimizer_sha256": "9bd45feccf6e8f06ecc714f0637df9b0a80d1b76f8e672e7e304d2ff1875fe04",
+        "step": 4
+      },
+      "role": "best",
+      "step_equal": true
+    },
+    {
+      "config_sha256_equal": true,
+      "file_sha256_equal": true,
+      "model_sha256_equal": true,
+      "optimizer_sha256_equal": true,
+      "original": {
+        "config_sha256": "09f9e4bc17178a44224f6050a488c0aa67395f3d79545055a50a1ebee2bdb78d",
+        "file_sha256": "dacb86e7833e1857c1a55ce9724ee5a3406f28493f6681317cad8964c8288def",
+        "model_sha256": "615fdb69f4e2295bdc63d7ef7910b3be61d0fa7e36f3ef6309c5b820c7a2a26f",
+        "optimizer_sha256": "289c1234a5f35d3b8c34b146b8a83fe9e0659cdef1ea9dfc147290607e03fa53",
+        "step": 12
+      },
+      "rerun": {
+        "config_sha256": "09f9e4bc17178a44224f6050a488c0aa67395f3d79545055a50a1ebee2bdb78d",
+        "file_sha256": "dacb86e7833e1857c1a55ce9724ee5a3406f28493f6681317cad8964c8288def",
+        "model_sha256": "615fdb69f4e2295bdc63d7ef7910b3be61d0fa7e36f3ef6309c5b820c7a2a26f",
+        "optimizer_sha256": "289c1234a5f35d3b8c34b146b8a83fe9e0659cdef1ea9dfc147290607e03fa53",
+        "step": 12
+      },
+      "role": "last",
+      "step_equal": true
+    }
+  ],
+  "exact_serialized_checkpoint_equality": true,
+  "historical_full_environment_available": false,
+  "history_exact_equal": true,
+  "identical_ordered_batch_payloads": true,
+  "independent_evaluation": "NOT_RUN",
+  "metrics": {
+    "best_validation_response_loss": {
+      "absolute_difference": 0.0,
+      "exact_equal": true,
+      "original": 1.7621078081149792,
+      "rerun": 1.7621078081149792
+    },
+    "heldout_test_response_loss_before_sft": {
+      "absolute_difference": 0.0,
+      "exact_equal": true,
+      "original": 2.166559250304213,
+      "rerun": 2.166559250304213
+    },
+    "heldout_test_response_loss_best_sft": {
+      "absolute_difference": 0.0,
+      "exact_equal": true,
+      "original": 2.161091944179848,
+      "rerun": 2.161091944179848
+    },
+    "heldout_test_response_loss_last_sft": {
+      "absolute_difference": 0.0,
+      "exact_equal": true,
+      "original": 2.1825095421638436,
+      "rerun": 2.1825095421638436
+    },
+    "initial_validation_response_loss": {
+      "absolute_difference": 0.0,
+      "exact_equal": true,
+      "original": 1.77098398970429,
+      "rerun": 1.77098398970429
+    }
+  },
+  "model_selection_permitted": false,
+  "model_state_and_config_equal": true,
+  "optimizer_state_equal": true,
+  "original_checkpoint_artifact_id": 15247155692,
+  "original_evidence_artifact_id": 15247550137,
+  "original_revision": "a089929068b5b64ac69bfb3a7d916b1864b8a299",
+  "original_run_id": 46104477318,
+  "original_zip_pins_verified": true,
+  "rights_review": "REVIEW_REQUIRED",
+  "row_exposures_per_run": 48,
+  "schema": "sagallm-traced-context-reproduction-v1",
+  "status": "BOUNDED_RERUN_COMPARISON_COMPLETE",
+  "steps_per_run": 12,
+  "trace_file_equal": true,
+  "universal_reproducibility_established": false
+}
