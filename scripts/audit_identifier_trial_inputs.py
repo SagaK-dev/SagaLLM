@@ -28,7 +28,6 @@ RECOVERY = "25a0d7cbacdead46d18c7261287a601bf7a2c114c8ff9a5a6ebf22a0e8ba3040"
 TOKENIZER = "186566808cb03e328cac9a6b7b384a8d0aefc54ccb83fbe97782a751726682fe"
 DATA = "1e9c0ff933c5096cf2d633e81ec0c90498006fab45397a28a4c073fbf181a23a"
 BROAD = "181346d5395efdd2ef376730321e1585d453b2b09a822302f6f2d03137e1aa8d"
-VALID = "e29c63a8461f"  # full SHA checked against the pinned corpus manifest
 LIMIT = 2_000_000
 
 
@@ -123,7 +122,7 @@ def reconstruct(args):
     canonical_dir=args.root/"canonical"
     build_java_diverse_corpus(canonical_dir)
     verify_java_diverse_corpus(canonical_dir)
-    cm=json.loads(pin(canonical_dir/"manifest.json",DATA))
+    pin(canonical_dir/"manifest.json",DATA)
     pin(canonical_dir/"train.jsonl",BROAD,90_000_000)
     # Historical verifier checks all split bytes, but only validation/TRAIN are tokenized here.
     valid,valid_counts=read_split(canonical_dir,"validation",tok,384)
