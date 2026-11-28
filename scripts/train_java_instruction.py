@@ -28,6 +28,7 @@ def main():
     p.add_argument('--lr-schedule',choices=['constant','warmup_cosine'])
     p.add_argument('--warmup-steps',type=int,default=0)
     p.add_argument('--min-lr-ratio',type=float,default=1.0)
+    p.add_argument('--dataset-mode',choices=['canonical','template_capped_v1'],default='canonical')
     a=p.parse_args()
     if not a.lr_schedule and (a.warmup_steps!=0 or a.min_lr_ratio!=1.0):
         p.error('Schedule parameters require --lr-schedule')
@@ -36,7 +37,7 @@ def main():
     report=train_instruction_sft(a.base,a.tokenizer,a.dataset,a.output,steps=a.steps,
          batch_size=a.batch_size,eval_every=a.eval_every,max_seconds=a.max_seconds,
          compile_cases=a.compile_cases,lr=a.lr,
-         target_context=a.context,record_exposure=a.record_exposure,validation_only=a.validation_only,lr_schedule=schedule,
+         target_context=a.context,record_exposure=a.record_exposure,validation_only=a.validation_only,lr_schedule=schedule,dataset_mode=a.dataset_mode,
          pinned_checkpoint_sha256=V017_SFT_BEST_SHA256 if a.context else V016_BASE_BEST_SHA256)
     print('JAVA_INSTRUCTION_SFT_SUMMARY '+json.dumps({k:v for k,v in report.items() if k!='history'},ensure_ascii=False),flush=True)
 
