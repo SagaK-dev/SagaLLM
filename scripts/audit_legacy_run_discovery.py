@@ -5,7 +5,7 @@ The Actions inventory represents accessible latest-attempt metadata, not exposur
 """
 import argparse
 from collections import Counter
-from datetime import datetime
+from datetime import datetime, timedelta
 import hashlib
 import json
 from pathlib import Path
@@ -227,16 +227,34 @@ def read_snapshot(path):
     return old, sha(raw)
 
 
-def live_pages(path, cutoff):
-    pages = parse(read_bounded(path, 64 * 1024 * 1024))
+def _page_rows(pages, cutoff, lower=None):
     require(isinstance(pages, list) and 1 <= len(pages) <= 10, "Pagination bound")
     count = pages[0]["total_count"]
-    require(type(count) is int and 0 < count <= 1000
+    require(type(count) is int and 0 <= count <= 1000
             and all(p["total_count"] == count and len(p["workflow_runs"]) <= 100 for p in pages),
             "Changing/oversized API count")
     rows = [normalize(r, live=True) for p in pages for r in p["workflow_runs"]]
-    require(len(rows) == count and all(stamp(r["created_at"]) <= stamp(cutoff) for r in rows),
+    require(len(rows) == count and all(stamp(r["created_at"]) <= stamp(cutoff) and
+            (lower is None or stamp(lower) <= stamp(r["created_at"])) for r in rows),
             "Incomplete or out-of-window page set")
+    return unique_runs(rows)
+
+
+def live_pages(path, cutoff):
+    data = parse(read_bounded(path, 64 * 1024 * 1024))
+    if isinstance(data,list):
+        return _page_rows(data,cutoff)
+    require(data["schema"]=="sagallm-actions-windowed-pages-v1" and data["cutoff_utc"]==cutoff
+            and 1<=len(data["windows"])<=256,"Windowed inventory schema")
+    expected=stamp(data["start_utc"]);last=stamp(cutoff);rows=[]
+    for w in data["windows"]:
+        start,end=stamp(w["start_utc"]),stamp(w["end_utc"])
+        require(start==expected and start<=end<=last and start.microsecond==end.microsecond==0,
+                "Inventory window gap/overlap")
+        rows.extend(_page_rows(w["pages"],w["end_utc"],w["start_utc"]).values())
+        require(len(rows)<=50000,"Aggregate inventory cap")
+        expected=end+timedelta(seconds=1)
+    require(expected==last+timedelta(seconds=1),"Incomplete cutoff coverage")
     return unique_runs(rows)
 
 
