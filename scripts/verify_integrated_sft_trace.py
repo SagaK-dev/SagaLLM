@@ -49,6 +49,14 @@ def audit(output,*,report_sha256,trace_sha256,tip_sha256,dataset,base,tokenizer)
             and report["prompt_version"]==PROMPT_VERSION and report["test_used_for_model_selection"] is False
             and report["java_code_executed"] is False and report["java_behavior_test"]=="NOT_RUN"
             and report["java_coding_ability"]=="NOT_ESTABLISHED","SFT report gate mismatch")
+    if report.get("evaluation_scope")=="VALIDATION_ONLY_DEVELOPMENT":
+        require(report["heldout_test_status"]=="NOT_RUN"
+                and report["test_bytes_structurally_verified"] is True
+                and report["original_split_counts"]["test"] is None
+                and all(report[k] is None for k in ("heldout_test_response_loss_before_sft",
+                    "heldout_test_response_loss_best_sft","heldout_test_response_loss_last_sft"))
+                and report["compile_only_base"]["status"]==report["compile_only_best"]["status"]=="NOT_RUN",
+                "Validation-only report gate mismatch")
     exp=report["optimizer_exposure"]
     require(exp["status"]=="LOCAL_TRACE_AND_TRAIN_SOURCE_VERIFIED"
             and exp["journal_file"]=="optimizer-exposure.jsonl"

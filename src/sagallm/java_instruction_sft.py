@@ -451,11 +451,13 @@ def train_instruction_sft(base_checkpoint:str|Path,tokenizer_file:str|Path,
                           lr:float=0.00015,seed:int=717,max_seconds:float=360,
                           require_pinned:bool=True, target_context:int|None=None,
                           pinned_checkpoint_sha256:str=V016_BASE_BEST_SHA256,
-                          record_exposure:bool=False)->dict:
+                          record_exposure:bool=False,validation_only:bool=False)->dict:
     if not (1<=steps<=1500 and 1<=batch_size<=8 and 1<=eval_every<=500
             and 1<=eval_count<=100 and 1<=test_count<=100 and 0<=compile_cases<=12
             and 0<lr<=0.001 and 10<=max_seconds<=600):
         raise ValueError('Unsafe SFT budget')
+    if validation_only and compile_cases:
+        raise ValueError('Validation-only mode requires compile_cases=0')
     root=Path(dataset);dest=Path(output)
     if dest.exists() or dest.is_symlink():raise FileExistsError('Refuse to replace experiment output')
     # Verify ALL splits before allocating a model. This recomputes canonical data.
@@ -583,23 +585,28 @@ def train_instruction_sft(base_checkpoint:str|Path,tokenizer_file:str|Path,
             exposure={'status':'LOCAL_TRACE_AND_TRAIN_SOURCE_VERIFIED','journal_file':trace_path.name,
                       'trace':verified,'source_binding':source,
                       'independent_attestation':False,'historical_exposure_verified':False}
-    # TEST tokenization and scoring occur only after best checkpoint selection is complete.
-    test_rows,test_info=read_split(root,'test',tokenizer,cfg.max_position_embeddings,
-        original_context=original_cfg.max_position_embeddings)
-    if not test_rows:raise ValueError('No accepted held-out test examples')
-    test_sample=eval_sample(test_rows,test_count)
-    last_test=response_loss(model,test_sample)
-    checkpoint_load(best_path,model)
-    best_test=response_loss(model,test_sample)
-    # Baseline diagnostic on the same held-out tests, after all checkpoint selection.
-    restore_verified_base_weights(model,state,original_cfg)
-    base_test=response_loss(model,test_sample)
-    # Compile-only generation: baseline and best on the exact same heldout prompts.
+    # Validation-only development never tokenizes or scores TEST. The canonical
+    # structural verification above still reads all split bytes.
+    test_info=None;base_test=None;best_test=None;last_test=None
     baseline_compile={'status':'NOT_RUN'};best_compile={'status':'NOT_RUN'}
-    if compile_cases:
-        baseline_compile=heldout_compilation(model,tokenizer,test_rows,max_cases=compile_cases)
+    if not validation_only:
+        # TEST tokenization and scoring occur only after best checkpoint selection is complete.
+        test_rows,test_info=read_split(root,'test',tokenizer,cfg.max_position_embeddings,
+            original_context=original_cfg.max_position_embeddings)
+        if not test_rows:raise ValueError('No accepted held-out test examples')
+        test_sample=eval_sample(test_rows,test_count)
+        last_test=response_loss(model,test_sample)
         checkpoint_load(best_path,model)
-        best_compile=heldout_compilation(model,tokenizer,test_rows,max_cases=compile_cases)
+        best_test=response_loss(model,test_sample)
+        # Baseline diagnostic on the same held-out tests, after all checkpoint selection.
+        restore_verified_base_weights(model,state,original_cfg)
+        base_test=response_loss(model,test_sample)
+        # Compile-only generation: baseline and best on the exact same heldout prompts.
+        baseline_compile={'status':'NOT_RUN'};best_compile={'status':'NOT_RUN'}
+        if compile_cases:
+            baseline_compile=heldout_compilation(model,tokenizer,test_rows,max_cases=compile_cases)
+            checkpoint_load(best_path,model)
+            best_compile=heldout_compilation(model,tokenizer,test_rows,max_cases=compile_cases)
     report={'status':'TRAINED_CPU','phase':'JAVA_INSTRUCTION_SFT','model_origin':origin,'source_pin_status':pin_status,
             'checkpoint_sha256_base':base_sha,'tokenizer_sha256':tok_sha,
             'data_manifest_sha256':manifest_sha,'prompt_version':PROMPT_VERSION,
@@ -619,6 +626,9 @@ def train_instruction_sft(base_checkpoint:str|Path,tokenizer_file:str|Path,
             'heldout_test_response_loss_best_sft':best_test,
             'heldout_test_response_loss_last_sft':last_test,
             'test_used_for_model_selection':False,
+            'evaluation_scope':'VALIDATION_ONLY_DEVELOPMENT' if validation_only else 'INTERNAL_HELDOUT_DIAGNOSTIC',
+            'heldout_test_status':'NOT_RUN' if validation_only else 'SCORED_INTERNAL',
+            'test_bytes_structurally_verified':True,
             'compile_only_base':baseline_compile,'compile_only_best':best_compile,
             'java_code_executed':False,'java_behavior_test':'NOT_RUN',
             'java_coding_ability':'NOT_ESTABLISHED','history':history,
