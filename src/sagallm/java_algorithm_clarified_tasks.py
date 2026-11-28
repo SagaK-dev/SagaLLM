@@ -3,8 +3,7 @@
 All options retain the original reference implementation. No automatic
 truncation, tokenizer change, or fallback to ambiguous prior prompts.
 """
-# Prefer the fuller expression; the second is an explicitly authored concise
-# alternative, never an algorithmically truncated version.
+# Preserve author preference order. New alternatives follow earlier proposals.
 RANGE = (
     "n q,整数A[n],q組l r。両端含むA[l..r]の和を各行出力。1<=n<=30,1<=q<=20,|A[i]|<=100,0<=l<=r<n。",
     "n q,整数A[n],q組l r。sum(A[i],l<=i<=r)を各行出力。1<=n<=30,1<=q<=20,|A[i]|<=100,0<=l<=r<n。",
@@ -25,7 +24,10 @@ PROPOSALS = {
         INTERVAL[0]+"単位区間をboolean配列に記録。",
         INTERVAL[1]+"単位区間のboolean配列。",
     ),
-    "interval_union_length-sort_merge-ja": tuple(p+"ソート併合。" for p in INTERVAL),
+    "interval_union_length-sort_merge-ja": (
+        *(p+"ソート併合。" for p in INTERVAL),
+        "n=0..30,整数l rをn組(-100<=l<=r<=100)。[l,r)をソート併合し和集合長を出力。",
+    ),
     "edit_distance-rolling-ja": (EDIT+"1次元DPで行更新。", EDIT+"1次元DP行交替。"),
     "unweighted_graph_distance-bfs-ja": (
         GRAPH[0]+"キューBFS:a-b最短辺数(不可-1)",
@@ -35,6 +37,7 @@ PROPOSALS = {
         GRAPH[0]+"Floyd-Warshall:a-b最短辺数(不可-1)",
         GRAPH[1]+"Floyd:a-b最短辺数(不可-1)",
         "n m (u v)*m a b;無向,V=[0,n),n=1..20,m=0..190; Floyd:a-b最短辺数(不可-1)",
+        "n=1..20 m=0..190 無向辺(u v)*m a b;V=[0,n);Floyd-Warshall:print min hops(a,b),no path=-1",
     ),
 }
 REVIEW_FOCUS = {
