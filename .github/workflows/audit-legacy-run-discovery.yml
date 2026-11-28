@@ -3,6 +3,7 @@ on:
   pull_request:
     paths:
       - 'scripts/audit_legacy_run_discovery.py'
+      - 'scripts/collect_legacy_run_pages.py'
       - 'tests/test_audit_legacy_run_discovery.py'
       - 'experiments/archive/**'
       - '.github/workflows/audit-legacy-run-discovery.yml'
@@ -33,7 +34,7 @@ jobs:
           tmp=$(mktemp -d)
           trap 'rm -rf "$tmp"' EXIT
           cutoff=$(date -u +%Y-%m-%dT%H:%M:%SZ)
-          gh api --paginate --slurp -X GET repos/SagaK-dev/SagaLLM/actions/runs -f per_page=100 -f "created=<$cutoff" > "$tmp/live-pages.json"
+          python -m scripts.collect_legacy_run_pages --cutoff "$cutoff" --output "$tmp/live-pages.json"
           unset GH_TOKEN
           revision=fe31880f6cb9bde71e01b22942964cb6df327186
           git fetch --depth=1 origin "$revision"
