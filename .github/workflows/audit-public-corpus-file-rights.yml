@@ -1,0 +1,57 @@
+name: SagaLLM public corpus file-level rights index
+on:
+  pull_request:
+    paths:
+      - 'scripts/audit_public_corpus_file_rights.py'
+      - 'tests/test_audit_public_corpus_file_rights.py'
+      - '.github/workflows/audit-public-corpus-file-rights.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  index:
+    if: github.repository == 'SagaK-dev/SagaLLM' && (github.event_name == 'workflow_dispatch' || github.event.pull_request.head.repo.full_name == github.repository)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    env:
+      GIT_TERMINAL_PROMPT: '0'
+      PYTHONHASHSEED: '0'
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+      - run: python -m unittest discover -s tests -p test_audit_public_corpus_file_rights.py
+      - name: Reconstruct exact upstream corpus and index per-file rights signals
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          tmp=$(mktemp -d)
+          trap 'rm -rf "$tmp"' EXIT
+          gh api repos/SagaK-dev/SagaLLM/actions/artifacts/14738360825/zip > "$tmp/public.zip"
+          unset GH_TOKEN
+          git fetch --depth=1 origin e60075a8baca2e1250b660c6acec11040733eec6
+          git worktree add --detach "$tmp/code" e60075a8baca2e1250b660c6acec11040733eec6
+          mkdir "$tmp/upstream"
+          fetch() {
+            git init -q "$tmp/upstream/$1"
+            git -C "$tmp/upstream/$1" -c core.hooksPath=/dev/null fetch --depth=1 "$2" "$3"
+            git -C "$tmp/upstream/$1" -c core.hooksPath=/dev/null checkout -q --detach FETCH_HEAD
+            test "$(git -C "$tmp/upstream/$1" rev-parse HEAD)" = "$3"
+          }
+          fetch algorithms https://github.com/TheAlgorithms/Java.git f4d6708297f86629a9e415070935b903ea8b1858
+          fetch gson https://github.com/google/gson.git d9b5079eaa4567219771bba6d04289cf45c7589b
+          fetch guava https://github.com/google/guava.git 36e3995499d6c3b74b1207d362fa9e19915d2589
+          fetch patterns https://github.com/iluwatar/java-design-patterns.git 4cabb204f240240bea319605a5ffa46ded728001
+          PYTHONPATH="$tmp/code/src" python -m sagallm.java_public_corpus --sources "$tmp/upstream" --output "$tmp/corpus"
+          PYTHONPATH="$tmp/code/src" python -m sagallm.java_public_corpus --verify "$tmp/corpus"
+          python -m scripts.audit_public_corpus_file_rights --corpus "$tmp/corpus" --upstream "$tmp/upstream" --archive "$tmp/public.zip" --out rights-index
+      - uses: actions/upload-artifact@v4
+        with:
+          name: historical-public-corpus-file-rights-index-metadata
+          path: rights-index/
+          if-no-files-found: error
