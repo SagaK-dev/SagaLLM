@@ -32,7 +32,9 @@ def run(output):
             eval_every=1,eval_count=6,test_count=6,compile_cases=0,max_seconds=60,
             require_pinned=False,record_exposure=True)
         exp=report["optimizer_exposure"]
-        if (report["optimizer_steps_completed"]!=2 or
+        if (report["model_origin"]!="LOCAL_CHECKPOINT_PIN_NOT_REQUIRED" or
+            report["source_pin_status"]!="PIN_NOT_REQUIRED" or
+            report["optimizer_steps_completed"]!=2 or
             exp["source_binding"]["recorded_row_exposures_rechecked"]!=4 or
             exp["trace"]["checkpoints"]["best"]["checkpoint_sha256"]!=report["best_checkpoint_sha256"] or
             exp["trace"]["checkpoints"]["last"]["checkpoint_sha256"]!=report["last_checkpoint_sha256"] or
