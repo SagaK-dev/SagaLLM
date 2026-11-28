@@ -49,7 +49,8 @@ STDIO = [
 RANK = [
     ("derived/ranking_auxiliary.jsonl", "auxiliary_input_screening_text"),
     ("derived/previous_holdback.jsonl", "development_probe_context"),
-    ("derived/parameter_ce_validation.jsonl", "shared_binding_pair_screening_context"),
+    ("derived/parameter_ce_train.jsonl", "shared_binding_train_pair_development_context"),
+    ("derived/parameter_ce_validation.jsonl", "shared_binding_pair_development_context"),
 ]
 CE = [
     ("derived/previous_holdback.jsonl", "development_probe_context"),
@@ -138,7 +139,7 @@ def integrate(root, scope, inventory, ledger, early):
                  "parent_checkpoint_sha256_declared": BEST, "reason": "NOT_AVAILABLE_IN_PRIOR_ARTIFACT",
                  "sources": source_assignments(entries, ANCESTOR + SFT + STDIO)}],
             "base_probe_context": {"checkpoint_sha256": BEST,
-                "sources": source_assignments(entries, STDIO[1:] + RANK + CE),
+                "sources": source_assignments(entries, [(p, "development_context_only") for p in sorted({p for p, _ in STDIO[1:] + RANK + CE})]),
                 "scope": "DEVELOPMENT_CONTEXT_ONLY_NOT_GRADIENT_EXPOSURE"},
             "early_report_audit": early,
             "missing_evidence": ["unarchived or local experiment enumeration",
