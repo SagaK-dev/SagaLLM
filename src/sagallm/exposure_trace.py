@@ -14,6 +14,7 @@ import re
 import struct
 
 import torch
+from .sft_lr_schedule import validate_schedule, step_lr, group_lr
 
 SCHEMA = "sagallm-optimizer-exposure-v1"
 ZERO = "0" * 64
@@ -97,8 +98,9 @@ def batch_record(rows, x, y):
 
 
 def validate_header(header):
-    require(set(header)=={"schema","split","base_checkpoint_sha256","tokenizer_sha256",
-                         "data_manifest_sha256","train_split_sha256","seed","max_steps","batch_size"}
+    allowed={"schema","split","base_checkpoint_sha256","tokenizer_sha256",
+             "data_manifest_sha256","train_split_sha256","seed","max_steps","batch_size"}
+    require(set(header)-{"lr_schedule"}==allowed
             and header["schema"]==SCHEMA and header["split"]=="train"
             and all(is_sha(header[k]) for k in ("base_checkpoint_sha256","tokenizer_sha256",
                                               "data_manifest_sha256","train_split_sha256"))
@@ -106,6 +108,8 @@ def validate_header(header):
             and type(header["max_steps"]) is int and 1<=header["max_steps"]<=MAX_STEPS
             and type(header["batch_size"]) is int and 1<=header["batch_size"]<=MAX_ROWS,
             "Invalid trace header")
+    if "lr_schedule" in header:
+        validate_schedule(header["lr_schedule"],header["max_steps"])
 
 
 class ExposureTrace:
@@ -151,12 +155,18 @@ class ExposureTrace:
         self.events+=1
         return h
 
-    def _begin(self,rows,x,y):
+    def _begin(self,rows,x,y,optimizer_lr=None):
         require(self.pending is None and self.completed<self.header["max_steps"]
                 and "last" not in self.checkpoints
                 and len(rows)==self.header["batch_size"],"Unexpected training step")
         record=batch_record(rows,x,y)
         step=self.completed+1
+        if "lr_schedule" in self.header:
+            require(type(optimizer_lr) is float and optimizer_lr==step_lr(self.header["lr_schedule"],self.header["max_steps"],step),
+                    "Actual optimizer learning rate differs from schedule")
+            record["optimizer_lr"]=optimizer_lr
+        else:
+            require(optimizer_lr is None,"Unexpected optimizer learning rate")
         intent=self._append("step_intent",{"step":step,**record})
         self.pending=(step,intent)
         return intent
@@ -196,7 +206,8 @@ class ExposureTrace:
 
 def traced_sft_step(model,optimizer,trace,rows,x,y):
     """Actual forward/backward/optimizer path; a failed step stays incomplete."""
-    intent=trace._begin(rows,x,y)
+    actual_lr=group_lr(optimizer) if "lr_schedule" in trace.header else None
+    intent=trace._begin(rows,x,y,actual_lr)
     try:
         optimizer.zero_grad(set_to_none=True)
         loss=model(x,labels=y).loss
@@ -241,7 +252,11 @@ def verify_trace(path,*,expected_sha256=None,expected_tip=None):
         if seq==0:
             require(kind=="header","Missing header");validate_header(pay);header=pay
         elif kind=="step_intent":
-            require(set(pay)=={"step","rows","input_sha256","labels_sha256","shape","loss_targets"}
+            expected={"step","rows","input_sha256","labels_sha256","shape","loss_targets"}
+            if "lr_schedule" in header:
+                expected.add("optimizer_lr")
+                require(type(pay.get("optimizer_lr")) is float and pay["optimizer_lr"]==step_lr(header["lr_schedule"],header["max_steps"],completed+1),"Trace learning rate mismatch")
+            require(set(pay)==expected
                     and pending is None and "last" not in checkpoints and type(pay["step"]) is int
                     and pay["step"]==completed+1<=header["max_steps"]
                     and len(pay["rows"])==header["batch_size"]
