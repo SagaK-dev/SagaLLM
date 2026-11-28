@@ -87,7 +87,7 @@ def replay_source_binding(trace_path, *, expected_trace_sha256, expected_tip,
         rows=[selected[r["id_sha256"]] for r in payload["rows"]]
         x,y=pack(rows)
         rebuilt=batch_record(rows,x,y)
-        require(rebuilt=={k:v for k,v in payload.items() if k!="step"},
+        require(rebuilt=={k:v for k,v in payload.items() if k not in ("step","optimizer_lr")},
                 "Recorded batch does not match re-encoded TRAIN inputs")
         rows_checked+=len(rows)
         targets+=rebuilt["loss_targets"]
