@@ -1,0 +1,23 @@
+name: SagaLLM verify durable traced pilot originals
+on:
+  pull_request:
+    paths:
+      - 'experiments/archive/traced-context-pilot-46104477318/**'
+      - 'scripts/archive_traced_pilot_originals.py'
+      - '.github/workflows/archive-traced-pilot-originals.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+      - name: Verify exact Git originals without artifact access
+        run: python -m scripts.archive_traced_pilot_originals
