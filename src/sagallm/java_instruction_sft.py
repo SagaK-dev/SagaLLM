@@ -446,12 +446,17 @@ def train_instruction_sft(base_checkpoint:str|Path,tokenizer_file:str|Path,
     root=Path(dataset);dest=Path(output)
     if dest.exists() or dest.is_symlink():raise FileExistsError('Refuse to replace experiment output')
     # Verify ALL splits before allocating a model. This recomputes canonical data.
-    manifest_sha=sha_file(root/'manifest.json')
+    if record_exposure:
+        manifest_path=root/'manifest.json'
+        if not manifest_path.is_file() or manifest_path.is_symlink() or manifest_path.stat().st_size>65536:
+            raise ValueError('Unsafe exposure manifest')
+        manifest_sha_before=sha_file(manifest_path)
     verify_java_diverse_corpus(root)
-    train_sha=sha_file(root/'train.jsonl')
+    manifest_sha=sha_file(root/'manifest.json')
+    train_sha=sha_file(root/'train.jsonl') if record_exposure else None
     if record_exposure:
         manifest=json.loads((root/'manifest.json').read_bytes())
-        if sha_file(root/'manifest.json')!=manifest_sha or manifest['files']['train']['sha256']!=train_sha:
+        if manifest_sha_before!=manifest_sha or sha_file(root/'manifest.json')!=manifest_sha or manifest['files']['train']['sha256']!=train_sha:
             raise ValueError('TRAIN source identity changed during verification')
     state,original_cfg,base_sha,tok_sha=_validate_base(
         Path(base_checkpoint),Path(tokenizer_file),require_pinned=require_pinned,
@@ -549,6 +554,12 @@ def train_instruction_sft(base_checkpoint:str|Path,tokenizer_file:str|Path,
                 binding=verified['checkpoints'][role]
                 if sha_file(path)!=binding['checkpoint_sha256']:
                     raise ValueError('Saved checkpoint hash mismatch')
+                saved=torch.load(path,map_location='cpu',weights_only=True)
+                if (saved['step']!=binding['completed_optimizer_returns'] or
+                    saved['train_state']['exposure_trace']!={k:binding[k] for k in
+                        ('schema','completed_optimizer_returns','prefix_sha256')}):
+                    raise ValueError('Embedded checkpoint trace binding mismatch')
+                del saved
             source=replay_source_binding(trace_path,expected_trace_sha256=final['trace_sha256'],
                 expected_tip=final['tip_sha256'],dataset_dir=root,tokenizer_path=tok_target,
                 base_checkpoint=base_checkpoint,context=cfg.max_position_embeddings)
