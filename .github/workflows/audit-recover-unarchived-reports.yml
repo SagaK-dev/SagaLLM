@@ -1,0 +1,41 @@
+name: SagaLLM recover unarchived historical reports
+on:
+  pull_request:
+    paths:
+      - 'scripts/audit_recover_unarchived_reports.py'
+      - 'tests/test_audit_recover_unarchived_reports.py'
+      - '.github/workflows/audit-recover-unarchived-reports.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  recovery:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+      - run: python -m unittest discover -s tests -p test_audit_recover_unarchived_reports.py
+      - name: Verify pinned triage and recover original report bytes
+        if: github.event_name == 'workflow_dispatch' || github.event.pull_request.head.repo.full_name == github.repository
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          tmp=$(mktemp -d)
+          trap 'rm -rf "$tmp"' EXIT
+          gh api repos/SagaK-dev/SagaLLM/actions/artifacts/15239309131/zip > "$tmp/triage.zip"
+          timeout 25m python -m scripts.audit_recover_unarchived_reports --prior-zip "$tmp/triage.zip" --output recovered-historical-reports --observed-at "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+      - uses: actions/upload-artifact@v4
+        if: github.event_name == 'workflow_dispatch' || github.event.pull_request.head.repo.full_name == github.repository
+        with:
+          name: recovered-historical-report-originals
+          path: recovered-historical-reports/
+          if-no-files-found: error
+          retention-days: 90
