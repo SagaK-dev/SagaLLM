@@ -139,7 +139,7 @@ def verify_zip(path, a, output):
             require(not p.is_absolute() and ".." not in p.parts and "\\" not in m.filename
                     and len(m.filename) <= 300 and not m.flag_bits & 1, "Unsafe ZIP member")
         wanted = ALLOWED.get(a["name"], ())
-        found, saved = [], 0
+        found, saved, pending = [], 0, []
         for index, name in enumerate(wanted):
             if name not in names:
                 found.append({"member": name, "status": "EXPECTED_MEMBER_MISSING"})
@@ -158,11 +158,21 @@ def verify_zip(path, a, output):
                 info["status"] = "JSON_OR_STRUCTURE_REVIEW_REQUIRED"
             if info["status"] == "METADATA_SCREEN_PASSED_NOT_RIGHTS_REVIEW":
                 filename = f"{a['run_id']}-{a['artifact_id']}-{index}.json"
-                with (output / filename).open("xb") as f:
-                    f.write(raw)
+                pending.append((filename, raw))
                 info["preserved_file"] = filename
                 saved += len(raw)
             found.append(info)
+        written = []
+        try:
+            for filename, raw in pending:
+                target = output / filename
+                with target.open("xb") as f:
+                    written.append(target)
+                    f.write(raw)
+        except OSError:
+            for target in written:
+                target.unlink(missing_ok=True)
+            raise
         return {**base, "status": "ZIP_VERIFIED", "member_count": len(members),
                 "report_members": found, "preserved_bytes": saved,
                 "unknown_artifact_name": not bool(wanted),
