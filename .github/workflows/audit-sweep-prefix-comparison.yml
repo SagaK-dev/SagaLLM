@@ -1,0 +1,41 @@
+name: SagaLLM traced sweep prefix comparison
+on:
+  pull_request:
+    paths:
+      - 'scripts/audit_sweep_prefix_comparison.py'
+      - 'tests/test_audit_sweep_prefix_comparison.py'
+      - '.github/workflows/audit-sweep-prefix-comparison.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  audit:
+    if: github.repository == 'SagaK-dev/SagaLLM' && (github.event_name == 'workflow_dispatch' || github.event.pull_request.head.repo.full_name == github.repository)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+      - run: PYTHONPATH=src python -m unittest discover -s tests -p test_audit_sweep_prefix_comparison.py
+      - name: Verify exact sweep archives and compare prefix records
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          tmp=$(mktemp -d)
+          trap 'rm -rf "$tmp"' EXIT
+          gh api repos/SagaK-dev/SagaLLM/actions/artifacts/15247392388/zip > "$tmp/old.zip"
+          gh api repos/SagaK-dev/SagaLLM/actions/artifacts/15254809203/zip > "$tmp/new.zip"
+          unset GH_TOKEN
+          PYTHONPATH=src python -m scripts.audit_sweep_prefix_comparison --old "$tmp/old.zip" --new "$tmp/new.zip" > prefix-comparison.json
+          cat prefix-comparison.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: prospective-traced-sweep-prefix-comparison-metadata
+          path: prefix-comparison.json
+          if-no-files-found: error
