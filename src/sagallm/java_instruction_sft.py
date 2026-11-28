@@ -452,7 +452,7 @@ def train_instruction_sft(base_checkpoint:str|Path,tokenizer_file:str|Path,
                           lr:float=0.00015,seed:int=717,max_seconds:float=360,
                           require_pinned:bool=True, target_context:int|None=None,
                           pinned_checkpoint_sha256:str=V016_BASE_BEST_SHA256,
-                          record_exposure:bool=False,validation_only:bool=False,lr_schedule:dict|None=None)->dict:
+                          record_exposure:bool=False,validation_only:bool=False,lr_schedule:dict|None=None,dataset_mode:str='canonical')->dict:
     if not (1<=steps<=1500 and 1<=batch_size<=8 and 1<=eval_every<=500
             and 1<=eval_count<=100 and 1<=test_count<=100 and 0<=compile_cases<=12
             and 0<lr<=0.001 and 10<=max_seconds<=600):
@@ -462,6 +462,11 @@ def train_instruction_sft(base_checkpoint:str|Path,tokenizer_file:str|Path,
         validate_schedule(lr_schedule,steps)
         if not record_exposure or lr_schedule['peak_lr']!=lr:
             raise ValueError('Explicit schedule requires trace and matching peak LR')
+    from .java_template_subset import MODE, verify_template_subset
+    if dataset_mode not in ('canonical',MODE):
+        raise ValueError('Unknown dataset mode')
+    if dataset_mode==MODE and not (validation_only and record_exposure and require_pinned):
+        raise ValueError('Template subset requires pinned validation-only traced training')
     if validation_only and compile_cases:
         raise ValueError('Validation-only mode requires compile_cases=0')
     root=Path(dataset);dest=Path(output)
@@ -472,7 +477,9 @@ def train_instruction_sft(base_checkpoint:str|Path,tokenizer_file:str|Path,
         if not manifest_path.is_file() or manifest_path.is_symlink() or manifest_path.stat().st_size>65536:
             raise ValueError('Unsafe exposure manifest')
         manifest_sha_before=sha_file(manifest_path)
-    verify_java_diverse_corpus(root)
+    subset_manifest=verify_template_subset(root) if dataset_mode==MODE else None
+    if subset_manifest is None:
+        verify_java_diverse_corpus(root)
     manifest_sha=sha_file(root/'manifest.json')
     train_sha=sha_file(root/'train.jsonl') if record_exposure else None
     if record_exposure:
@@ -517,6 +524,9 @@ def train_instruction_sft(base_checkpoint:str|Path,tokenizer_file:str|Path,
               'prompt_version':PROMPT_VERSION,'optimizer_base_lr':lr,'seed':seed}
     if lr_schedule is not None:
         metadata['lr_schedule']=lr_schedule
+    if subset_manifest is not None:
+        metadata['dataset_mode']=dataset_mode
+        metadata['dataset_membership_sha256']=subset_manifest['membership_sha256']
     exposure=None
     trace_path=dest/'optimizer-exposure.jsonl'
     if record_exposure:
@@ -655,6 +665,10 @@ def train_instruction_sft(base_checkpoint:str|Path,tokenizer_file:str|Path,
             'training_seconds':round(time.monotonic()-train_start,2)}
     if lr_schedule is not None:
         report['optimizer_spec']['lr_schedule']=lr_schedule
+    if subset_manifest is not None:
+        report['dataset_mode']=dataset_mode
+        report['dataset_membership_sha256']=subset_manifest['membership_sha256']
+        report['dataset_source']='Pinned canonical template-capped TRAIN subset; NOT independent human tasks'
     if exposure is not None:
         report['optimizer_exposure']=exposure
     (dest/'train-report.json').write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\n',encoding='utf8')
