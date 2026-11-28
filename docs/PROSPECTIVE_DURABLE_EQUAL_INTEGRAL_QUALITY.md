@@ -1,0 +1,3 @@
+# M2.6-e — durable equal-integral and corpus quality evidence
+
+Preserve exact 29 members of artifacts 15256371982, 15257010429, 15257180292 with pinned ZIP/member hashes. Verify 6 runs, 12 checkpoint tensor metadata roles, chain hashes, matched input payloads, actual rate integrals and the 1,448-row membership digest. Tensor indices are original records, not new checks of tensor bytes; no weights or dataset text copied. Publication is fixed owner/head/base, one-time only; replace with read-only verification after successful publication. No new training, independent evaluation or rights approval.

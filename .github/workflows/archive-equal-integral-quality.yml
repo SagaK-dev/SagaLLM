@@ -1,0 +1,22 @@
+name: SagaLLM verify durable equal-integral and quality originals
+on:
+  pull_request:
+    paths:
+      - 'experiments/archive/equal-integral-and-corpus-quality/**'
+      - 'scripts/archive_equal_integral_quality.py'
+      - '.github/workflows/archive-equal-integral-quality.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+      - run: python -m scripts.archive_equal_integral_quality

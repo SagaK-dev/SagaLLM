@@ -1,0 +1,708 @@
+{
+  "best": {
+    "checkpoint_sha256": "4792fd69df5ce8751cf5a13644caf3333ff6a1e3c7ecb36b47ae1d481fad79d2",
+    "config_sha256": "4921e623057add659059e979267f5de0bec82b89ef0984312ad961c25a66ca72",
+    "model_index_sha256": "e4a23d095839332166aa1f5a87e5cd8b258fdd34afbe9cb51b5f2b7dd610ef9c",
+    "optimizer_state_indexed": false,
+    "step": 4,
+    "tensor_bytes": 8461056,
+    "tensor_count": 39,
+    "tensors": {
+      "blocks.0.attention.k_proj.weight": {
+        "bytes": 73728,
+        "dtype": "torch.float32",
+        "sha256": "6454d4e9dcba4dcd75de2f3e912009c4cdc7a01dad3f297447c749085d46a588",
+        "shape": [
+          96,
+          192
+        ]
+      },
+      "blocks.0.attention.o_proj.weight": {
+        "bytes": 147456,
+        "dtype": "torch.float32",
+        "sha256": "6caf4dcccb43d70737b2fe19ef5d3498ae9669993852a08ff5609a40d70ed78b",
+        "shape": [
+          192,
+          192
+        ]
+      },
+      "blocks.0.attention.q_proj.weight": {
+        "bytes": 147456,
+        "dtype": "torch.float32",
+        "sha256": "db095449938a23b3ef87955f7459e2daa30eec45cb993b331737f969e3d7168a",
+        "shape": [
+          192,
+          192
+        ]
+      },
+      "blocks.0.attention.v_proj.weight": {
+        "bytes": 73728,
+        "dtype": "torch.float32",
+        "sha256": "4912d4f9ec8a712f71693ebff75fea5a558f1351ffcf99c8923219d029a9b74c",
+        "shape": [
+          96,
+          192
+        ]
+      },
+      "blocks.0.attention_norm.weight": {
+        "bytes": 768,
+        "dtype": "torch.float32",
+        "sha256": "52bd788f6e7dac738ddb45b36376b10340e26c75fd7cae3fbb3e2238928cb2d2",
+        "shape": [
+          192
+        ]
+      },
+      "blocks.0.feed_forward.down.weight": {
+        "bytes": 294912,
+        "dtype": "torch.float32",
+        "sha256": "d9418442fa1ee79e8468e01496e9e4360eb218799dc02acb37a387f593a669c2",
+        "shape": [
+          192,
+          384
+        ]
+      },
+      "blocks.0.feed_forward.gate.weight": {
+        "bytes": 294912,
+        "dtype": "torch.float32",
+        "sha256": "908f24e61abb5719d15bdee4b3b3966aa28c385cd460c3898489daf4791802d3",
+        "shape": [
+          384,
+          192
+        ]
+      },
+      "blocks.0.feed_forward.up.weight": {
+        "bytes": 294912,
+        "dtype": "torch.float32",
+        "sha256": "1cb93c0f459e452237aa92b7ea2aed5e4361bcee943e67a12b4d23c3794fadc0",
+        "shape": [
+          384,
+          192
+        ]
+      },
+      "blocks.0.ffn_norm.weight": {
+        "bytes": 768,
+        "dtype": "torch.float32",
+        "sha256": "5b59a1be45d4471fe86c90b326bc668c2606ff09818bc58492b88697311d0383",
+        "shape": [
+          192
+        ]
+      },
+      "blocks.1.attention.k_proj.weight": {
+        "bytes": 73728,
+        "dtype": "torch.float32",
+        "sha256": "7bc4439aae5c9193a4aae3c0a503a1acc54c2efa053e42d6673ba9dd9870353b",
+        "shape": [
+          96,
+          192
+        ]
+      },
+      "blocks.1.attention.o_proj.weight": {
+        "bytes": 147456,
+        "dtype": "torch.float32",
+        "sha256": "f88db309d6bc374c0d7365dfe2febf932b447c3d25579d0c14399d4516ac83c3",
+        "shape": [
+          192,
+          192
+        ]
+      },
+      "blocks.1.attention.q_proj.weight": {
+        "bytes": 147456,
+        "dtype": "torch.float32",
+        "sha256": "b42e60495e8aa5e90c5fab643f4d400682513633e7e3ced2de5da3f31d5b878d",
+        "shape": [
+          192,
+          192
+        ]
+      },
+      "blocks.1.attention.v_proj.weight": {
+        "bytes": 73728,
+        "dtype": "torch.float32",
+        "sha256": "8becbef1e6a64c24b9861b3aed957a2fb8838a13c9df1861ba38bf1c6192faf7",
+        "shape": [
+          96,
+          192
+        ]
+      },
+      "blocks.1.attention_norm.weight": {
+        "bytes": 768,
+        "dtype": "torch.float32",
+        "sha256": "2f23d62fa621d753c2382d603fff67d9527b71aef139d69a08543bae5b35b8aa",
+        "shape": [
+          192
+        ]
+      },
+      "blocks.1.feed_forward.down.weight": {
+        "bytes": 294912,
+        "dtype": "torch.float32",
+        "sha256": "48b7b207cb5a7204179cdbcd5c0cdf38ba28576bdf076a56ac48901f6fc3ca90",
+        "shape": [
+          192,
+          384
+        ]
+      },
+      "blocks.1.feed_forward.gate.weight": {
+        "bytes": 294912,
+        "dtype": "torch.float32",
+        "sha256": "1922d298e25e9ec5a0bf51bce07dc2facb0d5ab41dbae83baa134159e6377472",
+        "shape": [
+          384,
+          192
+        ]
+      },
+      "blocks.1.feed_forward.up.weight": {
+        "bytes": 294912,
+        "dtype": "torch.float32",
+        "sha256": "c3c354bbf6987628ce3ff8ee7b34c61a4335e9dc2e91616bb47f21c8b76677b3",
+        "shape": [
+          384,
+          192
+        ]
+      },
+      "blocks.1.ffn_norm.weight": {
+        "bytes": 768,
+        "dtype": "torch.float32",
+        "sha256": "2b9b02e50d089e5415a5129895e3b04e56dad45d538908b4bebbc9f522dbe82f",
+        "shape": [
+          192
+        ]
+      },
+      "blocks.2.attention.k_proj.weight": {
+        "bytes": 73728,
+        "dtype": "torch.float32",
+        "sha256": "692f5d11be1e8857301a00b16a5778db3c30cf3eaaacd6213ec5ffaaf3431e47",
+        "shape": [
+          96,
+          192
+        ]
+      },
+      "blocks.2.attention.o_proj.weight": {
+        "bytes": 147456,
+        "dtype": "torch.float32",
+        "sha256": "d3ec1df860f34e5cbcef24463d68d5300ffc99999adf9c16a7cac5be9603cd98",
+        "shape": [
+          192,
+          192
+        ]
+      },
+      "blocks.2.attention.q_proj.weight": {
+        "bytes": 147456,
+        "dtype": "torch.float32",
+        "sha256": "f2d48c2aad3f61fdf5e4d8d4498f556162ceae515cc37c6aa057988690b91459",
+        "shape": [
+          192,
+          192
+        ]
+      },
+      "blocks.2.attention.v_proj.weight": {
+        "bytes": 73728,
+        "dtype": "torch.float32",
+        "sha256": "ad761655f1ea09736d18dfede125346801825ba99b8301f43bac73507142a65e",
+        "shape": [
+          96,
+          192
+        ]
+      },
+      "blocks.2.attention_norm.weight": {
+        "bytes": 768,
+        "dtype": "torch.float32",
+        "sha256": "05a58340520dfcd1d6ed38ff8045fce03eca2394f3f4046469204f50ed682160",
+        "shape": [
+          192
+        ]
+      },
+      "blocks.2.feed_forward.down.weight": {
+        "bytes": 294912,
+        "dtype": "torch.float32",
+        "sha256": "8e0112fe45cca8572e7e250fd65100beee7bc81cd56cf1071795b65ba4f6fed6",
+        "shape": [
+          192,
+          384
+        ]
+      },
+      "blocks.2.feed_forward.gate.weight": {
+        "bytes": 294912,
+        "dtype": "torch.float32",
+        "sha256": "6fc824545a169fd88fad1a896446d2437b4aef9f2af9b48f37ed32e18877c775",
+        "shape": [
+          384,
+          192
+        ]
+      },
+      "blocks.2.feed_forward.up.weight": {
+        "bytes": 294912,
+        "dtype": "torch.float32",
+        "sha256": "839e2ae4d5e68a8f1b3a3865deea7bf0b7929ac1dcc7804df9e848fa98f8e4b2",
+        "shape": [
+          384,
+          192
+        ]
+      },
+      "blocks.2.ffn_norm.weight": {
+        "bytes": 768,
+        "dtype": "torch.float32",
+        "sha256": "ac998be1345d4efcf8fee6b244414df62f9d63aa29c320424347d46987e7c3fa",
+        "shape": [
+          192
+        ]
+      },
+      "blocks.3.attention.k_proj.weight": {
+        "bytes": 73728,
+        "dtype": "torch.float32",
+        "sha256": "3f530130ce05ed72be724592b558300be6a622a79ca104419ee7ed17a116addd",
+        "shape": [
+          96,
+          192
+        ]
+      },
+      "blocks.3.attention.o_proj.weight": {
+        "bytes": 147456,
+        "dtype": "torch.float32",
+        "sha256": "03defd0446155595e80a0821f3140baf769466f40e40e557dd087d17709d76ef",
+        "shape": [
+          192,
+          192
+        ]
+      },
+      "blocks.3.attention.q_proj.weight": {
+        "bytes": 147456,
+        "dtype": "torch.float32",
+        "sha256": "37a0e0ccc8f00f73a4d40e82a62d435227d12e522d631beca014473ea38c239d",
+        "shape": [
+          192,
+          192
+        ]
+      },
+      "blocks.3.attention.v_proj.weight": {
+        "bytes": 73728,
+        "dtype": "torch.float32",
+        "sha256": "11effba86e8550266dbf5f5b57dfb2b76a9137571ef6c77c435185135d7aa923",
+        "shape": [
+          96,
+          192
+        ]
+      },
+      "blocks.3.attention_norm.weight": {
+        "bytes": 768,
+        "dtype": "torch.float32",
+        "sha256": "4dbcbaf3b8a8e87f7125b3b69975c5e93c139531c6eef2c3cb5ed8290399d94a",
+        "shape": [
+          192
+        ]
+      },
+      "blocks.3.feed_forward.down.weight": {
+        "bytes": 294912,
+        "dtype": "torch.float32",
+        "sha256": "d0f887510db0990005c6ab729a09e785fa57e3a658ef100c54fdf23f8a53f12f",
+        "shape": [
+          192,
+          384
+        ]
+      },
+      "blocks.3.feed_forward.gate.weight": {
+        "bytes": 294912,
+        "dtype": "torch.float32",
+        "sha256": "818d168622e311db33108472c6b95404b88ad8b0a0640d7640ca1f7541f5befe",
+        "shape": [
+          384,
+          192
+        ]
+      },
+      "blocks.3.feed_forward.up.weight": {
+        "bytes": 294912,
+        "dtype": "torch.float32",
+        "sha256": "791cd05d5bb96fda0ee3122e41a9df9ac9dab262dae202e12e5c6ef6482cb332",
+        "shape": [
+          384,
+          192
+        ]
+      },
+      "blocks.3.ffn_norm.weight": {
+        "bytes": 768,
+        "dtype": "torch.float32",
+        "sha256": "297a05a6ffdaf933bc767bbb5c279c35bbeaeea334b9f39e4d6304e09b36d37b",
+        "shape": [
+          192
+        ]
+      },
+      "embedding.weight": {
+        "bytes": 1572864,
+        "dtype": "torch.float32",
+        "sha256": "018693cc3f173a4aa46350e7a7a20df27b812f0f630b65cde877d55578eaf979",
+        "shape": [
+          2048,
+          192
+        ]
+      },
+      "lm_head.weight": {
+        "bytes": 1572864,
+        "dtype": "torch.float32",
+        "sha256": "018693cc3f173a4aa46350e7a7a20df27b812f0f630b65cde877d55578eaf979",
+        "shape": [
+          2048,
+          192
+        ]
+      },
+      "norm.weight": {
+        "bytes": 768,
+        "dtype": "torch.float32",
+        "sha256": "84d9fd203c7596316b31bf684bd91dd58c8a8ffe59b8d6bebbe698e5f4879068",
+        "shape": [
+          192
+        ]
+      }
+    }
+  },
+  "last": {
+    "checkpoint_sha256": "f4e66673170b19828ed1f5103ef9e6b1738113cd358a968ad3b3fa4091db3187",
+    "config_sha256": "4921e623057add659059e979267f5de0bec82b89ef0984312ad961c25a66ca72",
+    "model_index_sha256": "73f4fbd3a3ccb3326342ebed067dc7c3b83be857da56186c91cb819713fc02cd",
+    "optimizer_state_indexed": false,
+    "step": 24,
+    "tensor_bytes": 8461056,
+    "tensor_count": 39,
+    "tensors": {
+      "blocks.0.attention.k_proj.weight": {
+        "bytes": 73728,
+        "dtype": "torch.float32",
+        "sha256": "cd8d93b3f315afc7bb5b6ad51f17b1aff305a718c3e5a97c7a4418afb4354b5d",
+        "shape": [
+          96,
+          192
+        ]
+      },
+      "blocks.0.attention.o_proj.weight": {
+        "bytes": 147456,
+        "dtype": "torch.float32",
+        "sha256": "157bd68d08dce471791a68e925c3bdbfb8dc98fc3becae15ec4622d52992ee34",
+        "shape": [
+          192,
+          192
+        ]
+      },
+      "blocks.0.attention.q_proj.weight": {
+        "bytes": 147456,
+        "dtype": "torch.float32",
+        "sha256": "15ee3b7ee17b9a172bec3cb5048c20a68d9dd9f869df4bbe1abc04cdd86702ce",
+        "shape": [
+          192,
+          192
+        ]
+      },
+      "blocks.0.attention.v_proj.weight": {
+        "bytes": 73728,
+        "dtype": "torch.float32",
+        "sha256": "a933406b30c2957554ea73c30ba69446076540ec6645ba42049af04ed838c708",
+        "shape": [
+          96,
+          192
+        ]
+      },
+      "blocks.0.attention_norm.weight": {
+        "bytes": 768,
+        "dtype": "torch.float32",
+        "sha256": "82657c26ee0e6d2a2c6423db12c6de0a45f5bb75c86c068c3825fd171d71cb23",
+        "shape": [
+          192
+        ]
+      },
+      "blocks.0.feed_forward.down.weight": {
+        "bytes": 294912,
+        "dtype": "torch.float32",
+        "sha256": "35c9f992891013d01a8608fad67aeba8b7e22e49eaa6dd667464a19f00bbe358",
+        "shape": [
+          192,
+          384
+        ]
+      },
+      "blocks.0.feed_forward.gate.weight": {
+        "bytes": 294912,
+        "dtype": "torch.float32",
+        "sha256": "630c456ccf9945b6486df535636ad0dd4fd2e57eb58175d111e424547147320b",
+        "shape": [
+          384,
+          192
+        ]
+      },
+      "blocks.0.feed_forward.up.weight": {
+        "bytes": 294912,
+        "dtype": "torch.float32",
+        "sha256": "d88839d6665dd319f12105d348324029677bd9160f9992a848fc37956f7f3754",
+        "shape": [
+          384,
+          192
+        ]
+      },
+      "blocks.0.ffn_norm.weight": {
+        "bytes": 768,
+        "dtype": "torch.float32",
+        "sha256": "4291b49769eb9d5169b19aca8476bf3c892aa11ec3040f212045b3cc955dcd8e",
+        "shape": [
+          192
+        ]
+      },
+      "blocks.1.attention.k_proj.weight": {
+        "bytes": 73728,
+        "dtype": "torch.float32",
+        "sha256": "33580e1674ce460740174452dc5ee63d71a75927625ec385254443a5f06ac15e",
+        "shape": [
+          96,
+          192
+        ]
+      },
+      "blocks.1.attention.o_proj.weight": {
+        "bytes": 147456,
+        "dtype": "torch.float32",
+        "sha256": "0ce2883fb6abc759b13337b2a702bf9fa3597d94b07e603b44699117cfaae98f",
+        "shape": [
+          192,
+          192
+        ]
+      },
+      "blocks.1.attention.q_proj.weight": {
+        "bytes": 147456,
+        "dtype": "torch.float32",
+        "sha256": "d2e79d28fa820c201bf152fd7483a7e95aefe2f7af0c43ef1809be9c94370807",
+        "shape": [
+          192,
+          192
+        ]
+      },
+      "blocks.1.attention.v_proj.weight": {
+        "bytes": 73728,
+        "dtype": "torch.float32",
+        "sha256": "4be73d41eec7549cc3249f393e8ea9c0d15c034520fde82a8a07d6f1f7e80ef3",
+        "shape": [
+          96,
+          192
+        ]
+      },
+      "blocks.1.attention_norm.weight": {
+        "bytes": 768,
+        "dtype": "torch.float32",
+        "sha256": "56ca8a3abf0cc9844da111dd3b129ca34765bd434e50be5cd39bae10262ca4e4",
+        "shape": [
+          192
+        ]
+      },
+      "blocks.1.feed_forward.down.weight": {
+        "bytes": 294912,
+        "dtype": "torch.float32",
+        "sha256": "db9067642dfe18b88b9887350fc596bd10ad47afbcb3a9c05f2135342c3eb477",
+        "shape": [
+          192,
+          384
+        ]
+      },
+      "blocks.1.feed_forward.gate.weight": {
+        "bytes": 294912,
+        "dtype": "torch.float32",
+        "sha256": "b932c2e18f27223746d7b01945201bc34e48b6a9fc72680385c95681b54a02a8",
+        "shape": [
+          384,
+          192
+        ]
+      },
+      "blocks.1.feed_forward.up.weight": {
+        "bytes": 294912,
+        "dtype": "torch.float32",
+        "sha256": "e20398e68a66440ca3551424abb480184bf81a9d8b26c3a8e5279d64e52104bd",
+        "shape": [
+          384,
+          192
+        ]
+      },
+      "blocks.1.ffn_norm.weight": {
+        "bytes": 768,
+        "dtype": "torch.float32",
+        "sha256": "7402eb74f1d77b7c8c42efbcc22089f7d64a3693d90595b04c9d70a2726dc9d6",
+        "shape": [
+          192
+        ]
+      },
+      "blocks.2.attention.k_proj.weight": {
+        "bytes": 73728,
+        "dtype": "torch.float32",
+        "sha256": "bd9d83352ddee5929af6b0ecb2276925c256eb42ad481c15e43cb8469a9214d4",
+        "shape": [
+          96,
+          192
+        ]
+      },
+      "blocks.2.attention.o_proj.weight": {
+        "bytes": 147456,
+        "dtype": "torch.float32",
+        "sha256": "a0f217f662bd789809baa978913c4c5683bea9b5585f058ae87940696ac32b07",
+        "shape": [
+          192,
+          192
+        ]
+      },
+      "blocks.2.attention.q_proj.weight": {
+        "bytes": 147456,
+        "dtype": "torch.float32",
+        "sha256": "a12e93659395dd29e5a68679a43de30105480c8fb8b62fab0f2367e1ba5f1fcf",
+        "shape": [
+          192,
+          192
+        ]
+      },
+      "blocks.2.attention.v_proj.weight": {
+        "bytes": 73728,
+        "dtype": "torch.float32",
+        "sha256": "bb427d9eb73a138c5e5830ea26afb4e806011565a0dd854794636efe18d3bd5b",
+        "shape": [
+          96,
+          192
+        ]
+      },
+      "blocks.2.attention_norm.weight": {
+        "bytes": 768,
+        "dtype": "torch.float32",
+        "sha256": "b49e2efdd05a9a41cdefa9e011412ae1bac45beda7cab7be70624aae13301fe7",
+        "shape": [
+          192
+        ]
+      },
+      "blocks.2.feed_forward.down.weight": {
+        "bytes": 294912,
+        "dtype": "torch.float32",
+        "sha256": "1f681c54ba056e4242e5be1e6fb08d68e4246bd62da14833bde220732ab8239d",
+        "shape": [
+          192,
+          384
+        ]
+      },
+      "blocks.2.feed_forward.gate.weight": {
+        "bytes": 294912,
+        "dtype": "torch.float32",
+        "sha256": "cb865d38a34952dec24474ad3de161fe0c305b5b213eecba3eb66cdadf1cd1a7",
+        "shape": [
+          384,
+          192
+        ]
+      },
+      "blocks.2.feed_forward.up.weight": {
+        "bytes": 294912,
+        "dtype": "torch.float32",
+        "sha256": "0cbe69ac72529cd8602296ffd878fb75ab4b9948e33c3dc65e54a52fda8ae8b7",
+        "shape": [
+          384,
+          192
+        ]
+      },
+      "blocks.2.ffn_norm.weight": {
+        "bytes": 768,
+        "dtype": "torch.float32",
+        "sha256": "17408792a3814c55caa85a44e4e4e0352e5cb620ea8cea2260a988510b8e6aa5",
+        "shape": [
+          192
+        ]
+      },
+      "blocks.3.attention.k_proj.weight": {
+        "bytes": 73728,
+        "dtype": "torch.float32",
+        "sha256": "e0ec86627e873a47ceae3c1c8b87e0ec4da626af511016d4f8105e87a400589d",
+        "shape": [
+          96,
+          192
+        ]
+      },
+      "blocks.3.attention.o_proj.weight": {
+        "bytes": 147456,
+        "dtype": "torch.float32",
+        "sha256": "a2bb24ba037179e1ae09f51102f77113cd2e175a0fe413964339a49d696a2480",
+        "shape": [
+          192,
+          192
+        ]
+      },
+      "blocks.3.attention.q_proj.weight": {
+        "bytes": 147456,
+        "dtype": "torch.float32",
+        "sha256": "f7901c4c2d86c0a88e54156645a7d99c8cfb2bfed89f3a8ffb44dc93ef357b91",
+        "shape": [
+          192,
+          192
+        ]
+      },
+      "blocks.3.attention.v_proj.weight": {
+        "bytes": 73728,
+        "dtype": "torch.float32",
+        "sha256": "fcd05c6712bcf9dcdb80985b61a82edf91cd7f4aacbc7052692c3e9ca988a9f3",
+        "shape": [
+          96,
+          192
+        ]
+      },
+      "blocks.3.attention_norm.weight": {
+        "bytes": 768,
+        "dtype": "torch.float32",
+        "sha256": "cc6226251a496ee0bc6b62abab1e9401a2976a5532a190d4a90c015935bda7fa",
+        "shape": [
+          192
+        ]
+      },
+      "blocks.3.feed_forward.down.weight": {
+        "bytes": 294912,
+        "dtype": "torch.float32",
+        "sha256": "871bcc0ddc86654bbf1a36cc6b9013471c2d243a052227ca40a1dcdd7f3f49c0",
+        "shape": [
+          192,
+          384
+        ]
+      },
+      "blocks.3.feed_forward.gate.weight": {
+        "bytes": 294912,
+        "dtype": "torch.float32",
+        "sha256": "215ef8cca8d7d75f04da1110746ec8bd7af79521bfcd37364b877c43f4868c47",
+        "shape": [
+          384,
+          192
+        ]
+      },
+      "blocks.3.feed_forward.up.weight": {
+        "bytes": 294912,
+        "dtype": "torch.float32",
+        "sha256": "ca994c89928a24297fd12da20c8b97a68710f5c68036dfc6c39bfd4ada6228bb",
+        "shape": [
+          384,
+          192
+        ]
+      },
+      "blocks.3.ffn_norm.weight": {
+        "bytes": 768,
+        "dtype": "torch.float32",
+        "sha256": "b2b3c3261a56b2f873726cda654da964c8e31908f8e0000b4a897b8040cfa1e3",
+        "shape": [
+          192
+        ]
+      },
+      "embedding.weight": {
+        "bytes": 1572864,
+        "dtype": "torch.float32",
+        "sha256": "0634a7a70635ff9744626ffe25678a7f1f6e8bd9fdfa94b3c59ec674ff1e6907",
+        "shape": [
+          2048,
+          192
+        ]
+      },
+      "lm_head.weight": {
+        "bytes": 1572864,
+        "dtype": "torch.float32",
+        "sha256": "0634a7a70635ff9744626ffe25678a7f1f6e8bd9fdfa94b3c59ec674ff1e6907",
+        "shape": [
+          2048,
+          192
+        ]
+      },
+      "norm.weight": {
+        "bytes": 768,
+        "dtype": "torch.float32",
+        "sha256": "6f7e3e5b1a77aeb5a9007b734fa2aaa39238897d7063683f7122f4f6053b8889",
+        "shape": [
+          192
+        ]
+      }
+    }
+  }
+}
