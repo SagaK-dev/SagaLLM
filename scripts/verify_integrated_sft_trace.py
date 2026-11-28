@@ -16,6 +16,7 @@ from sagallm.exposure_source_binding import bounded, replay_source_binding, MAX_
 from sagallm.java_instruction_sft import (read_split, interleaved_order, pack, PROMPT_VERSION,
     source_origin)
 from sagallm.tokenization import load_tokenizer
+from sagallm.sft_lr_schedule import step_lr
 
 MAX_REPORT_BYTES=2*1024*1024
 
@@ -94,6 +95,15 @@ def audit(output,*,report_sha256,trace_sha256,tip_sha256,dataset,base,tokenizer)
         expected_history=[s for s in range(1,completed+1) if s%spec["eval_every"]==0 or s==h["max_steps"]]
         require([r["step"] for r in report["history"]]==expected_history,"Evaluation schedule declaration mismatch")
         source_pin_fields="DECLARATIONS_CONSISTENT"
+    lr_status="NOT_RECORDED"
+    if "lr_schedule" in h:
+        require(report["optimizer_spec"]["lr_schedule"]==h["lr_schedule"] and
+                report["optimizer_spec"]["lr"]==h["lr_schedule"]["peak_lr"],"Schedule declaration mismatch")
+        require(all(e["payload"]["optimizer_lr"]==step_lr(h["lr_schedule"],h["max_steps"],e["payload"]["step"])
+                    for e in events if e["kind"]=="step_intent"),"Schedule replay mismatch")
+        lr_status="RECORDED_STEP_RATES_MATCH"
+    else:
+        require("lr_schedule" not in report.get("optimizer_spec",{}),"Unbound schedule declaration")
     context=report["model_context_length"]
     replay=replay_source_binding(journal,expected_trace_sha256=trace_sha256,expected_tip=tip_sha256,
         dataset_dir=dataset,tokenizer_path=tokenizer,base_checkpoint=base,context=context)
@@ -115,7 +125,7 @@ def audit(output,*,report_sha256,trace_sha256,tip_sha256,dataset,base,tokenizer)
         indices=[order[((step-1)*h["batch_size"]+j)%len(order)] for j in range(h["batch_size"])]
         chosen=[rows[i] for i in indices];x,y=pack(chosen)
         record=batch_record(chosen,x,y)
-        require(pay["step"]==step and record=={k:z for k,z in pay.items() if k!="step"},
+        require(pay["step"]==step and record=={k:z for k,z in pay.items() if k not in ("step","optimizer_lr")},
                 "Deterministic batch schedule mismatch")
         seen.update(indices);targets+=record["loss_targets"]
         if step==best_step:
@@ -139,7 +149,7 @@ def audit(output,*,report_sha256,trace_sha256,tip_sha256,dataset,base,tokenizer)
             "steps_rechecked":step,"row_exposures_rechecked":step*h["batch_size"],
             "distinct_train_rows_rechecked":len(seen),"loss_targets_rechecked":targets,
             "best_step_declared":best_step,"checkpoint_bindings":checkpoint_rows,
-            "selection_arithmetic_rechecked":True,"source_and_optimizer_declarations":source_pin_fields,"validation_losses_recomputed":False,
+            "selection_arithmetic_rechecked":True,"learning_rate_schedule_status":lr_status,"source_and_optimizer_declarations":source_pin_fields,"validation_losses_recomputed":False,
             "checkpoint_deserialized":False,"embedded_metadata_independently_read":False,
             "validation_or_test_rows_read":False,"actual_training_process_attested":False,
             "historical_exposure_verified":False,"gradient_influence_verified":False,
