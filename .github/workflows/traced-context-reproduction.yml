@@ -1,0 +1,75 @@
+name: SagaLLM traced context exact-revision reproduction
+on:
+  pull_request:
+    paths:
+      - 'scripts/compare_traced_context_reproduction.py'
+      - 'tests/test_compare_traced_context_reproduction.py'
+      - 'requirements/pilot-46104477318-observed.txt'
+      - '.github/workflows/traced-context-reproduction.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  reproduce:
+    if: github.repository == 'SagaK-dev/SagaLLM' && (github.event_name == 'workflow_dispatch' || github.event.pull_request.head.repo.full_name == github.repository)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    env:
+      OMP_NUM_THREADS: '2'
+      MKL_NUM_THREADS: '2'
+      PYTHONHASHSEED: '0'
+      TORCH_FORCE_WEIGHTS_ONLY_LOAD: '1'
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.11.18'
+      - name: Install observed original dependency versions
+        run: |
+          python -m pip install 'torch==2.15.0+cpu' --index-url https://download.pytorch.org/whl/cpu -c requirements/pilot-46104477318-observed.txt
+          python -m pip install -r requirements/pilot-46104477318-observed.txt
+          python -m pip check
+      - name: Rerun exact original merged revision and compare original bytes
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          tmp=$(mktemp -d)
+          trap 'git worktree remove --force "$tmp/original-code" 2>/dev/null || true; rm -rf "$tmp"' EXIT
+          for id in 14738368209 15247550137 15247155692; do
+            gh api "repos/SagaK-dev/SagaLLM/actions/artifacts/$id/zip" > "$tmp/$id.zip"
+          done
+          unset GH_TOKEN GITHUB_TOKEN
+          git fetch --depth=1 origin a089929068b5b64ac69bfb3a7d916b1864b8a299
+          git worktree add --detach "$tmp/original-code" a089929068b5b64ac69bfb3a7d916b1864b8a299
+          mkdir reproduction-evidence
+          python -m pip freeze --all > reproduction-evidence/environment-freeze.txt
+          python - <<'PY' > reproduction-evidence/environment.json
+          import json, os, platform, sys, torch, tokenizers
+          print(json.dumps({"python":sys.version,"torch":str(torch.__version__),"tokenizers":tokenizers.__version__,
+              "platform":platform.platform(),"machine":platform.machine(),"cpu_capability":torch.backends.cpu.get_cpu_capability(),
+              "torch_build":torch.__config__.show(),"threads":{k:os.environ.get(k) for k in ("OMP_NUM_THREADS","MKL_NUM_THREADS","PYTHONHASHSEED")},
+              "full_original_environment_recorded":False},sort_keys=True,indent=2))
+          PY
+          (
+            cd "$tmp/original-code"
+            PYTHONPATH=src python -m scripts.run_pinned_traced_context_pilot --parent-zip "$tmp/14738368209.zip" --output "$tmp/rerun"
+          )
+          # NumPy is only needed for the post-training byte comparator, not the original training.
+          python -m pip install numpy==2.2.6
+          PYTHONPATH=src python -m unittest discover -s tests -p test_compare_traced_context_reproduction.py
+          PYTHONPATH=src python -m scripts.compare_traced_context_reproduction --evidence-zip "$tmp/15247550137.zip" --weights-zip "$tmp/15247155692.zip" --original "$tmp/original" --rerun "$tmp/rerun" > reproduction-evidence/reproduction-report.json
+          cp "$tmp/rerun/"{train-report.json,pilot-summary.json,offline-audit.json,dataset-manifest.json,optimizer-exposure.jsonl} reproduction-evidence/
+          python - <<'PY'
+          import json
+          d=json.load(open("reproduction-evidence/reproduction-report.json"))
+          print(json.dumps({k:d[k] for k in ("identical_ordered_batch_payloads","model_state_and_config_equal","optimizer_state_equal","exact_serialized_checkpoint_equality","trace_file_equal","history_exact_equal","best_step_equal","metrics")},sort_keys=True))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: prospective-traced-context-reproduction-evidence
+          path: reproduction-evidence/
+          if-no-files-found: error
