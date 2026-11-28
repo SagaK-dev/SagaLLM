@@ -1,0 +1,39 @@
+{
+  "checkpoint_artifact_expiry": "2026-12-28T03:47:42Z",
+  "checkpoint_artifact_id": 15247155692,
+  "checkpoint_bytes_stored_in_git": false,
+  "checkpoint_zip_sha256": "f027874de13707df48567bae374ad8278d968160cb8580299278ae06119c6773",
+  "evidence_artifact_id": 15247550137,
+  "evidence_zip_sha256": "103201aae7eb8f6f1484c91c001a82dc43244d7cbaa9ab4ddcdd239eca7d056f",
+  "execution_revision": "a089929068b5b64ac69bfb3a7d916b1864b8a299",
+  "head_revision": "af836553f4580d144299557a25e219a5543eddec",
+  "historical_exposure_verified": false,
+  "independent_evaluation": "NOT_RUN",
+  "members": {
+    "dataset-manifest.json": {
+      "bytes": 2586,
+      "sha256": "1e9c0ff933c5096cf2d633e81ec0c90498006fab45397a28a4c073fbf181a23a"
+    },
+    "offline-audit.json": {
+      "bytes": 1524,
+      "sha256": "9b329e24c0ce163e7c9faccd38512de780e1a9c5a4b3d384c083b1988dc91d3d"
+    },
+    "optimizer-exposure.jsonl": {
+      "bytes": 28631,
+      "sha256": "6a2ccd2622c4fb2c4df1b838ea1a22fc3ca344e98fd3b98d292b9e35b8cfec05"
+    },
+    "pilot-summary.json": {
+      "bytes": 1872,
+      "sha256": "481e4d324a0e57abe345be96661b54ec51ac953b57a08d334dfd77dfb00d7034"
+    },
+    "train-report.json": {
+      "bytes": 5601,
+      "sha256": "0254485bb2c9ceee06227405689edd0476a7200deda6e8711789c4f06ae7c86e"
+    }
+  },
+  "metadata_only": true,
+  "model_selection_permitted": false,
+  "rights_review": "REVIEW_REQUIRED",
+  "run_id": 46104477318,
+  "schema": "sagallm-durable-traced-pilot-originals-v1"
+}
