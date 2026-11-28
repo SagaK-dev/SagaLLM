@@ -96,7 +96,13 @@ def test_real_canonical_split_two_step_cpu_sft(tmp_path):
     checkpoint_save(initial,model,optim,0,cfg,{'tokenizer_sha256':hashlib.sha256(tok.read_bytes()).hexdigest()})
     result=train_instruction_sft(initial,tok,dataset,tmp_path/'sft',steps=2,
                  batch_size=2,eval_every=1,eval_count=6,test_count=6,
-                 compile_cases=0,max_seconds=25,require_pinned=False)
+                 compile_cases=0,max_seconds=25,require_pinned=False,record_exposure=True)
+    exposure=result['optimizer_exposure']
+    assert exposure['status']=='LOCAL_TRACE_AND_TRAIN_SOURCE_VERIFIED'
+    assert exposure['trace']['completed_optimizer_returns']==2
+    assert exposure['source_binding']['recorded_row_exposures_rechecked']==4
+    assert exposure['trace']['checkpoints']['best']['completed_optimizer_returns']==result['best_checkpoint_step']
+    assert exposure['trace']['checkpoints']['last']['checkpoint_sha256']==result['last_checkpoint_sha256']
     assert result['optimizer_steps_completed']==2
     assert result['distinct_training_examples_seen']==4
     assert result['original_split_counts']['train']['total']==17080
