@@ -1,0 +1,82 @@
+name: SagaLLM remaining historical exposure scope
+on:
+  pull_request:
+    paths:
+      - 'scripts/audit_remaining_historical_scope.py'
+      - 'scripts/audit_integrated_exposure_scope.py'
+      - 'scripts/audit_early_input_reconstruction.py'
+      - 'scripts/audit_replay_activation_scope.py'
+      - 'scripts/audit_historical_exposure.py'
+      - 'scripts/audit_parameter_ce_exposure.py'
+      - 'tests/test_audit_remaining_historical_scope.py'
+      - 'experiments/archive/**'
+      - '.github/workflows/audit-remaining-historical-scope.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  scope:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+      - run: python -m unittest discover -s tests -p test_audit_remaining_historical_scope.py
+      - name: Install CPU-only reconstruction dependencies
+        if: github.event_name == 'workflow_dispatch' || github.event.pull_request.head.repo.full_name == github.repository
+        run: |
+          python -m pip install 'torch>=2.3' --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install 'PyYAML>=6' 'tokenizers>=0.20,<1'
+      - name: Verify archive scope and rebuild historical inputs
+        if: github.event_name == 'workflow_dispatch' || github.event.pull_request.head.repo.full_name == github.repository
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GIT_TERMINAL_PROMPT: '0'
+          PYTHONHASHSEED: '0'
+        shell: bash
+        run: |
+          set -euo pipefail
+          tmp=$(mktemp -d)
+          trap 'rm -rf "$tmp"' EXIT
+          gh api repos/SagaK-dev/SagaLLM/actions/artifacts/15199855239/zip > "$tmp/prior.zip"
+          gh api repos/SagaK-dev/SagaLLM/actions/artifacts/15186012660/zip > "$tmp/inventory.zip"
+          gh api repos/SagaK-dev/SagaLLM/actions/artifacts/14743051466/zip > "$tmp/model.zip"
+          unset GH_TOKEN
+          echo "b039250f6ebecb4f8631ba38050cf219eb41b53308ea8d0b13bb45f566477789  $tmp/model.zip" | sha256sum -c -
+          unzip -p "$tmp/model.zip" java-context-model/tokenizer.json > "$tmp/tokenizer.json"
+          rm "$tmp/model.zip"
+          python -m scripts.audit_remaining_historical_scope --prior-zip "$tmp/prior.zip" --inventory-zip "$tmp/inventory.zip" > integrated-exposure-scope.json
+          ab=40dcce6fe2e4bd2ab83ea70cf5a9cd12368c0312
+          m1=6f36acc0cfb856e82788660acef39829f91586b4
+          rerun=db48c97ef11d9ea9b0feb07e49bc53458a25706c
+          blocked=6eb20c4d581c3aaaf5db4f91a9c4517d2c2bbaca
+          git fetch --depth=1 origin "$ab" "$m1" "$rerun" "$blocked"
+          git diff --exit-code "$m1" "$rerun" -- scripts/diagnose_java_m1_conditioning.py src/sagallm
+          for mode in ab m1 blocked; do
+            case "$mode" in
+              ab) revision="$ab" ;;
+              m1) revision="$m1" ;;
+              blocked) revision="$blocked" ;;
+            esac
+            git worktree add --detach "$tmp/$mode" "$revision"
+            cp scripts/audit_early_input_reconstruction.py "$tmp/$mode/scripts/"
+            (
+              cd "$tmp/$mode"
+              PYTHONPATH=src python -m scripts.audit_early_input_reconstruction --mode "$mode" --reports "$GITHUB_WORKSPACE/experiments/archive/reports" --tokenizer "$tmp/tokenizer.json" --root "$tmp/$mode-data"
+            ) > "$GITHUB_WORKSPACE/early-$mode-reconstruction.json"
+          done
+      - uses: actions/upload-artifact@v4
+        if: github.event_name == 'workflow_dispatch' || github.event.pull_request.head.repo.full_name == github.repository
+        with:
+          name: historical-integrated-exposure-scope-metadata
+          path: |
+            integrated-exposure-scope.json
+            early-ab-reconstruction.json
+            early-m1-reconstruction.json
+            early-blocked-reconstruction.json
+          if-no-files-found: error
