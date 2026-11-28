@@ -1,62 +1,25 @@
-name: SagaLLM publish exact recovered report originals (one-time)
+name: SagaLLM verify durable recovered report originals
 on:
   pull_request:
-    types: [opened]
     paths:
+      - 'experiments/archive/recovered-2026-11-28/**'
+      - 'scripts/archive_recovered_originals.py'
+      - 'tests/test_archive_recovered_originals.py'
       - '.github/workflows/archive-recovered-originals.yml'
+  workflow_dispatch:
 permissions:
   contents: read
 jobs:
-  publish:
-    if: github.repository == 'SagaK-dev/SagaLLM' && github.actor == 'SagaK-dev' && github.event.pull_request.user.login == 'SagaK-dev' && github.event.pull_request.head.repo.full_name == 'SagaK-dev/SagaLLM' && github.event.pull_request.head.ref == 'evidence/recovered-originals-2026-11-28' && github.event.pull_request.base.ref == 'audit/recovered-checkpoint-bytes'
-    permissions:
-      contents: write
-      actions: read
+  verify:
     runs-on: ubuntu-24.04
-    timeout-minutes: 10
+    timeout-minutes: 5
     steps:
       - uses: actions/checkout@v5
         with:
-          ref: ${{ github.event.pull_request.head.sha }}
           persist-credentials: false
       - uses: actions/setup-python@v6
         with:
           python-version: '3.11'
       - run: python -m unittest discover -s tests -p test_archive_recovered_originals.py
-      - name: Stage exact pinned report originals only
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          set -euo pipefail
-          tmp=$(mktemp -d)
-          trap 'rm -rf "$tmp"' EXIT
-          gh api repos/SagaK-dev/SagaLLM/actions/artifacts/15240845377/zip > "$tmp/recovery.zip"
-          gh api repos/SagaK-dev/SagaLLM/actions/artifacts/15239309131/zip > "$tmp/triage.zip"
-          unset GH_TOKEN
-          python -m scripts.archive_recovered_originals --stage --recovery-zip "$tmp/recovery.zip" --triage-zip "$tmp/triage.zip"
-          python -m scripts.archive_recovered_originals
-      - name: Publish only fixed evidence directory to fixed draft branch
-        env:
-          GH_TOKEN: ${{ github.token }}
-          EXPECTED_HEAD: ${{ github.event.pull_request.head.sha }}
-        shell: bash
-        run: |
-          set -euo pipefail
-          test "$(git rev-parse HEAD)" = "$EXPECTED_HEAD"
-          test -z "$(git diff --name-only)"
-          git add -- experiments/archive/recovered-2026-11-28
-          python - <<'PY'
-          import subprocess
-          from pathlib import Path
-          paths = subprocess.check_output(["git","diff","--cached","--name-only"],text=True).splitlines()
-          assert len(paths)==36 and all(p.startswith("experiments/archive/recovered-2026-11-28/") for p in paths)
-          assert subprocess.check_output(["git","diff","--cached","--diff-filter=A","--name-only"],text=True).splitlines()==paths
-          for p in paths:
-              assert subprocess.check_output(["git","show",":"+p])==Path(p).read_bytes()
-          PY
-          git config user.name 'github-actions[bot]'
-          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git commit -m 'Preserve 35 exact historical report originals and pinned recovery manifest'
-          gh auth setup-git
-          git push origin HEAD:refs/heads/evidence/recovered-originals-2026-11-28
-          git rev-parse HEAD
+      - name: Verify committed exact bytes without Actions artifact access
+        run: python -m scripts.archive_recovered_originals
