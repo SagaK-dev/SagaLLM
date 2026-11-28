@@ -1,0 +1,44 @@
+name: SagaLLM patterns module license scope
+on:
+  pull_request:
+    paths:
+      - 'scripts/audit_patterns_module_license_scope.py'
+      - 'tests/test_audit_patterns_module_license_scope.py'
+      - '.github/workflows/audit-patterns-module-license-scope.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  audit:
+    if: github.repository == 'SagaK-dev/SagaLLM' && (github.event_name == 'workflow_dispatch' || github.event.pull_request.head.repo.full_name == github.repository)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    env:
+      GIT_TERMINAL_PROMPT: '0'
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+      - run: python -m unittest discover -s tests -p test_audit_patterns_module_license_scope.py
+      - name: Check exact pinned source blobs and module dependency declarations
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          tmp=$(mktemp -d)
+          trap 'rm -rf "$tmp"' EXIT
+          gh api repos/SagaK-dev/SagaLLM/actions/artifacts/15248000145/zip > "$tmp/index.zip"
+          unset GH_TOKEN
+          git init -q "$tmp/patterns"
+          git -C "$tmp/patterns" -c core.hooksPath=/dev/null fetch --depth=1 https://github.com/iluwatar/java-design-patterns.git 4cabb204f240240bea319605a5ffa46ded728001
+          git -C "$tmp/patterns" -c core.hooksPath=/dev/null checkout -q --detach FETCH_HEAD
+          python -m scripts.audit_patterns_module_license_scope --archive "$tmp/index.zip" --root "$tmp/patterns" --out module-scope
+      - uses: actions/upload-artifact@v4
+        with:
+          name: historical-patterns-module-license-scope-metadata
+          path: module-scope/
+          if-no-files-found: error
