@@ -24,11 +24,12 @@ def main():
     p.add_argument('--lr',type=float,default=0.00015)
     p.add_argument('--context',type=int,choices=[384],help='Opt-in 192→384 RoPE extrapolation using pinned v0.17 SFT weights')
     p.add_argument('--record-exposure',action='store_true',help='Record and verify a local optimizer-input journal; keep journal private until reviewed')
+    p.add_argument('--validation-only',action='store_true',help='Skip TEST scoring; requires --compile-cases 0')
     a=p.parse_args()
     report=train_instruction_sft(a.base,a.tokenizer,a.dataset,a.output,steps=a.steps,
          batch_size=a.batch_size,eval_every=a.eval_every,max_seconds=a.max_seconds,
          compile_cases=a.compile_cases,lr=a.lr,
-         target_context=a.context,record_exposure=a.record_exposure,
+         target_context=a.context,record_exposure=a.record_exposure,validation_only=a.validation_only,
          pinned_checkpoint_sha256=V017_SFT_BEST_SHA256 if a.context else V016_BASE_BEST_SHA256)
     print('JAVA_INSTRUCTION_SFT_SUMMARY '+json.dumps({k:v for k,v in report.items() if k!='history'},ensure_ascii=False),flush=True)
 
