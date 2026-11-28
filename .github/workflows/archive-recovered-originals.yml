@@ -1,0 +1,25 @@
+name: SagaLLM verify durable recovered report originals
+on:
+  pull_request:
+    paths:
+      - 'experiments/archive/recovered-2026-11-28/**'
+      - 'scripts/archive_recovered_originals.py'
+      - 'tests/test_archive_recovered_originals.py'
+      - '.github/workflows/archive-recovered-originals.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+      - run: python -m unittest discover -s tests -p test_archive_recovered_originals.py
+      - name: Verify committed exact bytes without Actions artifact access
+        run: python -m scripts.archive_recovered_originals

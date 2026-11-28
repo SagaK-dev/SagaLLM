@@ -1,0 +1,808 @@
+{
+  "actual_exposure_verified": false,
+  "all_candidate_archives_verified": true,
+  "all_reports_recovered": false,
+  "artifact_status_counts": {
+    "ZIP_VERIFIED": 33
+  },
+  "artifacts": [
+    {
+      "archive_bytes_verified": true,
+      "archive_sha256": "d8736084f930fdc2a3f2849229af6c9738f4e51d9286d67ee813d46f17fe3e5c",
+      "artifact_id": 14738460187,
+      "artifact_name": "sagallm-v016-pinned-java-cpu",
+      "commit_sha": "410bde009ac3cf96aeb9cf87b5ea059e0b96b89f",
+      "expires_at": "2026-12-22T03:41:05Z",
+      "member_count": 9,
+      "other_json_member_count": 2,
+      "preserved_bytes": 3081,
+      "report_members": [
+        {
+          "bytes": 3081,
+          "member": "java-model/train-report.json",
+          "preserved_file": "44981593346-14738460187-0.json",
+          "report_sha256": "991a46e35b49ecf9c1fe355639fb48b81bac5b5e5fcdd72277d51411501bb312",
+          "status": "METADATA_SCREEN_PASSED_NOT_RIGHTS_REVIEW"
+        }
+      ],
+      "run_id": 44981593346,
+      "status": "ZIP_VERIFIED",
+      "unknown_artifact_name": false
+    },
+    {
+      "archive_bytes_verified": true,
+      "archive_sha256": "0ac91ef858ffb0566fb9e3ee1f73c9807a2f77dda1934e6b8363acc3845de1d0",
+      "artifact_id": 14742982787,
+      "artifact_name": "sagallm-v017-java-instruction-sft-cpu",
+      "commit_sha": "c531d43d1d1d2e9da18a14045bfced3cfcaa2720",
+      "expires_at": "2026-12-22T06:34:09Z",
+      "member_count": 5,
+      "other_json_member_count": 2,
+      "preserved_bytes": 7750,
+      "report_members": [
+        {
+          "bytes": 7750,
+          "member": "java-sft-model/train-report.json",
+          "preserved_file": "44994208255-14742982787-0.json",
+          "report_sha256": "15045128e267041fa1ed72df066eb35ad03ebbd4a653953567fedbe8b681dbd7",
+          "status": "METADATA_SCREEN_PASSED_NOT_RIGHTS_REVIEW"
+        }
+      ],
+      "run_id": 44994208255,
+      "status": "ZIP_VERIFIED",
+      "unknown_artifact_name": false
+    },
+    {
+      "archive_bytes_verified": true,
+      "archive_sha256": "1984dcfe432521b3c53ffda88051c6783368b3fcb0c60a2cdf272a2466532b84",
+      "artifact_id": 14743162578,
+      "artifact_name": "sagallm-v018-java-context-sft-cpu",
+      "commit_sha": "e3438df3de5f13702ade326a8a3b5222e0c86191",
+      "expires_at": "2026-12-22T06:46:32Z",
+      "member_count": 5,
+      "other_json_member_count": 2,
+      "preserved_bytes": 8014,
+      "report_members": [
+        {
+          "bytes": 8014,
+          "member": "java-context-model/train-report.json",
+          "preserved_file": "44995129073-14743162578-0.json",
+          "report_sha256": "062e154a9ae2f37cbd16439b27cf1c72b1aa9b59bfd894a7eb5e52b101e6ebe6",
+          "status": "METADATA_SCREEN_PASSED_NOT_RIGHTS_REVIEW"
+        }
+      ],
+      "run_id": 44995129073,
+      "status": "ZIP_VERIFIED",
+      "unknown_artifact_name": false
+    },
+    {
+      "archive_bytes_verified": true,
+      "archive_sha256": "69a9dd6ae24a8b32dbdb64e996e0b17cb8a7820c3de12437e290f9e6f7a4cafb",
+      "artifact_id": 14744203384,
+      "artifact_name": "sagallm-v018-java-context-sft-cpu",
+      "commit_sha": "39c4734a1fb1626c9ff8d1bdfceae4d690d1c54d",
+      "expires_at": "2026-12-22T07:19:53Z",
+      "member_count": 5,
+      "other_json_member_count": 2,
+      "preserved_bytes": 14504,
+      "report_members": [
+        {
+          "bytes": 14504,
+          "member": "java-context-model/train-report.json",
+          "preserved_file": "44997649616-14744203384-0.json",
+          "report_sha256": "2f178f8cde1af3868a9fa2fd04c205ee95d59b729c243e801a053ab24a351472",
+          "status": "METADATA_SCREEN_PASSED_NOT_RIGHTS_REVIEW"
+        }
+      ],
+      "run_id": 44997649616,
+      "status": "ZIP_VERIFIED",
+      "unknown_artifact_name": false
+    },
+    {
+      "archive_bytes_verified": true,
+      "archive_sha256": "1a1d50faf9cf95795d3e9d966585d5c4e9cd374e7c76a3dbe9ac311c8042eeef",
+      "artifact_id": 14744622237,
+      "artifact_name": "sagallm-v017-java-instruction-sft-cpu",
+      "commit_sha": "39c4734a1fb1626c9ff8d1bdfceae4d690d1c54d",
+      "expires_at": "2026-12-22T07:20:02Z",
+      "member_count": 5,
+      "other_json_member_count": 2,
+      "preserved_bytes": 14052,
+      "report_members": [
+        {
+          "bytes": 14052,
+          "member": "java-sft-model/train-report.json",
+          "preserved_file": "44997649515-14744622237-0.json",
+          "report_sha256": "33d678c3baf840cf06f78dc249238430225e585c119a856232d0fad38833c3db",
+          "status": "METADATA_SCREEN_PASSED_NOT_RIGHTS_REVIEW"
+        }
+      ],
+      "run_id": 44997649515,
+      "status": "ZIP_VERIFIED",
+      "unknown_artifact_name": false
+    },
+    {
+      "archive_bytes_verified": true,
+      "archive_sha256": "8f610edde4c8021ed8df19706568779ce34300b40b7d982ef7f85430244243a5",
+      "artifact_id": 14745948361,
+      "artifact_name": "sagallm-v018-paired-java-compile-diagnostics",
+      "commit_sha": "c5a64d35260e3941d74d938988cfb45824845e9e",
+      "expires_at": "2026-12-22T08:27:12Z",
+      "member_count": 1,
+      "other_json_member_count": 0,
+      "preserved_bytes": 11039,
+      "report_members": [
+        {
+          "bytes": 11039,
+          "member": "paired-java-compile.json",
+          "preserved_file": "45002816445-14745948361-0.json",
+          "report_sha256": "ed8a681aa680dfc6e84339e26552056e1a4c3fa0f2f443737f692f7c68164adf",
+          "status": "METADATA_SCREEN_PASSED_NOT_RIGHTS_REVIEW"
+        }
+      ],
+      "run_id": 45002816445,
+      "status": "ZIP_VERIFIED",
+      "unknown_artifact_name": false
+    },
+    {
+      "archive_bytes_verified": true,
+      "archive_sha256": "721544afcd79af8bde4700f09bcc6ebe37cf2ce31b6dd6a4b1401cf76697afb9",
+      "artifact_id": 14747408591,
+      "artifact_name": "sagallm-v018-paired-java-compile-diagnostics",
+      "commit_sha": "d227e210fd9fb43efd06a5ef40dedbcd0e796032",
+      "expires_at": "2026-12-22T09:05:25Z",
+      "member_count": 1,
+      "other_json_member_count": 0,
+      "preserved_bytes": 11039,
+      "report_members": [
+        {
+          "bytes": 11039,
+          "member": "paired-java-compile.json",
+          "preserved_file": "45005749317-14747408591-0.json",
+          "report_sha256": "6d27dbf64782f119bd442f27e427118eaa432d732e380e569e6c011d9d899bc8",
+          "status": "METADATA_SCREEN_PASSED_NOT_RIGHTS_REVIEW"
+        }
+      ],
+      "run_id": 45005749317,
+      "status": "ZIP_VERIFIED",
+      "unknown_artifact_name": false
+    },
+    {
+      "archive_bytes_verified": true,
+      "archive_sha256": "321ac64f2cb343c4c7b29cbd7ad03b396eca6325b30c1189752a08719b6af9bb",
+      "artifact_id": 14747229205,
+      "artifact_name": "sagallm-v018-paired-java-compile-diagnostics",
+      "commit_sha": "d227e210fd9fb43efd06a5ef40dedbcd0e796032",
+      "expires_at": "2026-12-22T09:20:15Z",
+      "member_count": 1,
+      "other_json_member_count": 0,
+      "preserved_bytes": 11039,
+      "report_members": [
+        {
+          "bytes": 11039,
+          "member": "paired-java-compile.json",
+          "preserved_file": "45006966969-14747229205-0.json",
+          "report_sha256": "c104b222f4663836dfdac7d1b83c6ec82dc8d3019e357ce6813c0477f840eaed",
+          "status": "METADATA_SCREEN_PASSED_NOT_RIGHTS_REVIEW"
+        }
+      ],
+      "run_id": 45006966969,
+      "status": "ZIP_VERIFIED",
+      "unknown_artifact_name": false
+    },
+    {
+      "archive_bytes_verified": true,
+      "archive_sha256": "db4b4acd34a1383a3af4e94a4037b99aa7d659c17702c02dd77ed1973fa870ec",
+      "artifact_id": 14748339682,
+      "artifact_name": "sagallm-v018-java-context-sft-cpu",
+      "commit_sha": "f74f0ae72241eec9df4e7fb7f78b432edff43afd",
+      "expires_at": "2026-12-22T09:40:51Z",
+      "member_count": 5,
+      "other_json_member_count": 2,
+      "preserved_bytes": 15271,
+      "report_members": [
+        {
+          "bytes": 15271,
+          "member": "java-context-model/train-report.json",
+          "preserved_file": "45008623555-14748339682-0.json",
+          "report_sha256": "345527b46b126efa09e97bfbe747e4cb3a4377df0cf699db01dcebad5f6d485d",
+          "status": "METADATA_SCREEN_PASSED_NOT_RIGHTS_REVIEW"
+        }
+      ],
+      "run_id": 45008623555,
+      "status": "ZIP_VERIFIED",
+      "unknown_artifact_name": false
+    },
+    {
+      "archive_bytes_verified": true,
+      "archive_sha256": "dda030d2c975d149d40209faf7c6ce66a3a18e1de08a9afe31b0163bb4d8c9c4",
+      "artifact_id": 14748209117,
+      "artifact_name": "sagallm-v017-java-instruction-sft-cpu",
+      "commit_sha": "f74f0ae72241eec9df4e7fb7f78b432edff43afd",
+      "expires_at": "2026-12-22T09:41:29Z",
+      "member_count": 5,
+      "other_json_member_count": 2,
+      "preserved_bytes": 14748,
+      "report_members": [
+        {
+          "bytes": 14748,
+          "member": "java-sft-model/train-report.json",
+          "preserved_file": "45008623563-14748209117-0.json",
+          "report_sha256": "c504d66af24473cdd5815e9587723584e38c882411ea5a9e7c37d4252e4e4551",
+          "status": "METADATA_SCREEN_PASSED_NOT_RIGHTS_REVIEW"
+        }
+      ],
+      "run_id": 45008623563,
+      "status": "ZIP_VERIFIED",
+      "unknown_artifact_name": false
+    },
+    {
+      "archive_bytes_verified": true,
+      "archive_sha256": "7684193ffe2bdf943efc8c7e687126d9a48b1992232fe7c12d105fc46d2bd3a9",
+      "artifact_id": 14749131871,
+      "artifact_name": "sagallm-v018-paired-java-compile-diagnostics",
+      "commit_sha": "64746266267d5591063671d815f4bb7f418fa889",
+      "expires_at": "2026-12-22T09:42:59Z",
+      "member_count": 1,
+      "other_json_member_count": 0,
+      "preserved_bytes": 11806,
+      "report_members": [
+        {
+          "bytes": 11806,
+          "member": "paired-java-compile.json",
+          "preserved_file": "45008806904-14749131871-0.json",
+          "report_sha256": "f59918cb37b3d7c7be99fd347664ab18b7c4c82ca8b91808c13f0969885ea64b",
+          "status": "METADATA_SCREEN_PASSED_NOT_RIGHTS_REVIEW"
+        }
+      ],
+      "run_id": 45008806904,
+      "status": "ZIP_VERIFIED",
+      "unknown_artifact_name": false
+    },
+    {
+      "archive_bytes_verified": true,
+      "archive_sha256": "1aa4040a5ecd2b6ea68043356444dc2d98d7d74b1d5e623675e4c21129f6f9bb",
+      "artifact_id": 14749380801,
+      "artifact_name": "sagallm-v017-java-instruction-sft-cpu",
+      "commit_sha": "9cff85c07d04e89703d809014e549dfd33e504fa",
+      "expires_at": "2026-12-22T09:48:20Z",
+      "member_count": 5,
+      "other_json_member_count": 2,
+      "preserved_bytes": 15363,
+      "report_members": [
+        {
+          "bytes": 15363,
+          "member": "java-sft-model/train-report.json",
+          "preserved_file": "45009207635-14749380801-0.json",
+          "report_sha256": "cca037c8c0ede4ef4df03d39e8011b84786e96a8f1afa7357515eddea693c5e9",
+          "status": "METADATA_SCREEN_PASSED_NOT_RIGHTS_REVIEW"
+        }
+      ],
+      "run_id": 45009207635,
+      "status": "ZIP_VERIFIED",
+      "unknown_artifact_name": false
+    },
+    {
+      "archive_bytes_verified": true,
+      "archive_sha256": "0927c685276370269c83586531656716e55f985de9d8f3748310f5653cf41b29",
+      "artifact_id": 14749446106,
+      "artifact_name": "sagallm-v018-java-context-sft-cpu",
+      "commit_sha": "9cff85c07d04e89703d809014e549dfd33e504fa",
+      "expires_at": "2026-12-22T09:48:29Z",
+      "member_count": 5,
+      "other_json_member_count": 2,
+      "preserved_bytes": 15909,
+      "report_members": [
+        {
+          "bytes": 15909,
+          "member": "java-context-model/train-report.json",
+          "preserved_file": "45009207646-14749446106-0.json",
+          "report_sha256": "c0efede503d30e8c1917f863e1a4c139629db96d7160a509a3cdb2c6905ecd40",
+          "status": "METADATA_SCREEN_PASSED_NOT_RIGHTS_REVIEW"
+        }
+      ],
+      "run_id": 45009207646,
+      "status": "ZIP_VERIFIED",
+      "unknown_artifact_name": false
+    },
+    {
+      "archive_bytes_verified": true,
+      "archive_sha256": "39a2b8468961233d3789edc599d627c25c49edfb25502c40f36611a002261559",
+      "artifact_id": 14748849006,
+      "artifact_name": "sagallm-v018-paired-java-compile-diagnostics",
+      "commit_sha": "6c1c2a143a99a4213f3fc38047289ea66729a0ee",
+      "expires_at": "2026-12-22T09:50:33Z",
+      "member_count": 1,
+      "other_json_member_count": 0,
+      "preserved_bytes": 12442,
+      "report_members": [
+        {
+          "bytes": 12442,
+          "member": "paired-java-compile.json",
+          "preserved_file": "45009411175-14748849006-0.json",
+          "report_sha256": "13fcd9552591da3c1489a71ad5c64b1272da23e05944394e72daaa0d0878bc73",
+          "status": "METADATA_SCREEN_PASSED_NOT_RIGHTS_REVIEW"
+        }
+      ],
+      "run_id": 45009411175,
+      "status": "ZIP_VERIFIED",
+      "unknown_artifact_name": false
+    },
+    {
+      "archive_bytes_verified": true,
+      "archive_sha256": "4d8bce4b3027a4b5cbb06bb761693591f9ad74478c21a6902a3dd3fb4c1b53a5",
+      "artifact_id": 14748804923,
+      "artifact_name": "sagallm-v018-java-context-sft-cpu",
+      "commit_sha": "62cb73c68fe6b27f9397226b050692a7d5ee0e7d",
+      "expires_at": "2026-12-22T09:56:19Z",
+      "member_count": 5,
+      "other_json_member_count": 2,
+      "preserved_bytes": 17054,
+      "report_members": [
+        {
+          "bytes": 17054,
+          "member": "java-context-model/train-report.json",
+          "preserved_file": "45009828075-14748804923-0.json",
+          "report_sha256": "946d0d542128d5eafac8f2af65c748172ec997e36f316939c9139f1f68df2a94",
+          "status": "METADATA_SCREEN_PASSED_NOT_RIGHTS_REVIEW"
+        }
+      ],
+      "run_id": 45009828075,
+      "status": "ZIP_VERIFIED",
+      "unknown_artifact_name": false
+    },
+    {
+      "archive_bytes_verified": true,
+      "archive_sha256": "91fd7494e11ff5852d08f9ad85d93aad65af46509f4b77076843f2a3fe6b244f",
+      "artifact_id": 14748774748,
+      "artifact_name": "sagallm-v017-java-instruction-sft-cpu",
+      "commit_sha": "62cb73c68fe6b27f9397226b050692a7d5ee0e7d",
+      "expires_at": "2026-12-22T09:56:30Z",
+      "member_count": 5,
+      "other_json_member_count": 2,
+      "preserved_bytes": 16330,
+      "report_members": [
+        {
+          "bytes": 16330,
+          "member": "java-sft-model/train-report.json",
+          "preserved_file": "45009828052-14748774748-0.json",
+          "report_sha256": "b2f3c8c5f10b7b89a7ae16be6d429e70eb69f685c3e9556bcfa04ae4fd46ea10",
+          "status": "METADATA_SCREEN_PASSED_NOT_RIGHTS_REVIEW"
+        }
+      ],
+      "run_id": 45009828052,
+      "status": "ZIP_VERIFIED",
+      "unknown_artifact_name": false
+    },
+    {
+      "archive_bytes_verified": true,
+      "archive_sha256": "54032eabf88845110d7751188b08bc43ac9b119c106891263544b55dc8c94e9a",
+      "artifact_id": 14749431662,
+      "artifact_name": "sagallm-v018-paired-java-compile-diagnostics",
+      "commit_sha": "53800b2db5d90d9788d14ac797f4c142a112d07f",
+      "expires_at": "2026-12-22T09:57:51Z",
+      "member_count": 1,
+      "other_json_member_count": 0,
+      "preserved_bytes": 15288,
+      "report_members": [
+        {
+          "bytes": 15288,
+          "member": "paired-java-compile.json",
+          "preserved_file": "45010006685-14749431662-0.json",
+          "report_sha256": "67759da7932c4c9c4f003de0f03d79f1bf3637b32dae6afe79710dcccc2113eb",
+          "status": "METADATA_SCREEN_PASSED_NOT_RIGHTS_REVIEW"
+        }
+      ],
+      "run_id": 45010006685,
+      "status": "ZIP_VERIFIED",
+      "unknown_artifact_name": false
+    },
+    {
+      "archive_bytes_verified": true,
+      "archive_sha256": "6efe4da58556bb2b409b3a2b5fa714df73d8fc1de3e68fe2a4ba6224d515ea18",
+      "artifact_id": 14749483711,
+      "artifact_name": "sagallm-v018-java-context-sft-cpu",
+      "commit_sha": "4b28bd1cfa02f6d039949b01bdbd0ac0cae4068a",
+      "expires_at": "2026-12-22T10:07:48Z",
+      "member_count": 5,
+      "other_json_member_count": 2,
+      "preserved_bytes": 17163,
+      "report_members": [
+        {
+          "bytes": 17163,
+          "member": "java-context-model/train-report.json",
+          "preserved_file": "45010810137-14749483711-0.json",
+          "report_sha256": "a5af8e4dbb99146512f72fb9490cce619745044364a8e1d0c828592ba627c181",
+          "status": "METADATA_SCREEN_PASSED_NOT_RIGHTS_REVIEW"
+        }
+      ],
+      "run_id": 45010810137,
+      "status": "ZIP_VERIFIED",
+      "unknown_artifact_name": false
+    },
+    {
+      "archive_bytes_verified": true,
+      "archive_sha256": "b39173c721f32543ad190b1a2753d0c2a75bc5aeda874bbc44b12dfda32bb53c",
+      "artifact_id": 14749273241,
+      "artifact_name": "sagallm-v017-java-instruction-sft-cpu",
+      "commit_sha": "4b28bd1cfa02f6d039949b01bdbd0ac0cae4068a",
+      "expires_at": "2026-12-22T10:08:28Z",
+      "member_count": 5,
+      "other_json_member_count": 2,
+      "preserved_bytes": 16440,
+      "report_members": [
+        {
+          "bytes": 16440,
+          "member": "java-sft-model/train-report.json",
+          "preserved_file": "45010810295-14749273241-0.json",
+          "report_sha256": "40e1c8236c17c276ca98f05c938f49dc92f9204ca0d89655ed8f81262f3456df",
+          "status": "METADATA_SCREEN_PASSED_NOT_RIGHTS_REVIEW"
+        }
+      ],
+      "run_id": 45010810295,
+      "status": "ZIP_VERIFIED",
+      "unknown_artifact_name": false
+    },
+    {
+      "archive_bytes_verified": true,
+      "archive_sha256": "788c774797e3a32ea7d5362f26a326b0edb7bb8ce51007a28505b8d964a57eca",
+      "artifact_id": 14750051523,
+      "artifact_name": "sagallm-java-prompt-validation-experiment",
+      "commit_sha": "d361fd6796391fb9983e6adf1af39acedd3af202",
+      "expires_at": "2026-12-22T10:10:42Z",
+      "member_count": 1,
+      "other_json_member_count": 0,
+      "preserved_bytes": 36134,
+      "report_members": [
+        {
+          "bytes": 36134,
+          "member": "java-prompt-validation-experiment.json",
+          "preserved_file": "45011067264-14750051523-0.json",
+          "report_sha256": "c8002219d8e3c5fbb0f6c919563b9279873cfc6b92b967c4a539ad67efcf0a4b",
+          "status": "METADATA_SCREEN_PASSED_NOT_RIGHTS_REVIEW"
+        }
+      ],
+      "run_id": 45011067264,
+      "status": "ZIP_VERIFIED",
+      "unknown_artifact_name": false
+    },
+    {
+      "archive_bytes_verified": true,
+      "archive_sha256": "4c7f423971c01d18e5f12ee54ccddd0018db4bd084be743a54582189dc7b31f9",
+      "artifact_id": 14749628453,
+      "artifact_name": "sagallm-v018-paired-java-compile-diagnostics",
+      "commit_sha": "d361fd6796391fb9983e6adf1af39acedd3af202",
+      "expires_at": "2026-12-22T10:10:45Z",
+      "member_count": 1,
+      "other_json_member_count": 0,
+      "preserved_bytes": 15398,
+      "report_members": [
+        {
+          "bytes": 15398,
+          "member": "paired-java-compile.json",
+          "preserved_file": "45011067268-14749628453-0.json",
+          "report_sha256": "a7f74476e595edee758301a1285e7ed13c24782c7bc0a925c78a25be5b7f3820",
+          "status": "METADATA_SCREEN_PASSED_NOT_RIGHTS_REVIEW"
+        }
+      ],
+      "run_id": 45011067268,
+      "status": "ZIP_VERIFIED",
+      "unknown_artifact_name": false
+    },
+    {
+      "archive_bytes_verified": true,
+      "archive_sha256": "2631469620412ce526c15a7171430d380caf22db4a6bc22345926fd4eeca20a2",
+      "artifact_id": 14750067161,
+      "artifact_name": "sagallm-java-train-only-identifier-candidates",
+      "commit_sha": "876f7a8767089f7206edce13b6d1dbb0c5d8f61b",
+      "expires_at": "2026-12-22T10:22:34Z",
+      "member_count": 3,
+      "other_json_member_count": 0,
+      "preserved_bytes": 1544,
+      "report_members": [
+        {
+          "bytes": 634,
+          "member": "manifest.json",
+          "preserved_file": "45012079916-14750067161-0.json",
+          "report_sha256": "3aae302ff32bd3737e2b0b8f06d4db089c0aebab8eba7030b213f54357e3b7cd",
+          "status": "METADATA_SCREEN_PASSED_NOT_RIGHTS_REVIEW"
+        },
+        {
+          "bytes": 910,
+          "member": "audit-summary.json",
+          "preserved_file": "45012079916-14750067161-1.json",
+          "report_sha256": "715e7dc85fed81ff968f3cbda5d28716d1be90177f233697f5ef23cd9f57c5c4",
+          "status": "METADATA_SCREEN_PASSED_NOT_RIGHTS_REVIEW"
+        }
+      ],
+      "run_id": 45012079916,
+      "status": "ZIP_VERIFIED",
+      "unknown_artifact_name": false
+    },
+    {
+      "archive_bytes_verified": true,
+      "archive_sha256": "8fcd9dd0d1842de6479cc58f3b7ece44462c8ce227361000c48d3bd4b139759d",
+      "artifact_id": 14750350753,
+      "artifact_name": "sagallm-java-train-only-identifier-candidates",
+      "commit_sha": "6140ec8b7130a3644a029e1e090add8c38c1d84e",
+      "expires_at": "2026-12-22T10:22:39Z",
+      "member_count": 3,
+      "other_json_member_count": 0,
+      "preserved_bytes": 1544,
+      "report_members": [
+        {
+          "bytes": 634,
+          "member": "manifest.json",
+          "preserved_file": "45012092638-14750350753-0.json",
+          "report_sha256": "3aae302ff32bd3737e2b0b8f06d4db089c0aebab8eba7030b213f54357e3b7cd",
+          "status": "METADATA_SCREEN_PASSED_NOT_RIGHTS_REVIEW"
+        },
+        {
+          "bytes": 910,
+          "member": "audit-summary.json",
+          "preserved_file": "45012092638-14750350753-1.json",
+          "report_sha256": "715e7dc85fed81ff968f3cbda5d28716d1be90177f233697f5ef23cd9f57c5c4",
+          "status": "METADATA_SCREEN_PASSED_NOT_RIGHTS_REVIEW"
+        }
+      ],
+      "run_id": 45012092638,
+      "status": "ZIP_VERIFIED",
+      "unknown_artifact_name": false
+    },
+    {
+      "archive_bytes_verified": true,
+      "archive_sha256": "17eb4a91397a376eab70e8ac304db2ffec13a0883b08c720e34ca3ae9b195c53",
+      "artifact_id": 14750148284,
+      "artifact_name": "sagallm-java-train-only-identifier-candidates",
+      "commit_sha": "6fc6ddbd3624582c9a46d1fa1634072fbe2f567f",
+      "expires_at": "2026-12-22T10:25:38Z",
+      "member_count": 3,
+      "other_json_member_count": 0,
+      "preserved_bytes": 1544,
+      "report_members": [
+        {
+          "bytes": 634,
+          "member": "manifest.json",
+          "preserved_file": "45012338346-14750148284-0.json",
+          "report_sha256": "3aae302ff32bd3737e2b0b8f06d4db089c0aebab8eba7030b213f54357e3b7cd",
+          "status": "METADATA_SCREEN_PASSED_NOT_RIGHTS_REVIEW"
+        },
+        {
+          "bytes": 910,
+          "member": "audit-summary.json",
+          "preserved_file": "45012338346-14750148284-1.json",
+          "report_sha256": "715e7dc85fed81ff968f3cbda5d28716d1be90177f233697f5ef23cd9f57c5c4",
+          "status": "METADATA_SCREEN_PASSED_NOT_RIGHTS_REVIEW"
+        }
+      ],
+      "run_id": 45012338346,
+      "status": "ZIP_VERIFIED",
+      "unknown_artifact_name": false
+    },
+    {
+      "archive_bytes_verified": true,
+      "archive_sha256": "ac16cd725a84a26e02f2c00964f236b8670529aa4ba7c35512ce60da8597246d",
+      "artifact_id": 14752812310,
+      "artifact_name": "sagallm-java-identifier-ab-validation",
+      "commit_sha": "797ae0d195045ee2c5177ca44c0df474876bd3fc",
+      "expires_at": "2026-12-22T11:43:26Z",
+      "member_count": 5,
+      "other_json_member_count": 2,
+      "preserved_bytes": 24395,
+      "report_members": [
+        {
+          "bytes": 24395,
+          "member": "identifier-ab-evidence/ab-report.json",
+          "preserved_file": "45018649700-14752812310-0.json",
+          "report_sha256": "7488f1ab75108ce8befa9b67a5b6bb380ff9802d3ca3c7a35dfc084dacad887d",
+          "status": "METADATA_SCREEN_PASSED_NOT_RIGHTS_REVIEW"
+        }
+      ],
+      "run_id": 45018649700,
+      "status": "ZIP_VERIFIED",
+      "unknown_artifact_name": false
+    },
+    {
+      "archive_bytes_verified": true,
+      "archive_sha256": "0679dfc57619f60b8f9a981160dbd2054970030f4faca15cc22d8af5bcca9e3c",
+      "artifact_id": 14753120733,
+      "artifact_name": "sagallm-java-identifier-ab-validation",
+      "commit_sha": "49c7c55915f03d94a722951ca9b2f7918ba13d3e",
+      "expires_at": "2026-12-22T11:46:15Z",
+      "member_count": 5,
+      "other_json_member_count": 2,
+      "preserved_bytes": 24397,
+      "report_members": [
+        {
+          "bytes": 24397,
+          "member": "identifier-ab-evidence/ab-report.json",
+          "preserved_file": "45018851049-14753120733-0.json",
+          "report_sha256": "2d11ded150f1b52e26117d70f0c38f735b572f882c36a75da1a86cc5fb921a5d",
+          "status": "METADATA_SCREEN_PASSED_NOT_RIGHTS_REVIEW"
+        }
+      ],
+      "run_id": 45018851049,
+      "status": "ZIP_VERIFIED",
+      "unknown_artifact_name": false
+    },
+    {
+      "archive_bytes_verified": true,
+      "archive_sha256": "bf142c8a4b4fa1905b505a62a5424ca2da9129f19c911b6126955245980f4fcd",
+      "artifact_id": 14756075922,
+      "artifact_name": "sagallm-broad-mixture-low-lr-validation-ab",
+      "commit_sha": "4269121a03d06ebdc07629159e7698336d9c4dee",
+      "expires_at": "2026-12-22T13:14:21Z",
+      "member_count": 5,
+      "other_json_member_count": 2,
+      "preserved_bytes": 24757,
+      "report_members": [
+        {
+          "bytes": 24757,
+          "member": "broad-mix-ab-evidence/ab-report.json",
+          "preserved_file": "45026352157-14756075922-0.json",
+          "report_sha256": "47fb1577c8932aa1182c672d54fc21c1b4d86b058360ca018ec8aab1aadd665d",
+          "status": "METADATA_SCREEN_PASSED_NOT_RIGHTS_REVIEW"
+        }
+      ],
+      "run_id": 45026352157,
+      "status": "ZIP_VERIFIED",
+      "unknown_artifact_name": false
+    },
+    {
+      "archive_bytes_verified": true,
+      "archive_sha256": "57098c53a1864db5f68a8e1307f6b37466610aaa89da03cf9b2264c0afcde079",
+      "artifact_id": 14756001714,
+      "artifact_name": "sagallm-broad-mixture-low-lr-validation-ab",
+      "commit_sha": "f3a5a7e64fb8cb5e01e56291ff22cc34196115c6",
+      "expires_at": "2026-12-22T13:17:22Z",
+      "member_count": 5,
+      "other_json_member_count": 2,
+      "preserved_bytes": 24759,
+      "report_members": [
+        {
+          "bytes": 24759,
+          "member": "broad-mix-ab-evidence/ab-report.json",
+          "preserved_file": "45026590750-14756001714-0.json",
+          "report_sha256": "986cf35b4fd91561671f9d80189875f59f49732cf3b9d1f8445c8500ff240add",
+          "status": "METADATA_SCREEN_PASSED_NOT_RIGHTS_REVIEW"
+        }
+      ],
+      "run_id": 45026590750,
+      "status": "ZIP_VERIFIED",
+      "unknown_artifact_name": false
+    },
+    {
+      "archive_bytes_verified": true,
+      "archive_sha256": "aabadc6a30b2b2dbe57e8f946894745a9fdf3772a6b21a0ef88f1ae94d288b98",
+      "artifact_id": 14809802712,
+      "artifact_name": "sagallm-public-java-compile-diagnostic-unreviewed",
+      "commit_sha": "3dc5317803402c1fbde0b80400773a6d1d447719",
+      "expires_at": "2026-12-23T10:48:49Z",
+      "member_count": 1,
+      "other_json_member_count": 0,
+      "preserved_bytes": 7551,
+      "report_members": [
+        {
+          "bytes": 7551,
+          "member": "exploratory-public-java-compile-only.json",
+          "preserved_file": "45159337002-14809802712-0.json",
+          "report_sha256": "675faedd65720d714d94358945da597acd2f301f32742e74cb9a0383c9fb11f0",
+          "status": "METADATA_SCREEN_PASSED_NOT_RIGHTS_REVIEW"
+        }
+      ],
+      "run_id": 45159337002,
+      "status": "ZIP_VERIFIED",
+      "unknown_artifact_name": false
+    },
+    {
+      "archive_bytes_verified": true,
+      "archive_sha256": "fdaa90d3c1eb80ab21ccfccdaaa4dd9850bf54d5c49bdd0ab1022525f2c1f228",
+      "artifact_id": 14809758426,
+      "artifact_name": "sagallm-public-java-compile-diagnostic-unreviewed",
+      "commit_sha": "5fe61fd5798fd900c5f51d9ff804f54ea931a048",
+      "expires_at": "2026-12-23T10:51:46Z",
+      "member_count": 1,
+      "other_json_member_count": 0,
+      "preserved_bytes": 7551,
+      "report_members": [
+        {
+          "bytes": 7551,
+          "member": "exploratory-public-java-compile-only.json",
+          "preserved_file": "45159800650-14809758426-0.json",
+          "report_sha256": "675faedd65720d714d94358945da597acd2f301f32742e74cb9a0383c9fb11f0",
+          "status": "METADATA_SCREEN_PASSED_NOT_RIGHTS_REVIEW"
+        }
+      ],
+      "run_id": 45159800650,
+      "status": "ZIP_VERIFIED",
+      "unknown_artifact_name": false
+    },
+    {
+      "archive_bytes_verified": true,
+      "archive_sha256": "32f177aefd654c2d5b90edff80a03f8e5e917aa7e6fbffcddc4420eb8a1b1884",
+      "artifact_id": 14809854631,
+      "artifact_name": "sagallm-public-java-isolated-behavior-unreviewed",
+      "commit_sha": "540bdd3aaa45fa198a78f854f60144c308378075",
+      "expires_at": "2026-12-23T11:02:21Z",
+      "member_count": 1,
+      "other_json_member_count": 0,
+      "preserved_bytes": 3643,
+      "report_members": [
+        {
+          "bytes": 3643,
+          "member": "exploratory-public-java-oci-io.json",
+          "preserved_file": "45161286649-14809854631-0.json",
+          "report_sha256": "247e5899ea2b3f58293bccab648364f8a1fd3363c7c1003383d65a674f987d51",
+          "status": "METADATA_SCREEN_PASSED_NOT_RIGHTS_REVIEW"
+        }
+      ],
+      "run_id": 45161286649,
+      "status": "ZIP_VERIFIED",
+      "unknown_artifact_name": false
+    },
+    {
+      "archive_bytes_verified": true,
+      "archive_sha256": "30ef8a7319e3740927e2d71cc42a16a121cececdbc1891447ddf3432288ba559",
+      "artifact_id": 14812505339,
+      "artifact_name": "sagallm-public-java-isolated-behavior-unreviewed",
+      "commit_sha": "0d1fbd6fb22dc6b9b272a1ed6f886e9338ffcb6e",
+      "expires_at": "2026-12-23T11:05:09Z",
+      "member_count": 1,
+      "other_json_member_count": 0,
+      "preserved_bytes": 4572,
+      "report_members": [
+        {
+          "bytes": 4572,
+          "member": "exploratory-public-java-oci-io.json",
+          "preserved_file": "45161722607-14812505339-0.json",
+          "report_sha256": "a0b1e779869c332a1c7b343ec870823800da7b9106f341e28d85b3a6529c0653",
+          "status": "METADATA_SCREEN_PASSED_NOT_RIGHTS_REVIEW"
+        }
+      ],
+      "run_id": 45161722607,
+      "status": "ZIP_VERIFIED",
+      "unknown_artifact_name": false
+    },
+    {
+      "archive_bytes_verified": true,
+      "archive_sha256": "dbc9702411141ee1b5b684a1bf903ad117fa6ba28080d83485d4119b64e75392",
+      "artifact_id": 15101943417,
+      "artifact_name": "historical-development-data-evidence",
+      "commit_sha": "46617e6dd6962fb08311c7e32ebfe2c33ec5a417",
+      "expires_at": "2027-02-24T09:14:28Z",
+      "member_count": 1,
+      "other_json_member_count": 1,
+      "preserved_bytes": 0,
+      "report_members": [],
+      "run_id": 45790130406,
+      "status": "ZIP_VERIFIED",
+      "unknown_artifact_name": true
+    }
+  ],
+  "candidate_count": 33,
+  "full_exposure_inventory": "NOT_ESTABLISHED",
+  "independent_evaluation": "NOT_RUN",
+  "model_selection_permitted": false,
+  "new_inference": false,
+  "new_java_execution": false,
+  "new_training": false,
+  "observed_at_utc": "2026-11-28T00:37:07Z",
+  "preserved_bytes": 426121,
+  "preserved_report_count": 35,
+  "prior_evidence": {
+    "archive_sha256": "f06646c8fce3267c588c8b37d13e126f5a5aa7d86315fcb9126dbae2c083e5b0",
+    "artifact_id": 15239309131,
+    "member_sha256": {
+      "unarchived-artifact-triage.json": "a50cc2626debffb24bb3bcacdc9ecaa0d20091d1149ec3773be2dc0916e17c8c"
+    },
+    "run_id": 46087794746
+  },
+  "report_member_status_counts": {
+    "METADATA_SCREEN_PASSED_NOT_RIGHTS_REVIEW": 35
+  },
+  "rights_review": "REVIEW_REQUIRED",
+  "schema": "sagallm-recovered-historical-reports-v1",
+  "status": "BOUNDED_RECOVERY_ATTEMPT_COMPLETE",
+  "training_lineage_verified": false,
+  "zip_verified_count": 33
+}

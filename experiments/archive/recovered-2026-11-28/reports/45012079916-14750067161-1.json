@@ -1,0 +1,27 @@
+{
+  "status": "CANDIDATE_TRAIN_ONLY_NOT_USED_FOR_TRAINING",
+  "schema": "sagallm-identifier-train-candidates-v1",
+  "candidate_sha256": "ad18e0a328f00db2bca204c3911afd66307099e3d41ba0f0d97c964463d3c2d9",
+  "families": 10,
+  "candidate_examples": 120,
+  "original_identifier_vocabulary_in_scope": 10,
+  "new_identifier_vocabulary_used": 28,
+  "reproducibility": "PASS",
+  "compiler": {
+    "status": "PASS",
+    "compiled": 120,
+    "attempted": 120,
+    "failed_candidate_indices": [],
+    "failure_kind": "NONE",
+    "compiler_exit_code": 0,
+    "compile_only": true,
+    "java_executed": false,
+    "javac_annotation_processing": "DISABLED",
+    "raw_javac_diagnostics_persisted": false
+  },
+  "canonical_dataset_unchanged": true,
+  "used_for_training": false,
+  "validation_or_test_tasks_used_for_augmentation": false,
+  "generated_java_executed": false,
+  "generalization_improvement_established": false
+}

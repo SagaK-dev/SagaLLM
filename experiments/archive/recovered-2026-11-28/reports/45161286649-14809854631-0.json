@@ -1,0 +1,121 @@
+{
+  "status": "EXPLORATORY_PUBLIC_UNREVIEWED_ISOLATED_IO",
+  "suite_sha256": "d1af64a934c304f04b2cfa822280c73cb7da7b64d09e83f62b071b945a244c74",
+  "original_six_tasks": 6,
+  "original_27_cases": 27,
+  "matched_previous_compiles": 4,
+  "attempted_cases_across_models": 19,
+  "v017_checkpoint_sha256": "a17268d80ff443e4a0347f3a29df433556506f13537c78ce282836fa8fe4e5f9",
+  "v018_checkpoint_sha256": "9802e848f0abea9979623f461b5e63cd7aed838acd087d06b20d747db1e2a0fc",
+  "tokenizer_sha256": "186566808cb03e328cac9a6b7b384a8d0aefc54ccb83fbe97782a751726682fe",
+  "model_context": 384,
+  "decoding": "GREEDY_170_TOKENS",
+  "oci_backend": "docker",
+  "oci_image_id": "sha256:fb4df7dcd7c9343cceee7cecf91544971499bec7a483f87f0f12a8c68d2e00d2",
+  "oci_smoke": "PASS",
+  "isolation": {
+    "runner": "EPHEMERAL_GITHUB_HOSTED_VM",
+    "container_network": "none",
+    "root_filesystem": "read_only",
+    "capabilities": "all_dropped",
+    "no_new_privileges": true,
+    "user": "65534",
+    "pid_limit": 64,
+    "memory_limit_mb": 384,
+    "image_pull_during_java_run": false,
+    "security_proof": false
+  },
+  "v017": {
+    "compiled_outputs_regenerated": 2,
+    "io_cases_attempted": 10,
+    "io_cases_passed": 0,
+    "io_cases_failing": 10,
+    "tasks_passed_all_cases": 0,
+    "status": "EVALUATED",
+    "tasks": [
+      {
+        "id": "ex_luhn",
+        "cases_total": 5,
+        "cases_passed": 0,
+        "case_statuses": [
+          "FAIL",
+          "FAIL",
+          "FAIL",
+          "FAIL",
+          "FAIL"
+        ],
+        "task_status": "FAIL",
+        "generated_source_stored": false,
+        "host_java_execution": false,
+        "source_sha256": "e13884938d9bf32bbc04837151465cd58f1eff7b72982255940d85e4a224b1d2"
+      },
+      {
+        "id": "ex_atbash_cipher",
+        "cases_total": 5,
+        "cases_passed": 0,
+        "case_statuses": [
+          "FAIL",
+          "FAIL",
+          "FAIL",
+          "FAIL",
+          "FAIL"
+        ],
+        "task_status": "FAIL",
+        "generated_source_stored": false,
+        "host_java_execution": false,
+        "source_sha256": "2b513562b6c49b4b9db66f14fabb016490b41873dd5abcb280e01e44f2e54278"
+      }
+    ]
+  },
+  "v018": {
+    "compiled_outputs_regenerated": 2,
+    "io_cases_attempted": 9,
+    "io_cases_passed": 0,
+    "io_cases_failing": 9,
+    "tasks_passed_all_cases": 0,
+    "status": "EVALUATED",
+    "tasks": [
+      {
+        "id": "ex_hamming",
+        "cases_total": 4,
+        "cases_passed": 0,
+        "case_statuses": [
+          "FAIL",
+          "FAIL",
+          "FAIL",
+          "FAIL"
+        ],
+        "task_status": "FAIL",
+        "generated_source_stored": false,
+        "host_java_execution": false,
+        "source_sha256": "118dec6fa07db5da66d9ac57e3b998db7dc536d89a687542a0a85aaa75294ac3"
+      },
+      {
+        "id": "ex_luhn",
+        "cases_total": 5,
+        "cases_passed": 0,
+        "case_statuses": [
+          "FAIL",
+          "FAIL",
+          "FAIL",
+          "FAIL",
+          "FAIL"
+        ],
+        "task_status": "FAIL",
+        "generated_source_stored": false,
+        "host_java_execution": false,
+        "source_sha256": "a1389e892e8622f8dca677394427480f632f83ab11d5eab3cc6897df9f079faf"
+      }
+    ]
+  },
+  "human_review_status": "REVIEW_REQUIRED",
+  "public_pretraining_contamination_possible": true,
+  "original_prompts_used_verbatim": false,
+  "independent_benchmark_approval": false,
+  "model_selection_permitted": false,
+  "model_updated": false,
+  "model_behavioral_correctness_generalized": false,
+  "generated_source_persisted": false,
+  "raw_stdout_or_stderr_persisted": false,
+  "java_execution": "OCI_ONLY"
+}
