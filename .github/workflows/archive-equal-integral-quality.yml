@@ -1,0 +1,60 @@
+name: SagaLLM preserve equal-integral and quality originals (one-time)
+on:
+  pull_request:
+    types: [opened]
+    paths:
+      - '.github/workflows/archive-equal-integral-quality.yml'
+permissions:
+  contents: read
+jobs:
+  publish:
+    if: github.repository == 'SagaK-dev/SagaLLM' && github.actor == 'SagaK-dev' && github.event.pull_request.user.login == 'SagaK-dev' && github.event.pull_request.head.repo.full_name == github.repository && github.event.pull_request.head.ref == 'evidence/equal-integral-and-corpus-quality' && github.event.pull_request.base.ref == 'evidence/schedule-sweep-prefix-originals'
+    permissions:
+      contents: write
+      actions: read
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          persist-credentials: false
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+      - name: Stage exact metadata originals
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          tmp=$(mktemp -d)
+          trap 'rm -rf "$tmp"' EXIT
+          for id in 15256371982 15257010429 15257180292; do
+            gh api "repos/SagaK-dev/SagaLLM/actions/artifacts/$id/zip" > "$tmp/$id.zip"
+          done
+          unset GH_TOKEN
+          python -m scripts.archive_equal_integral_quality --equal-integral "$tmp/15256371982.zip" --quality "$tmp/15257010429.zip" --collisions "$tmp/15257180292.zip"
+          python -m scripts.archive_equal_integral_quality
+      - name: Publish exact new metadata only
+        env:
+          GH_TOKEN: ${{ github.token }}
+          EXPECTED_HEAD: ${{ github.event.pull_request.head.sha }}
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$EXPECTED_HEAD"
+          test -z "$(git diff --name-only)"
+          git add -- experiments/archive/equal-integral-and-corpus-quality
+          python - <<'PY'
+          import subprocess
+          from pathlib import Path
+          from scripts.archive_equal_integral_quality import ROOT,PINS
+          paths=subprocess.check_output(["git","diff","--cached","--name-only"],text=True).splitlines()
+          assert set(paths)=={str(ROOT/n) for n in set(PINS)|{"archive-manifest.json"}}
+          assert subprocess.check_output(["git","diff","--cached","--diff-filter=A","--name-only"],text=True).splitlines()==paths
+          for p in paths:assert subprocess.check_output(["git","show",":"+p])==Path(p).read_bytes()
+          PY
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -m 'Preserve equal-integral and corpus quality metadata originals'
+          gh auth setup-git
+          git push origin HEAD:refs/heads/evidence/equal-integral-and-corpus-quality
