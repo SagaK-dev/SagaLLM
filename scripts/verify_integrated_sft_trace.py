@@ -104,6 +104,17 @@ def audit(output,*,report_sha256,trace_sha256,tip_sha256,dataset,base,tokenizer)
         lr_status="RECORDED_STEP_RATES_MATCH"
     else:
         require("lr_schedule" not in report.get("optimizer_spec",{}),"Unbound schedule declaration")
+    dataset_status="CANONICAL_OR_LEGACY_DECLARATION"
+    from sagallm.java_template_subset import MODE, verify_subset_train
+    manifest=json.loads(bounded(Path(dataset)/"manifest.json",h["data_manifest_sha256"],65536))
+    if manifest.get("schema")=="sagallm-java-template-capped-v1":
+        subset=verify_subset_train(dataset)
+        require(report.get("dataset_mode")==MODE and report.get("dataset_membership_sha256")==subset["membership_sha256"]
+                and report["evaluation_scope"]=="VALIDATION_ONLY_DEVELOPMENT" and report["source_pin_status"]!="PIN_NOT_REQUIRED",
+                "Subset provenance declaration mismatch")
+        dataset_status="PINNED_TEMPLATE_SUBSET_MEMBERSHIP_VERIFIED"
+    else:
+        require("dataset_mode" not in report and "dataset_membership_sha256" not in report,"Unexpected subset declaration")
     context=report["model_context_length"]
     replay=replay_source_binding(journal,expected_trace_sha256=trace_sha256,expected_tip=tip_sha256,
         dataset_dir=dataset,tokenizer_path=tokenizer,base_checkpoint=base,context=context)
@@ -143,7 +154,7 @@ def audit(output,*,report_sha256,trace_sha256,tip_sha256,dataset,base,tokenizer)
         checkpoint_rows.append({"role":role,"sha256":expected,"bytes":len(raw),
                                 "step_declared":expected_step,"journal_prefix_sha256":binding["prefix_sha256"]})
         del raw
-    return {"schema":"sagallm-integrated-sft-offline-audit-v1",
+    result={"schema":"sagallm-integrated-sft-offline-audit-v1",
             "status":"PINNED_REPORT_TRACE_SCHEDULE_AND_CHECKPOINT_BYTES_MATCH",
             "report_sha256":report_sha256,"trace_sha256":trace_sha256,"tip_sha256":tip_sha256,
             "steps_rechecked":step,"row_exposures_rechecked":step*h["batch_size"],
@@ -154,6 +165,9 @@ def audit(output,*,report_sha256,trace_sha256,tip_sha256,dataset,base,tokenizer)
             "validation_or_test_rows_read":False,"actual_training_process_attested":False,
             "historical_exposure_verified":False,"gradient_influence_verified":False,
             "independent_evaluation":"NOT_RUN","model_selection_permitted":False}
+    if dataset_status=="PINNED_TEMPLATE_SUBSET_MEMBERSHIP_VERIFIED":
+        result["dataset_membership_status"]=dataset_status
+    return result
 
 
 if __name__=="__main__":
