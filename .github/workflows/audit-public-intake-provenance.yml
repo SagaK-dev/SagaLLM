@@ -1,0 +1,57 @@
+name: SagaLLM public intake provenance
+on:
+  pull_request:
+    paths:
+      - 'scripts/audit_public_intake_provenance.py'
+      - 'tests/test_audit_public_intake_provenance.py'
+      - 'licenses/exercism-problem-specifications-MIT.txt'
+      - '.github/workflows/audit-public-intake-provenance.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+      - run: python -m unittest discover -s tests -p test_audit_public_intake_provenance.py
+      - name: Verify pinned upstream license, canonical data and reference oracles
+        if: github.event_name == 'workflow_dispatch' || github.event.pull_request.head.repo.full_name == github.repository
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GIT_TERMINAL_PROMPT: '0'
+        shell: bash
+        run: |
+          set -euo pipefail
+          tmp=$(mktemp -d)
+          trap 'rm -rf "$tmp"' EXIT
+          gh api repos/SagaK-dev/SagaLLM/actions/artifacts/15246017436/zip > "$tmp/unified.zip"
+          unset GH_TOKEN
+          git fetch --depth=1 origin 0d1fbd6fb22dc6b9b272a1ed6f886e9338ffcb6e
+          git show 0d1fbd6fb22dc6b9b272a1ed6f886e9338ffcb6e:examples/java_external_io_INTAKE.json > "$tmp/suite.json"
+          git init --bare "$tmp/upstream.git"
+          git -C "$tmp/upstream.git" fetch --depth=1 https://github.com/exercism/problem-specifications.git 4812c213a2647e2034ad5ac78155ce9265cdd171
+          mkdir "$tmp/data"
+          git -C "$tmp/upstream.git" show 4812c213a2647e2034ad5ac78155ce9265cdd171:LICENSE > "$tmp/data/LICENSE"
+          for slug in hamming rna-transcription luhn roman-numerals allergies atbash-cipher; do
+            git -C "$tmp/upstream.git" show "4812c213a2647e2034ad5ac78155ce9265cdd171:exercises/$slug/canonical-data.json" > "$tmp/data/$slug.json"
+          done
+          python -m scripts.audit_public_intake_provenance --suite "$tmp/suite.json" --upstream "$tmp/data" --notice licenses/exercism-problem-specifications-MIT.txt --unified-zip "$tmp/unified.zip" > public-intake-provenance.json
+          python - <<'PY'
+          import json
+          d=json.load(open("public-intake-provenance.json"))
+          print(json.dumps({k:d[k] for k in ("observed_upstream_license","attribution_notice_exact_match","canonical_exercises","matched_cases","oracle_matches","rights_review")},sort_keys=True))
+          PY
+      - uses: actions/upload-artifact@v4
+        if: github.event_name == 'workflow_dispatch' || github.event.pull_request.head.repo.full_name == github.repository
+        with:
+          name: historical-public-intake-provenance-metadata
+          path: public-intake-provenance.json
+          if-no-files-found: error
