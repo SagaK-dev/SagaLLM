@@ -1,0 +1,40 @@
+name: SagaLLM exposure trace source binding
+on:
+  pull_request:
+    paths:
+      - 'src/sagallm/exposure_source_binding.py'
+      - 'src/sagallm/exposure_trace.py'
+      - 'scripts/smoke_optimizer_exposure_trace.py'
+      - 'tests/test_exposure_source_binding.py'
+      - '.github/workflows/exposure-source-binding.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    env:
+      OMP_NUM_THREADS: '1'
+      MKL_NUM_THREADS: '1'
+      TORCH_FORCE_WEIGHTS_ONLY_LOAD: '1'
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+      - run: |
+          python -m pip install 'torch>=2.6' --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install -e '.[fast-tokenizer]'
+      - run: python -m unittest discover -s tests -p test_exposure_source_binding.py
+      - name: Verify actual synthetic CPU trace against original TRAIN rows
+        run: python -m scripts.smoke_optimizer_exposure_trace --output exposure-source-binding-smoke
+      - uses: actions/upload-artifact@v4
+        with:
+          name: prospective-exposure-source-binding-smoke
+          path: |
+            exposure-source-binding-smoke/optimizer-exposure.jsonl
+            exposure-source-binding-smoke/trace-smoke-report.json
+          if-no-files-found: error

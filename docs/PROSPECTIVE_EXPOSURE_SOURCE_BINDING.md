@@ -1,0 +1,7 @@
+# M2.5-b — prospective trace source binding
+
+The #87 trace adapter successfully recorded a synthetic CPU SFT run (CI 46103193649, artifact 15246497942). A hash chain alone cannot show that recorded inputs belong to the claimed TRAIN split.
+
+The new verifier requires external trace digest/tip pins, finalization, exact dataset manifest/TRAIN/tokenizer/base-checkpoint file hashes, and the train manifest count. It rejects duplicate IDs across TRAIN and unknown recorded IDs, reconstructs each referenced source row with the actual SFT encoder, repacks every ordered batch, and compares row ID/family digests, input/label bytes, positions, padding and supervised target counts. It never reads validation/test files or deserializes checkpoint files. The context is an explicit re-encoding parameter, not evidence of the original configured context. No schedule/optimizer-execution attestation or proof of nonzero gradient influence follows from this check.
+
+The synthetic fixture smoke now writes its source and manifest only into a temporary directory and validates all four recorded row exposures after two actual AdamW updates. Tests include unknown recorded rows, same-ID altered content, source-file changes and duplicate IDs. The uploaded artifact contains only trace and smoke metadata; no corpus or checkpoint binaries. This is opt-in prospective infrastructure and not yet integrated into the main SFT entrypoint. The historical rights, lineage, and independent-evaluation gates stay closed.
