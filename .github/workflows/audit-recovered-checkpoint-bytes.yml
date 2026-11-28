@@ -1,0 +1,46 @@
+name: SagaLLM recovered checkpoint byte audit
+on:
+  pull_request:
+    paths:
+      - 'scripts/audit_recovered_checkpoint_bytes.py'
+      - 'tests/test_audit_recovered_checkpoint_bytes.py'
+      - '.github/workflows/audit-recovered-checkpoint-bytes.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  byte-audit:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+      - run: python -m unittest discover -s tests -p test_audit_recovered_checkpoint_bytes.py
+      - name: Reverify report ledger and hash opaque checkpoint members
+        if: github.event_name == 'workflow_dispatch' || github.event.pull_request.head.repo.full_name == github.repository
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          tmp=$(mktemp -d)
+          trap 'rm -rf "$tmp"' EXIT
+          gh api repos/SagaK-dev/SagaLLM/actions/artifacts/15239309131/zip > "$tmp/triage.zip"
+          gh api repos/SagaK-dev/SagaLLM/actions/artifacts/15240845377/zip > "$tmp/recovery.zip"
+          gh api repos/SagaK-dev/SagaLLM/actions/artifacts/15240695936/zip > "$tmp/ledger.zip"
+          timeout 25m python -m scripts.audit_recovered_checkpoint_bytes --triage-zip "$tmp/triage.zip" --recovery-zip "$tmp/recovery.zip" --ledger-zip "$tmp/ledger.zip" --observed-at "$(date -u +%Y-%m-%dT%H:%M:%SZ)" > recovered-checkpoint-byte-scope.json
+          python - <<'PY'
+          import json
+          d=json.load(open("recovered-checkpoint-byte-scope.json"))
+          print(json.dumps({k:d[k] for k in ("candidate_archive_count","archive_status_counts","member_status_counts","verified_member_count","distinct_verified_member_hash_count","unmapped_claims_matched_to_member_bytes","unmapped_claims_without_matching_member_bytes","member_hashes_without_indexed_claim")},sort_keys=True))
+          PY
+      - uses: actions/upload-artifact@v4
+        if: github.event_name == 'workflow_dispatch' || github.event.pull_request.head.repo.full_name == github.repository
+        with:
+          name: historical-recovered-checkpoint-byte-metadata
+          path: recovered-checkpoint-byte-scope.json
+          if-no-files-found: error
