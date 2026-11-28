@@ -13,7 +13,8 @@ from pathlib import Path
 
 from sagallm.exposure_trace import MAX_BYTES, batch_record, digest, is_sha, require, verify_trace, _unique
 from sagallm.exposure_source_binding import bounded, replay_source_binding, MAX_CHECKPOINT_BYTES
-from sagallm.java_instruction_sft import read_split, interleaved_order, pack, PROMPT_VERSION
+from sagallm.java_instruction_sft import (read_split, interleaved_order, pack, PROMPT_VERSION,
+    source_origin)
 from sagallm.tokenization import load_tokenizer
 
 MAX_REPORT_BYTES=2*1024*1024
@@ -67,6 +68,24 @@ def audit(output,*,report_sha256,trace_sha256,tip_sha256,dataset,base,tokenizer)
     require(h["base_checkpoint_sha256"]==report["checkpoint_sha256_base"]
             and h["tokenizer_sha256"]==report["tokenizer_sha256"]
             and h["data_manifest_sha256"]==report["data_manifest_sha256"],"Report input pins mismatch")
+    # Legacy prospective reports lack these fields; do not retroactively certify them.
+    source_pin_fields="NOT_RECORDED"
+    if "source_pin_status" in report or "optimizer_spec" in report:
+        spec=report["optimizer_spec"]
+        pin_status=report["source_pin_status"]
+        require(pin_status in ("PIN_NOT_REQUIRED","KNOWN_HISTORICAL_PIN_MATCHED","CALLER_PIN_MATCHED"),
+                "Unknown source pin status")
+        origin,_,expected_status=source_origin(h["base_checkpoint_sha256"],h["tokenizer_sha256"],
+            require_pinned=pin_status!="PIN_NOT_REQUIRED",pinned_checkpoint_sha256=h["base_checkpoint_sha256"])
+        require(report["model_origin"]==origin and pin_status==expected_status,"Source origin mismatch")
+        require(spec["name"]=="AdamW" and spec["seed"]==h["seed"] and spec["batch_size"]==h["batch_size"]
+                and type(spec["eval_every"]) is int and 1<=spec["eval_every"]<=500
+                and type(spec["lr"]) in (int,float) and 0<spec["lr"]<=0.001
+                and spec["weight_decay"]==0.01 and spec["gradient_clip_norm"]==1.0,
+                "Optimizer specification mismatch")
+        expected_history=[s for s in range(1,completed+1) if s%spec["eval_every"]==0 or s==h["max_steps"]]
+        require([r["step"] for r in report["history"]]==expected_history,"Evaluation schedule declaration mismatch")
+        source_pin_fields="DECLARATIONS_CONSISTENT"
     context=report["model_context_length"]
     replay=replay_source_binding(journal,expected_trace_sha256=trace_sha256,expected_tip=tip_sha256,
         dataset_dir=dataset,tokenizer_path=tokenizer,base_checkpoint=base,context=context)
@@ -112,7 +131,7 @@ def audit(output,*,report_sha256,trace_sha256,tip_sha256,dataset,base,tokenizer)
             "steps_rechecked":step,"row_exposures_rechecked":step*h["batch_size"],
             "distinct_train_rows_rechecked":len(seen),"loss_targets_rechecked":targets,
             "best_step_declared":best_step,"checkpoint_bindings":checkpoint_rows,
-            "selection_arithmetic_rechecked":True,"validation_losses_recomputed":False,
+            "selection_arithmetic_rechecked":True,"source_and_optimizer_declarations":source_pin_fields,"validation_losses_recomputed":False,
             "checkpoint_deserialized":False,"embedded_metadata_independently_read":False,
             "validation_or_test_rows_read":False,"actual_training_process_attested":False,
             "historical_exposure_verified":False,"gradient_influence_verified":False,
