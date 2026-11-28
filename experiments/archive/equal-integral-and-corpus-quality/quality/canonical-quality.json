@@ -1,0 +1,1997 @@
+{
+  "checkpoint_deserialized": false,
+  "cross_split_signature_count": 0,
+  "cross_split_signatures": [],
+  "distinct_normalized_signatures": 111,
+  "exact_response_count": 17536,
+  "exact_task_hash_cross_split_count": 0,
+  "exact_task_hash_multiple_response_count": 28,
+  "family_rows": [
+    {
+      "family": "anagram",
+      "max_signature_multiplicity": 18,
+      "rows": 18,
+      "signatures": 1,
+      "split": "test"
+    },
+    {
+      "family": "array_two_sum",
+      "max_signature_multiplicity": 30,
+      "rows": 30,
+      "signatures": 1,
+      "split": "test"
+    },
+    {
+      "family": "balanced_brackets",
+      "max_signature_multiplicity": 18,
+      "rows": 18,
+      "signatures": 1,
+      "split": "test"
+    },
+    {
+      "family": "collatz_max",
+      "max_signature_multiplicity": 30,
+      "rows": 30,
+      "signatures": 1,
+      "split": "test"
+    },
+    {
+      "family": "fibonacci",
+      "max_signature_multiplicity": 18,
+      "rows": 18,
+      "signatures": 1,
+      "split": "test"
+    },
+    {
+      "family": "lcm",
+      "max_signature_multiplicity": 18,
+      "rows": 18,
+      "signatures": 1,
+      "split": "test"
+    },
+    {
+      "family": "longest_common_prefix",
+      "max_signature_multiplicity": 30,
+      "rows": 30,
+      "signatures": 1,
+      "split": "test"
+    },
+    {
+      "family": "matrix_spiral",
+      "max_signature_multiplicity": 30,
+      "rows": 30,
+      "signatures": 1,
+      "split": "test"
+    },
+    {
+      "family": "palindrome",
+      "max_signature_multiplicity": 18,
+      "rows": 18,
+      "signatures": 1,
+      "split": "test"
+    },
+    {
+      "family": "prime",
+      "max_signature_multiplicity": 18,
+      "rows": 18,
+      "signatures": 1,
+      "split": "test"
+    },
+    {
+      "accepted_by_context": {
+        "192": 140,
+        "384": 140,
+        "512": 140
+      },
+      "family": "absolute",
+      "max_signature_multiplicity": 140,
+      "positions": {
+        "max": 95,
+        "median": 85,
+        "min": 83,
+        "p95": 95
+      },
+      "rows": 140,
+      "signatures": 1,
+      "split": "train"
+    },
+    {
+      "accepted_by_context": {
+        "192": 140,
+        "384": 140,
+        "512": 140
+      },
+      "family": "add",
+      "max_signature_multiplicity": 140,
+      "positions": {
+        "max": 111,
+        "median": 92,
+        "min": 84,
+        "p95": 110
+      },
+      "rows": 140,
+      "signatures": 1,
+      "split": "train"
+    },
+    {
+      "accepted_by_context": {
+        "192": 140,
+        "384": 140,
+        "512": 140
+      },
+      "family": "array_average",
+      "max_signature_multiplicity": 140,
+      "positions": {
+        "max": 142,
+        "median": 133,
+        "min": 123,
+        "p95": 140
+      },
+      "rows": 140,
+      "signatures": 1,
+      "split": "train"
+    },
+    {
+      "accepted_by_context": {
+        "192": 140,
+        "384": 140,
+        "512": 140
+      },
+      "family": "array_contains",
+      "max_signature_multiplicity": 140,
+      "positions": {
+        "max": 153,
+        "median": 138,
+        "min": 125,
+        "p95": 151
+      },
+      "rows": 140,
+      "signatures": 1,
+      "split": "train"
+    },
+    {
+      "accepted_by_context": {
+        "192": 280,
+        "384": 280,
+        "512": 280
+      },
+      "family": "array_count_greater",
+      "max_signature_multiplicity": 280,
+      "positions": {
+        "max": 165,
+        "median": 140,
+        "min": 127,
+        "p95": 163
+      },
+      "rows": 280,
+      "signatures": 1,
+      "split": "train"
+    },
+    {
+      "accepted_by_context": {
+        "192": 140,
+        "384": 140,
+        "512": 140
+      },
+      "family": "array_even_count",
+      "max_signature_multiplicity": 140,
+      "positions": {
+        "max": 151,
+        "median": 129,
+        "min": 119,
+        "p95": 149
+      },
+      "rows": 140,
+      "signatures": 1,
+      "split": "train"
+    },
+    {
+      "accepted_by_context": {
+        "192": 280,
+        "384": 280,
+        "512": 280
+      },
+      "family": "array_filter_negative",
+      "max_signature_multiplicity": 280,
+      "positions": {
+        "max": 162,
+        "median": 129,
+        "min": 119,
+        "p95": 160
+      },
+      "rows": 280,
+      "signatures": 1,
+      "split": "train"
+    },
+    {
+      "accepted_by_context": {
+        "192": 140,
+        "384": 140,
+        "512": 140
+      },
+      "family": "array_max",
+      "max_signature_multiplicity": 140,
+      "positions": {
+        "max": 144,
+        "median": 129,
+        "min": 119,
+        "p95": 142
+      },
+      "rows": 140,
+      "signatures": 1,
+      "split": "train"
+    },
+    {
+      "accepted_by_context": {
+        "192": 280,
+        "384": 280,
+        "512": 280
+      },
+      "family": "array_median",
+      "max_signature_multiplicity": 280,
+      "positions": {
+        "max": 162,
+        "median": 135,
+        "min": 125,
+        "p95": 160
+      },
+      "rows": 280,
+      "signatures": 1,
+      "split": "train"
+    },
+    {
+      "accepted_by_context": {
+        "192": 140,
+        "384": 140,
+        "512": 140
+      },
+      "family": "array_min",
+      "max_signature_multiplicity": 140,
+      "positions": {
+        "max": 144,
+        "median": 129,
+        "min": 119,
+        "p95": 142
+      },
+      "rows": 140,
+      "signatures": 1,
+      "split": "train"
+    },
+    {
+      "accepted_by_context": {
+        "192": 140,
+        "384": 140,
+        "512": 140
+      },
+      "family": "array_prefix",
+      "max_signature_multiplicity": 140,
+      "positions": {
+        "max": 148,
+        "median": 128,
+        "min": 118,
+        "p95": 146
+      },
+      "rows": 140,
+      "signatures": 1,
+      "split": "train"
+    },
+    {
+      "accepted_by_context": {
+        "192": 140,
+        "384": 280,
+        "512": 280
+      },
+      "family": "array_range",
+      "max_signature_multiplicity": 280,
+      "positions": {
+        "max": 206,
+        "median": 165,
+        "min": 155,
+        "p95": 204
+      },
+      "rows": 280,
+      "signatures": 1,
+      "split": "train"
+    },
+    {
+      "accepted_by_context": {
+        "192": 140,
+        "384": 140,
+        "512": 140
+      },
+      "family": "array_reverse",
+      "max_signature_multiplicity": 140,
+      "positions": {
+        "max": 147,
+        "median": 128,
+        "min": 118,
+        "p95": 145
+      },
+      "rows": 140,
+      "signatures": 1,
+      "split": "train"
+    },
+    {
+      "accepted_by_context": {
+        "192": 278,
+        "384": 280,
+        "512": 280
+      },
+      "family": "array_rotate_left",
+      "max_signature_multiplicity": 280,
+      "positions": {
+        "max": 193,
+        "median": 168,
+        "min": 158,
+        "p95": 191
+      },
+      "rows": 280,
+      "signatures": 1,
+      "split": "train"
+    },
+    {
+      "accepted_by_context": {
+        "192": 280,
+        "384": 280,
+        "512": 280
+      },
+      "family": "array_running_max",
+      "max_signature_multiplicity": 280,
+      "positions": {
+        "max": 180,
+        "median": 152,
+        "min": 142,
+        "p95": 178
+      },
+      "rows": 280,
+      "signatures": 1,
+      "split": "train"
+    },
+    {
+      "accepted_by_context": {
+        "192": 140,
+        "384": 280,
+        "512": 280
+      },
+      "family": "array_second_max",
+      "max_signature_multiplicity": 280,
+      "positions": {
+        "max": 215,
+        "median": 184,
+        "min": 174,
+        "p95": 213
+      },
+      "rows": 280,
+      "signatures": 1,
+      "split": "train"
+    },
+    {
+      "accepted_by_context": {
+        "192": 140,
+        "384": 140,
+        "512": 140
+      },
+      "family": "array_sort",
+      "max_signature_multiplicity": 140,
+      "positions": {
+        "max": 147,
+        "median": 127,
+        "min": 117,
+        "p95": 145
+      },
+      "rows": 140,
+      "signatures": 1,
+      "split": "train"
+    },
+    {
+      "accepted_by_context": {
+        "192": 140,
+        "384": 140,
+        "512": 140
+      },
+      "family": "array_square",
+      "max_signature_multiplicity": 140,
+      "positions": {
+        "max": 137,
+        "median": 115,
+        "min": 105,
+        "p95": 135
+      },
+      "rows": 140,
+      "signatures": 1,
+      "split": "train"
+    },
+    {
+      "accepted_by_context": {
+        "192": 140,
+        "384": 140,
+        "512": 140
+      },
+      "family": "array_sum",
+      "max_signature_multiplicity": 140,
+      "positions": {
+        "max": 135,
+        "median": 124,
+        "min": 114,
+        "p95": 133
+      },
+      "rows": 140,
+      "signatures": 1,
+      "split": "train"
+    },
+    {
+      "accepted_by_context": {
+        "192": 280,
+        "384": 280,
+        "512": 280
+      },
+      "family": "array_unique_sorted",
+      "max_signature_multiplicity": 280,
+      "positions": {
+        "max": 178,
+        "median": 147,
+        "min": 137,
+        "p95": 176
+      },
+      "rows": 280,
+      "signatures": 1,
+      "split": "train"
+    },
+    {
+      "accepted_by_context": {
+        "192": 140,
+        "384": 140,
+        "512": 140
+      },
+      "family": "average_three",
+      "max_signature_multiplicity": 140,
+      "positions": {
+        "max": 101,
+        "median": 93,
+        "min": 84,
+        "p95": 100
+      },
+      "rows": 140,
+      "signatures": 1,
+      "split": "train"
+    },
+    {
+      "accepted_by_context": {
+        "192": 280,
+        "384": 280,
+        "512": 280
+      },
+      "family": "binary_format",
+      "max_signature_multiplicity": 280,
+      "positions": {
+        "max": 94,
+        "median": 81,
+        "min": 77,
+        "p95": 94
+      },
+      "rows": 280,
+      "signatures": 1,
+      "split": "train"
+    },
+    {
+      "accepted_by_context": {
+        "192": 280,
+        "384": 280,
+        "512": 280
+      },
+      "family": "binomial_coefficient",
+      "max_signature_multiplicity": 280,
+      "positions": {
+        "max": 160,
+        "median": 121,
+        "min": 114,
+        "p95": 160
+      },
+      "rows": 280,
+      "signatures": 1,
+      "split": "train"
+    },
+    {
+      "accepted_by_context": {
+        "192": 280,
+        "384": 280,
+        "512": 280
+      },
+      "family": "bit_count",
+      "max_signature_multiplicity": 280,
+      "positions": {
+        "max": 124,
+        "median": 80,
+        "min": 76,
+        "p95": 124
+      },
+      "rows": 280,
+      "signatures": 1,
+      "split": "train"
+    },
+    {
+      "accepted_by_context": {
+        "192": 140,
+        "384": 140,
+        "512": 140
+      },
+      "family": "boolean_logic",
+      "max_signature_multiplicity": 140,
+      "positions": {
+        "max": 120,
+        "median": 103,
+        "min": 97,
+        "p95": 120
+      },
+      "rows": 140,
+      "signatures": 1,
+      "split": "train"
+    },
+    {
+      "accepted_by_context": {
+        "192": 140,
+        "384": 140,
+        "512": 140
+      },
+      "family": "char_count",
+      "max_signature_multiplicity": 140,
+      "positions": {
+        "max": 127,
+        "median": 116,
+        "min": 112,
+        "p95": 127
+      },
+      "rows": 140,
+      "signatures": 1,
+      "split": "train"
+    },
+    {
+      "accepted_by_context": {
+        "192": 140,
+        "384": 140,
+        "512": 140
+      },
+      "family": "clamp",
+      "max_signature_multiplicity": 140,
+      "positions": {
+        "max": 120,
+        "median": 104,
+        "min": 96,
+        "p95": 118
+      },
+      "rows": 140,
+      "signatures": 1,
+      "split": "train"
+    },
+    {
+      "accepted_by_context": {
+        "192": 280,
+        "384": 280,
+        "512": 280
+      },
+      "family": "collatz_steps",
+      "max_signature_multiplicity": 280,
+      "positions": {
+        "max": 176,
+        "median": 128,
+        "min": 124,
+        "p95": 176
+      },
+      "rows": 280,
+      "signatures": 1,
+      "split": "train"
+    },
+    {
+      "accepted_by_context": {
+        "192": 140,
+        "384": 140,
+        "512": 140
+      },
+      "family": "contains",
+      "max_signature_multiplicity": 140,
+      "positions": {
+        "max": 110,
+        "median": 93,
+        "min": 89,
+        "p95": 110
+      },
+      "rows": 140,
+      "signatures": 1,
+      "split": "train"
+    },
+    {
+      "accepted_by_context": {
+        "192": 280,
+        "384": 280,
+        "512": 280
+      },
+      "family": "count_divisors",
+      "max_signature_multiplicity": 280,
+      "positions": {
+        "max": 143,
+        "median": 118,
+        "min": 114,
+        "p95": 143
+      },
+      "rows": 280,
+      "signatures": 1,
+      "split": "train"
+    },
+    {
+      "accepted_by_context": {
+        "192": 140,
+        "384": 140,
+        "512": 140
+      },
+      "family": "count_down",
+      "max_signature_multiplicity": 140,
+      "positions": {
+        "max": 113,
+        "median": 91,
+        "min": 88,
+        "p95": 113
+      },
+      "rows": 140,
+      "signatures": 1,
+      "split": "train"
+    },
+    {
+      "accepted_by_context": {
+        "192": 140,
+        "384": 140,
+        "512": 140
+      },
+      "family": "count_up",
+      "max_signature_multiplicity": 140,
+      "positions": {
+        "max": 99,
+        "median": 92,
+        "min": 89,
+        "p95": 99
+      },
+      "rows": 140,
+      "signatures": 1,
+      "split": "train"
+    },
+    {
+      "accepted_by_context": {
+        "192": 140,
+        "384": 140,
+        "512": 140
+      },
+      "family": "cube",
+      "max_signature_multiplicity": 140,
+      "positions": {
+        "max": 94,
+        "median": 90,
+        "min": 86,
+        "p95": 94
+      },
+      "rows": 140,
+      "signatures": 1,
+      "split": "train"
+    },
+    {
+      "accepted_by_context": {
+        "192": 140,
+        "384": 140,
+        "512": 140
+      },
+      "family": "digit_count",
+      "max_signature_multiplicity": 140,
+      "positions": {
+        "max": 125,
+        "median": 110,
+        "min": 106,
+        "p95": 125
+      },
+      "rows": 140,
+      "signatures": 1,
+      "split": "train"
+    },
+    {
+      "accepted_by_context": {
+        "192": 140,
+        "384": 140,
+        "512": 140
+      },
+      "family": "digit_sum",
+      "max_signature_multiplicity": 140,
+      "positions": {
+        "max": 122,
+        "median": 108,
+        "min": 104,
+        "p95": 122
+      },
+      "rows": 140,
+      "signatures": 1,
+      "split": "train"
+    },
+    {
+      "accepted_by_context": {
+        "192": 140,
+        "384": 140,
+        "512": 140
+      },
+      "family": "divide",
+      "max_signature_multiplicity": 140,
+      "positions": {
+        "max": 120,
+        "median": 96,
+        "min": 88,
+        "p95": 119
+      },
+      "rows": 140,
+      "signatures": 1,
+      "split": "train"
+    },
+    {
+      "accepted_by_context": {
+        "192": 140,
+        "384": 140,
+        "512": 140
+      },
+      "family": "divisible",
+      "max_signature_multiplicity": 140,
+      "positions": {
+        "max": 99,
+        "median": 87,
+        "min": 80,
+        "p95": 98
+      },
+      "rows": 140,
+      "signatures": 1,
+      "split": "train"
+    },
+    {
+      "accepted_by_context": {
+        "192": 140,
+        "384": 140,
+        "512": 140
+      },
+      "family": "ends_with",
+      "max_signature_multiplicity": 140,
+      "positions": {
+        "max": 105,
+        "median": 96,
+        "min": 92,
+        "p95": 105
+      },
+      "rows": 140,
+      "signatures": 1,
+      "split": "train"
+    },
+    {
+      "accepted_by_context": {
+        "192": 140,
+        "384": 140,
+        "512": 140
+      },
+      "family": "even_odd",
+      "max_signature_multiplicity": 140,
+      "positions": {
+        "max": 102,
+        "median": 90,
+        "min": 87,
+        "p95": 102
+      },
+      "rows": 140,
+      "signatures": 1,
+      "split": "train"
+    },
+    {
+      "accepted_by_context": {
+        "192": 280,
+        "384": 280,
+        "512": 280
+      },
+      "family": "hex_format",
+      "max_signature_multiplicity": 280,
+      "positions": {
+        "max": 95,
+        "median": 85,
+        "min": 81,
+        "p95": 95
+      },
+      "rows": 280,
+      "signatures": 1,
+      "split": "train"
+    },
+    {
+      "accepted_by_context": {
+        "192": 280,
+        "384": 280,
+        "512": 280
+      },
+      "family": "last_index",
+      "max_signature_multiplicity": 280,
+      "positions": {
+        "max": 126,
+        "median": 90,
+        "min": 86,
+        "p95": 126
+      },
+      "rows": 280,
+      "signatures": 1,
+      "split": "train"
+    },
+    {
+      "accepted_by_context": {
+        "192": 140,
+        "384": 140,
+        "512": 140
+      },
+      "family": "leap_year",
+      "max_signature_multiplicity": 140,
+      "positions": {
+        "max": 124,
+        "median": 108,
+        "min": 104,
+        "p95": 124
+      },
+      "rows": 140,
+      "signatures": 1,
+      "split": "train"
+    },
+    {
+      "accepted_by_context": {
+        "192": 280,
+        "384": 280,
+        "512": 280
+      },
+      "family": "left_pad",
+      "max_signature_multiplicity": 280,
+      "positions": {
+        "max": 143,
+        "median": 110,
+        "min": 106,
+        "p95": 143
+      },
+      "rows": 280,
+      "signatures": 1,
+      "split": "train"
+    },
+    {
+      "accepted_by_context": {
+        "192": 140,
+        "384": 140,
+        "512": 140
+      },
+      "family": "list_add",
+      "max_signature_multiplicity": 140,
+      "positions": {
+        "max": 139,
+        "median": 122,
+        "min": 116,
+        "p95": 139
+      },
+      "rows": 140,
+      "signatures": 1,
+      "split": "train"
+    },
+    {
+      "accepted_by_context": {
+        "192": 280,
+        "384": 280,
+        "512": 280
+      },
+      "family": "list_filter_even",
+      "max_signature_multiplicity": 280,
+      "positions": {
+        "max": 175,
+        "median": 143,
+        "min": 133,
+        "p95": 173
+      },
+      "rows": 280,
+      "signatures": 1,
+      "split": "train"
+    },
+    {
+      "accepted_by_context": {
+        "192": 140,
+        "384": 140,
+        "512": 140
+      },
+      "family": "lower",
+      "max_signature_multiplicity": 140,
+      "positions": {
+        "max": 126,
+        "median": 108,
+        "min": 104,
+        "p95": 126
+      },
+      "rows": 140,
+      "signatures": 1,
+      "split": "train"
+    },
+    {
+      "accepted_by_context": {
+        "192": 140,
+        "384": 280,
+        "512": 280
+      },
+      "family": "map_frequency",
+      "max_signature_multiplicity": 280,
+      "positions": {
+        "max": 211,
+        "median": 170,
+        "min": 156,
+        "p95": 209
+      },
+      "rows": 280,
+      "signatures": 1,
+      "split": "train"
+    },
+    {
+      "accepted_by_context": {
+        "192": 140,
+        "384": 140,
+        "512": 140
+      },
+      "family": "map_sum",
+      "max_signature_multiplicity": 140,
+      "positions": {
+        "max": 147,
+        "median": 129,
+        "min": 123,
+        "p95": 147
+      },
+      "rows": 140,
+      "signatures": 1,
+      "split": "train"
+    },
+    {
+      "accepted_by_context": {
+        "192": 280,
+        "384": 280,
+        "512": 280
+      },
+      "family": "matrix_row_sums",
+      "max_signature_multiplicity": 280,
+      "positions": {
+        "max": 162,
+        "median": 141,
+        "min": 133,
+        "p95": 160
+      },
+      "rows": 280,
+      "signatures": 1,
+      "split": "train"
+    },
+    {
+      "accepted_by_context": {
+        "192": 280,
+        "384": 280,
+        "512": 280
+      },
+      "family": "matrix_trace",
+      "max_signature_multiplicity": 280,
+      "positions": {
+        "max": 181,
+        "median": 150,
+        "min": 143,
+        "p95": 179
+      },
+      "rows": 280,
+      "signatures": 1,
+      "split": "train"
+    },
+    {
+      "accepted_by_context": {
+        "192": 280,
+        "384": 280,
+        "512": 280
+      },
+      "family": "matrix_transpose",
+      "max_signature_multiplicity": 280,
+      "positions": {
+        "max": 157,
+        "median": 146,
+        "min": 138,
+        "p95": 155
+      },
+      "rows": 280,
+      "signatures": 1,
+      "split": "train"
+    },
+    {
+      "accepted_by_context": {
+        "192": 140,
+        "384": 140,
+        "512": 140
+      },
+      "family": "maximum",
+      "max_signature_multiplicity": 140,
+      "positions": {
+        "max": 99,
+        "median": 87,
+        "min": 80,
+        "p95": 98
+      },
+      "rows": 140,
+      "signatures": 1,
+      "split": "train"
+    },
+    {
+      "accepted_by_context": {
+        "192": 140,
+        "384": 140,
+        "512": 140
+      },
+      "family": "method_square",
+      "max_signature_multiplicity": 140,
+      "positions": {
+        "max": 135,
+        "median": 107,
+        "min": 104,
+        "p95": 135
+      },
+      "rows": 140,
+      "signatures": 1,
+      "split": "train"
+    },
+    {
+      "accepted_by_context": {
+        "192": 140,
+        "384": 140,
+        "512": 140
+      },
+      "family": "minimum",
+      "max_signature_multiplicity": 140,
+      "positions": {
+        "max": 99,
+        "median": 87,
+        "min": 80,
+        "p95": 98
+      },
+      "rows": 140,
+      "signatures": 1,
+      "split": "train"
+    },
+    {
+      "accepted_by_context": {
+        "192": 140,
+        "384": 140,
+        "512": 140
+      },
+      "family": "modulo",
+      "max_signature_multiplicity": 140,
+      "positions": {
+        "max": 111,
+        "median": 94,
+        "min": 86,
+        "p95": 110
+      },
+      "rows": 140,
+      "signatures": 1,
+      "split": "train"
+    },
+    {
+      "accepted_by_context": {
+        "192": 140,
+        "384": 140,
+        "512": 140
+      },
+      "family": "multiply",
+      "max_signature_multiplicity": 140,
+      "positions": {
+        "max": 111,
+        "median": 93,
+        "min": 85,
+        "p95": 110
+      },
+      "rows": 140,
+      "signatures": 1,
+      "split": "train"
+    },
+    {
+      "accepted_by_context": {
+        "192": 280,
+        "384": 280,
+        "512": 280
+      },
+      "family": "numeric_string",
+      "max_signature_multiplicity": 280,
+      "positions": {
+        "max": 127,
+        "median": 98,
+        "min": 94,
+        "p95": 127
+      },
+      "rows": 280,
+      "signatures": 1,
+      "split": "train"
+    },
+    {
+      "accepted_by_context": {
+        "192": 140,
+        "384": 140,
+        "512": 140
+      },
+      "family": "parse_exception",
+      "max_signature_multiplicity": 140,
+      "positions": {
+        "max": 144,
+        "median": 116,
+        "min": 113,
+        "p95": 144
+      },
+      "rows": 140,
+      "signatures": 1,
+      "split": "train"
+    },
+    {
+      "accepted_by_context": {
+        "192": 280,
+        "384": 280,
+        "512": 280
+      },
+      "family": "perfect_square",
+      "max_signature_multiplicity": 280,
+      "positions": {
+        "max": 133,
+        "median": 107,
+        "min": 103,
+        "p95": 133
+      },
+      "rows": 280,
+      "signatures": 1,
+      "split": "train"
+    },
+    {
+      "accepted_by_context": {
+        "192": 140,
+        "384": 140,
+        "512": 140
+      },
+      "family": "power_two",
+      "max_signature_multiplicity": 140,
+      "positions": {
+        "max": 91,
+        "median": 84,
+        "min": 80,
+        "p95": 90
+      },
+      "rows": 140,
+      "signatures": 1,
+      "split": "train"
+    },
+    {
+      "accepted_by_context": {
+        "192": 140,
+        "384": 140,
+        "512": 140
+      },
+      "family": "queue_sum",
+      "max_signature_multiplicity": 140,
+      "positions": {
+        "max": 146,
+        "median": 116,
+        "min": 110,
+        "p95": 146
+      },
+      "rows": 140,
+      "signatures": 1,
+      "split": "train"
+    },
+    {
+      "accepted_by_context": {
+        "192": 140,
+        "384": 140,
+        "512": 140
+      },
+      "family": "rectangle_area",
+      "max_signature_multiplicity": 140,
+      "positions": {
+        "max": 120,
+        "median": 98,
+        "min": 90,
+        "p95": 119
+      },
+      "rows": 140,
+      "signatures": 1,
+      "split": "train"
+    },
+    {
+      "accepted_by_context": {
+        "192": 280,
+        "384": 280,
+        "512": 280
+      },
+      "family": "remove_vowels",
+      "max_signature_multiplicity": 280,
+      "positions": {
+        "max": 137,
+        "median": 111,
+        "min": 107,
+        "p95": 137
+      },
+      "rows": 280,
+      "signatures": 1,
+      "split": "train"
+    },
+    {
+      "accepted_by_context": {
+        "192": 140,
+        "384": 140,
+        "512": 140
+      },
+      "family": "repeat",
+      "max_signature_multiplicity": 140,
+      "positions": {
+        "max": 102,
+        "median": 96,
+        "min": 91,
+        "p95": 100
+      },
+      "rows": 140,
+      "signatures": 1,
+      "split": "train"
+    },
+    {
+      "accepted_by_context": {
+        "192": 140,
+        "384": 140,
+        "512": 140
+      },
+      "family": "replace",
+      "max_signature_multiplicity": 140,
+      "positions": {
+        "max": 109,
+        "median": 99,
+        "min": 95,
+        "p95": 109
+      },
+      "rows": 140,
+      "signatures": 1,
+      "split": "train"
+    },
+    {
+      "accepted_by_context": {
+        "192": 280,
+        "384": 280,
+        "512": 280
+      },
+      "family": "reverse_digits",
+      "max_signature_multiplicity": 280,
+      "positions": {
+        "max": 139,
+        "median": 116,
+        "min": 112,
+        "p95": 139
+      },
+      "rows": 280,
+      "signatures": 1,
+      "split": "train"
+    },
+    {
+      "accepted_by_context": {
+        "192": 280,
+        "384": 280,
+        "512": 280
+      },
+      "family": "reverse_words",
+      "max_signature_multiplicity": 280,
+      "positions": {
+        "max": 151,
+        "median": 125,
+        "min": 121,
+        "p95": 151
+      },
+      "rows": 280,
+      "signatures": 1,
+      "split": "train"
+    },
+    {
+      "accepted_by_context": {
+        "192": 140,
+        "384": 140,
+        "512": 140
+      },
+      "family": "set_unique",
+      "max_signature_multiplicity": 140,
+      "positions": {
+        "max": 139,
+        "median": 125,
+        "min": 116,
+        "p95": 139
+      },
+      "rows": 140,
+      "signatures": 1,
+      "split": "train"
+    },
+    {
+      "accepted_by_context": {
+        "192": 140,
+        "384": 140,
+        "512": 140
+      },
+      "family": "sign",
+      "max_signature_multiplicity": 128,
+      "positions": {
+        "max": 124,
+        "median": 101,
+        "min": 96,
+        "p95": 124
+      },
+      "rows": 140,
+      "signatures": 2,
+      "split": "train"
+    },
+    {
+      "accepted_by_context": {
+        "192": 140,
+        "384": 140,
+        "512": 140
+      },
+      "family": "square",
+      "max_signature_multiplicity": 140,
+      "positions": {
+        "max": 92,
+        "median": 88,
+        "min": 84,
+        "p95": 92
+      },
+      "rows": 140,
+      "signatures": 1,
+      "split": "train"
+    },
+    {
+      "accepted_by_context": {
+        "192": 140,
+        "384": 140,
+        "512": 140
+      },
+      "family": "stack_reverse",
+      "max_signature_multiplicity": 140,
+      "positions": {
+        "max": 173,
+        "median": 136,
+        "min": 130,
+        "p95": 173
+      },
+      "rows": 140,
+      "signatures": 1,
+      "split": "train"
+    },
+    {
+      "accepted_by_context": {
+        "192": 140,
+        "384": 140,
+        "512": 140
+      },
+      "family": "starts_with",
+      "max_signature_multiplicity": 140,
+      "positions": {
+        "max": 107,
+        "median": 98,
+        "min": 94,
+        "p95": 107
+      },
+      "rows": 140,
+      "signatures": 1,
+      "split": "train"
+    },
+    {
+      "accepted_by_context": {
+        "192": 280,
+        "384": 280,
+        "512": 280
+      },
+      "family": "stream_even_sum",
+      "max_signature_multiplicity": 280,
+      "positions": {
+        "max": 162,
+        "median": 140,
+        "min": 130,
+        "p95": 160
+      },
+      "rows": 280,
+      "signatures": 1,
+      "split": "train"
+    },
+    {
+      "accepted_by_context": {
+        "192": 140,
+        "384": 140,
+        "512": 140
+      },
+      "family": "stream_sum",
+      "max_signature_multiplicity": 140,
+      "positions": {
+        "max": 137,
+        "median": 118,
+        "min": 108,
+        "p95": 135
+      },
+      "rows": 140,
+      "signatures": 1,
+      "split": "train"
+    },
+    {
+      "accepted_by_context": {
+        "192": 140,
+        "384": 140,
+        "512": 140
+      },
+      "family": "string_builder",
+      "max_signature_multiplicity": 140,
+      "positions": {
+        "max": 129,
+        "median": 120,
+        "min": 112,
+        "p95": 129
+      },
+      "rows": 140,
+      "signatures": 1,
+      "split": "train"
+    },
+    {
+      "accepted_by_context": {
+        "192": 140,
+        "384": 140,
+        "512": 140
+      },
+      "family": "string_length",
+      "max_signature_multiplicity": 140,
+      "positions": {
+        "max": 111,
+        "median": 89,
+        "min": 85,
+        "p95": 111
+      },
+      "rows": 140,
+      "signatures": 1,
+      "split": "train"
+    },
+    {
+      "accepted_by_context": {
+        "192": 140,
+        "384": 140,
+        "512": 140
+      },
+      "family": "substring",
+      "max_signature_multiplicity": 140,
+      "positions": {
+        "max": 117,
+        "median": 98,
+        "min": 94,
+        "p95": 117
+      },
+      "rows": 140,
+      "signatures": 1,
+      "split": "train"
+    },
+    {
+      "accepted_by_context": {
+        "192": 140,
+        "384": 140,
+        "512": 140
+      },
+      "family": "subtract",
+      "max_signature_multiplicity": 140,
+      "positions": {
+        "max": 111,
+        "median": 93,
+        "min": 85,
+        "p95": 110
+      },
+      "rows": 140,
+      "signatures": 1,
+      "split": "train"
+    },
+    {
+      "accepted_by_context": {
+        "192": 280,
+        "384": 280,
+        "512": 280
+      },
+      "family": "sum_squares",
+      "max_signature_multiplicity": 280,
+      "positions": {
+        "max": 138,
+        "median": 108,
+        "min": 104,
+        "p95": 138
+      },
+      "rows": 280,
+      "signatures": 1,
+      "split": "train"
+    },
+    {
+      "accepted_by_context": {
+        "192": 140,
+        "384": 140,
+        "512": 140
+      },
+      "family": "sum_to",
+      "max_signature_multiplicity": 140,
+      "positions": {
+        "max": 111,
+        "median": 101,
+        "min": 98,
+        "p95": 111
+      },
+      "rows": 140,
+      "signatures": 1,
+      "split": "train"
+    },
+    {
+      "accepted_by_context": {
+        "192": 140,
+        "384": 140,
+        "512": 140
+      },
+      "family": "temperature_c",
+      "max_signature_multiplicity": 140,
+      "positions": {
+        "max": 111,
+        "median": 98,
+        "min": 94,
+        "p95": 111
+      },
+      "rows": 140,
+      "signatures": 1,
+      "split": "train"
+    },
+    {
+      "accepted_by_context": {
+        "192": 140,
+        "384": 140,
+        "512": 140
+      },
+      "family": "temperature_f",
+      "max_signature_multiplicity": 140,
+      "positions": {
+        "max": 109,
+        "median": 96,
+        "min": 92,
+        "p95": 109
+      },
+      "rows": 140,
+      "signatures": 1,
+      "split": "train"
+    },
+    {
+      "accepted_by_context": {
+        "192": 140,
+        "384": 140,
+        "512": 140
+      },
+      "family": "times_table",
+      "max_signature_multiplicity": 140,
+      "positions": {
+        "max": 121,
+        "median": 96,
+        "min": 93,
+        "p95": 121
+      },
+      "rows": 140,
+      "signatures": 1,
+      "split": "train"
+    },
+    {
+      "accepted_by_context": {
+        "192": 140,
+        "384": 280,
+        "512": 280
+      },
+      "family": "title_case",
+      "max_signature_multiplicity": 280,
+      "positions": {
+        "max": 202,
+        "median": 176,
+        "min": 172,
+        "p95": 202
+      },
+      "rows": 280,
+      "signatures": 1,
+      "split": "train"
+    },
+    {
+      "accepted_by_context": {
+        "192": 280,
+        "384": 280,
+        "512": 280
+      },
+      "family": "triangular_number",
+      "max_signature_multiplicity": 280,
+      "positions": {
+        "max": 109,
+        "median": 91,
+        "min": 87,
+        "p95": 109
+      },
+      "rows": 280,
+      "signatures": 1,
+      "split": "train"
+    },
+    {
+      "accepted_by_context": {
+        "192": 140,
+        "384": 140,
+        "512": 140
+      },
+      "family": "trim",
+      "max_signature_multiplicity": 140,
+      "positions": {
+        "max": 113,
+        "median": 96,
+        "min": 92,
+        "p95": 113
+      },
+      "rows": 140,
+      "signatures": 1,
+      "split": "train"
+    },
+    {
+      "accepted_by_context": {
+        "192": 280,
+        "384": 280,
+        "512": 280
+      },
+      "family": "unique_character_count",
+      "max_signature_multiplicity": 280,
+      "positions": {
+        "max": 130,
+        "median": 98,
+        "min": 94,
+        "p95": 130
+      },
+      "rows": 280,
+      "signatures": 1,
+      "split": "train"
+    },
+    {
+      "accepted_by_context": {
+        "192": 140,
+        "384": 140,
+        "512": 140
+      },
+      "family": "upper",
+      "max_signature_multiplicity": 140,
+      "positions": {
+        "max": 126,
+        "median": 108,
+        "min": 104,
+        "p95": 126
+      },
+      "rows": 140,
+      "signatures": 1,
+      "split": "train"
+    },
+    {
+      "accepted_by_context": {
+        "192": 140,
+        "384": 140,
+        "512": 140
+      },
+      "family": "vowel_count",
+      "max_signature_multiplicity": 140,
+      "positions": {
+        "max": 151,
+        "median": 134,
+        "min": 130,
+        "p95": 151
+      },
+      "rows": 140,
+      "signatures": 1,
+      "split": "train"
+    },
+    {
+      "accepted_by_context": {
+        "192": 280,
+        "384": 280,
+        "512": 280
+      },
+      "family": "word_count",
+      "max_signature_multiplicity": 280,
+      "positions": {
+        "max": 133,
+        "median": 108,
+        "min": 104,
+        "p95": 133
+      },
+      "rows": 280,
+      "signatures": 1,
+      "split": "train"
+    },
+    {
+      "accepted_by_context": {
+        "192": 30,
+        "384": 30,
+        "512": 30
+      },
+      "family": "armstrong_number",
+      "max_signature_multiplicity": 30,
+      "positions": {
+        "max": 161,
+        "median": 135,
+        "min": 133,
+        "p95": 161
+      },
+      "rows": 30,
+      "signatures": 1,
+      "split": "validation"
+    },
+    {
+      "accepted_by_context": {
+        "192": 18,
+        "384": 18,
+        "512": 18
+      },
+      "family": "binary_search",
+      "max_signature_multiplicity": 18,
+      "positions": {
+        "max": 168,
+        "median": 141,
+        "min": 131,
+        "p95": 168
+      },
+      "rows": 18,
+      "signatures": 1,
+      "split": "validation"
+    },
+    {
+      "accepted_by_context": {
+        "192": 18,
+        "384": 18,
+        "512": 18
+      },
+      "family": "factorial",
+      "max_signature_multiplicity": 18,
+      "positions": {
+        "max": 120,
+        "median": 104,
+        "min": 101,
+        "p95": 120
+      },
+      "rows": 18,
+      "signatures": 1,
+      "split": "validation"
+    },
+    {
+      "accepted_by_context": {
+        "192": 18,
+        "384": 18,
+        "512": 18
+      },
+      "family": "gcd",
+      "max_signature_multiplicity": 18,
+      "positions": {
+        "max": 126,
+        "median": 115,
+        "min": 110,
+        "p95": 126
+      },
+      "rows": 18,
+      "signatures": 1,
+      "split": "validation"
+    },
+    {
+      "accepted_by_context": {
+        "192": 18,
+        "384": 18,
+        "512": 18
+      },
+      "family": "list_sort",
+      "max_signature_multiplicity": 18,
+      "positions": {
+        "max": 150,
+        "median": 135,
+        "min": 127,
+        "p95": 150
+      },
+      "rows": 18,
+      "signatures": 1,
+      "split": "validation"
+    },
+    {
+      "accepted_by_context": {
+        "192": 30,
+        "384": 30,
+        "512": 30
+      },
+      "family": "missing_array_value",
+      "max_signature_multiplicity": 30,
+      "positions": {
+        "max": 161,
+        "median": 131,
+        "min": 128,
+        "p95": 161
+      },
+      "rows": 30,
+      "signatures": 1,
+      "split": "validation"
+    },
+    {
+      "accepted_by_context": {
+        "192": 18,
+        "384": 18,
+        "512": 18
+      },
+      "family": "reverse_string",
+      "max_signature_multiplicity": 18,
+      "positions": {
+        "max": 109,
+        "median": 93,
+        "min": 93,
+        "p95": 109
+      },
+      "rows": 18,
+      "signatures": 1,
+      "split": "validation"
+    },
+    {
+      "accepted_by_context": {
+        "192": 15,
+        "384": 30,
+        "512": 30
+      },
+      "family": "run_length_encode",
+      "max_signature_multiplicity": 30,
+      "positions": {
+        "max": 198,
+        "median": 171,
+        "min": 170,
+        "p95": 198
+      },
+      "rows": 30,
+      "signatures": 1,
+      "split": "validation"
+    },
+    {
+      "accepted_by_context": {
+        "192": 18,
+        "384": 18,
+        "512": 18
+      },
+      "family": "set_intersection",
+      "max_signature_multiplicity": 18,
+      "positions": {
+        "max": 162,
+        "median": 144,
+        "min": 138,
+        "p95": 162
+      },
+      "rows": 18,
+      "signatures": 1,
+      "split": "validation"
+    },
+    {
+      "accepted_by_context": {
+        "192": 30,
+        "384": 30,
+        "512": 30
+      },
+      "family": "set_union",
+      "max_signature_multiplicity": 30,
+      "positions": {
+        "max": 158,
+        "median": 136,
+        "min": 132,
+        "p95": 156
+      },
+      "rows": 30,
+      "signatures": 1,
+      "split": "validation"
+    }
+  ],
+  "independent_evaluation": "NOT_RUN",
+  "java_executed": false,
+  "manifest_sha256": "1e9c0ff933c5096cf2d633e81ec0c90498006fab45397a28a4c073fbf181a23a",
+  "model_selection_permitted": false,
+  "rights_review": "REVIEW_REQUIRED",
+  "schema": "sagallm-canonical-sft-quality-v1",
+  "semantic_equivalence_verified": false,
+  "signature_is_heuristic": true,
+  "split_summary": {
+    "test": {
+      "accepted_by_context": null,
+      "distinct_source_signatures": 10,
+      "most_common_signature_rows": 30,
+      "positions": null,
+      "response_tokens": null,
+      "rows": 228,
+      "tokenization_status": "NOT_RUN"
+    },
+    "train": {
+      "accepted_by_context": {
+        "192": 16518,
+        "384": 17080,
+        "512": 17080
+      },
+      "distinct_source_signatures": 91,
+      "most_common_signature_rows": 280,
+      "positions": {
+        "max": 215,
+        "median": 123,
+        "min": 76,
+        "p95": 178
+      },
+      "response_tokens": {
+        "max": 127,
+        "median": 67,
+        "min": 38,
+        "p95": 111
+      },
+      "rows": 17080,
+      "tokenization_status": "MEASURED"
+    },
+    "validation": {
+      "accepted_by_context": {
+        "192": 213,
+        "384": 228,
+        "512": 228
+      },
+      "distinct_source_signatures": 10,
+      "existing_eval_sample": {
+        "family_counts": {
+          "armstrong_number": 3,
+          "binary_search": 3,
+          "factorial": 3,
+          "gcd": 3,
+          "list_sort": 3,
+          "missing_array_value": 3,
+          "reverse_string": 3,
+          "run_length_encode": 3,
+          "set_intersection": 3,
+          "set_union": 3
+        },
+        "id_sha256": [
+          "394a172d6259880018aceb16f7cb3aa035d1dd368cc84ddec97ebf3232f97157",
+          "6718ca855678570c1da3c4f2163104c6e0646db6e20a77e00f9f3821ec3e0798",
+          "807c8894850b57b98333e090f5072097d840ac336d9295e2aa1666047995765f",
+          "7b6727416ed023d3f30373a9777a41f9aaa666966e29cf7d0703bb75020fd00f",
+          "a544527b51ceb8333e5007c05a2ff14392b1aa84578c0b61290225ea63a357d4",
+          "f9a7fa26a2d9461096cc252e87cbd0fea39ba612569587c860cbf22c4152bbb6",
+          "1a2bdac33ced5099faf1ddd055d15b9a874a4ddb8a979b485504e08f896d0499",
+          "7207d3b31c5bdb722c3c76cee829cb823e8ef5dd855b6da1e6e19a8fb5cab5b2",
+          "d0b9492d0b6ea9d94655c901b56e674164b876315159a523c008c3f9d76d8efb",
+          "43898791d816e3fc04ed0df4c19b21dd0f620cc0437165baf4a537590ad66893",
+          "011ed534d986ad2a8aed9899c224f319b33643b48343795c27847696068b5f15",
+          "c148249f03674305122f98a64455c04f11eec472ae478e48fe8117454b51daac",
+          "cb2169c9212998505e6a991b2c11f696fcb6908d377cd8e9350f925aa5b53cea",
+          "bc8c8e34a1824c2bea0f117f002a55d1623f7a6ff89e66877fada59ad2178adc",
+          "08579e87c82ac803d65603007128b979abfefe21ebfdeb8df8c916de4855aae4",
+          "f98bbeda8501d0b41fcfe8bf4d6608b1f160231e526920c54d872203c143e929",
+          "32a4ec4d4bb284ba36b98107a485fba756c3454034307a34a86813393a309344",
+          "f80645e278b94eeba0653ba2da978572284c541ca702cc7de93bf2d72d805966",
+          "64f249c16cb196a0732a21cac29e315d75e24a2981a9f46466feb545202f9539",
+          "6c0228b9b446b256031e1b5998f4b92dca42a8db828723f2f6baf32d8b4ab743",
+          "a1b1b7461b1edbd36ef8777f4ab145979d0e484f70cf8505d12c6f640275318b",
+          "c8b3f86ac31a4a0660482f39f9e8cf6bc6804af2711c4628ae756b0313176b16",
+          "5f7f666f5bd541ba45d9647618a30fd94eeaee2ebafda411e5f7d774057cde5b",
+          "08f541faa11bc547b80000805c5df99af9dfb4e7c7ee086faa7a49b25f08887f",
+          "0b77e9ef8bcb9064104e82019b2de7f5a46ded18b04051e2bc8f97cf77197203",
+          "611206fce1be6b261789b9d12aa97023be5d4053507da28348c175c14ebf8bee",
+          "c7cbb3efd59977115aff9dac875b28b7d189d04ef8730c66429d8ebcda321ca1",
+          "5b92ac3719b584173f0fe431e89b836466b8aa23b9b774597fd61b6ba17623b6",
+          "3fd2a60ddfd324522e621ebbea4ebdba30b31878f92173e2b84fbcef86dee92c",
+          "a4c25766a8a2e48936595bd497c6b45ffcbf71bd4d12dd65d34ad5f1dda5a03b"
+        ],
+        "rows": 30
+      },
+      "most_common_signature_rows": 30,
+      "positions": {
+        "max": 198,
+        "median": 136,
+        "min": 93,
+        "p95": 198
+      },
+      "response_tokens": {
+        "max": 128,
+        "median": 88,
+        "min": 53,
+        "p95": 128
+      },
+      "rows": 228,
+      "tokenization_status": "MEASURED"
+    }
+  },
+  "status": "CANONICAL_TEMPLATE_TOKENIZER_AUDIT_COMPLETE",
+  "test_structural_source_read": true,
+  "test_tokenization_or_scoring": false,
+  "tokenizer_sha256": "186566808cb03e328cac9a6b7b384a8d0aefc54ccb83fbe97782a751726682fe"
+}
