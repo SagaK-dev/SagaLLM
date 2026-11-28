@@ -11,6 +11,7 @@ from sagallm.java_instruction_sft import train_instruction_sft, sha_file
 from sagallm.model import SagaTransformer
 from sagallm.tokenization import ByteBPETokenizer
 from sagallm.training import checkpoint_save
+from scripts.verify_integrated_sft_trace import audit
 
 
 def run(output):
@@ -37,6 +38,12 @@ def run(output):
             exp["trace"]["checkpoints"]["last"]["checkpoint_sha256"]!=report["last_checkpoint_sha256"] or
             report["test_used_for_model_selection"] is not False or report["java_code_executed"] is not False):
             raise ValueError("Integrated smoke scope mismatch")
+        proof=audit(dest,report_sha256=sha_file(dest/"train-report.json"),
+            trace_sha256=exp["trace"]["trace_sha256"],tip_sha256=exp["trace"]["tip_sha256"],
+            dataset=dataset,base=base,tokenizer=tok)
+        if proof["steps_rechecked"]!=2 or proof["row_exposures_rechecked"]!=4:
+            raise ValueError("Offline verifier coverage mismatch")
+        (output/"offline-audit.json").write_text(json.dumps(proof,sort_keys=True,indent=2)+"\n")
         (output/"optimizer-exposure.jsonl").write_bytes((dest/"optimizer-exposure.jsonl").read_bytes())
         (output/"train-report.json").write_bytes((dest/"train-report.json").read_bytes())
         summary={"status":"INTEGRATED_CPU_SFT_TRACE_SMOKE_COMPLETE",
