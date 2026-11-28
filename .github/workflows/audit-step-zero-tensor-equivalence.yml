@@ -1,0 +1,56 @@
+name: SagaLLM step-zero tensor equivalence
+on:
+  pull_request:
+    paths:
+      - 'scripts/audit_step_zero_tensor_equivalence.py'
+      - 'tests/test_audit_step_zero_tensor_equivalence.py'
+      - '.github/workflows/audit-step-zero-tensor-equivalence.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  compare:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    env:
+      TORCH_FORCE_WEIGHTS_ONLY_LOAD: '1'
+      OMP_NUM_THREADS: '1'
+      MKL_NUM_THREADS: '1'
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+      - run: |
+          python -m pip install 'torch>=2.6' --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install numpy
+          python -m unittest discover -s tests -p test_audit_step_zero_tensor_equivalence.py
+      - name: Fetch fixed historical archives and compare weights-only states
+        if: github.event_name == 'workflow_dispatch' || github.event.pull_request.head.repo.full_name == github.repository
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          tmp=$(mktemp -d)
+          trap 'rm -rf "$tmp"' EXIT
+          for id in 14743051466 14752812310 14753120733 14756075922 14756001714; do
+            gh api "repos/SagaK-dev/SagaLLM/actions/artifacts/$id/zip" > "$tmp/$id.zip"
+          done
+          gh api repos/SagaK-dev/SagaLLM/actions/artifacts/15246425930/zip > "$tmp/lineage.zip"
+          unset GH_TOKEN GITHUB_TOKEN
+          timeout 5m python -m scripts.audit_step_zero_tensor_equivalence --lineage-zip "$tmp/lineage.zip" --archives "$tmp" > step-zero-tensor-equivalence.json
+          python - <<'PY'
+          import json
+          d=json.load(open("step-zero-tensor-equivalence.json"))
+          print(json.dumps({k:d[k] for k in ("member_count","distinct_serialized_checkpoint_hashes","tensor_and_config_equal_member_count","tensor_and_config_equal_distinct_hashes","all_selected_step_zero_tensors_match_parent","torch_version")},sort_keys=True))
+          PY
+      - uses: actions/upload-artifact@v4
+        if: github.event_name == 'workflow_dispatch' || github.event.pull_request.head.repo.full_name == github.repository
+        with:
+          name: historical-step-zero-tensor-equivalence-metadata
+          path: step-zero-tensor-equivalence.json
+          if-no-files-found: error
